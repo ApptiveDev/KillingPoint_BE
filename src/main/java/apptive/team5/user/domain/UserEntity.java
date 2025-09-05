@@ -1,5 +1,6 @@
 package apptive.team5.user.domain;
 
+import apptive.team5.oauth2.dto.OAuth2Response;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -40,5 +41,13 @@ public class UserEntity {
         this.username = username;
         this.roleType = roleType;
         this.socialType = socialType;
+    }
+
+    public UserEntity(OAuth2Response oAuth2Response) {
+        this.identifier = oAuth2Response.getProvider() + "-" + oAuth2Response.getProviderId();
+        this.email = oAuth2Response.getEmail();
+        this.username = oAuth2Response.getUsername();
+        this.roleType = UserRoleType.USER;
+        this.socialType = oAuth2Response.getProvider();
     }
 }
