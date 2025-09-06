@@ -1,6 +1,6 @@
 package apptive.team5.user.service;
 
-import apptive.team5.global.exception.ErrorCode;
+import apptive.team5.global.exception.ExceptionCode;
 import apptive.team5.global.exception.NotFoundEntityException;
 import apptive.team5.user.domain.UserEntity;
 import apptive.team5.user.repository.UserRepository;
@@ -18,7 +18,7 @@ public class UserLowService {
 
     public UserEntity findByIdentifier(String identifier) {
         return userRepository.findByIdentifier(identifier)
-                .orElseThrow(()-> new NotFoundEntityException(ErrorCode.NOT_FOUND_USER));
+                .orElseThrow(()-> new NotFoundEntityException(ExceptionCode.NOT_FOUND_USER));
     }
 
     public boolean existsByIdentifier(String identifier) {
