@@ -46,7 +46,8 @@ public class SecurityConfig {
         http.httpBasic(AbstractHttpConfigurer::disable);
 
         http.authorizeHttpRequests(auth->auth
-                .anyRequest().permitAll());
+                .requestMatchers(whiteList).permitAll()
+                .anyRequest().authenticated());
 
         http.oauth2Login(oauth2->oauth2
                 .userInfoEndpoint((userInfoEndpointConfig ->
@@ -77,7 +78,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setAllowedHeaders(List.of("Authorization", "X-Refresh-Token"));
         configuration.setAllowCredentials(true);
         configuration.setExposedHeaders(List.of("Authorization", "X-Refresh-Token"));
         configuration.setMaxAge(3600L);
@@ -86,4 +87,11 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
+
+    private final String[] whiteList =
+            {
+                    "/api/jwt/exchange",
+                    "/login/oauth2/code/**",
+                    "/oauth2/authorization/**"
+            };
 }
