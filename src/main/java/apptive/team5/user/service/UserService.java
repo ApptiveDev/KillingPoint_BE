@@ -1,6 +1,8 @@
 package apptive.team5.user.service;
 import apptive.team5.jwt.component.JWTUtil;
 import apptive.team5.jwt.dto.TokenResponse;
+import apptive.team5.jwt.repository.RefreshTokenRepository;
+import apptive.team5.jwt.service.JwtService;
 import apptive.team5.oauth2.dto.OAuth2Response;
 import apptive.team5.user.domain.UserEntity;
 import apptive.team5.user.domain.UserRoleType;
@@ -14,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
 
     private final UserLowService userLowService;
+    private final JwtService jwtService;
     private final JWTUtil jwtUtil;
 
     public TokenResponse socialLogin(OAuth2Response oAuth2Response) {
@@ -29,6 +32,9 @@ public class UserService {
 
         String accessToken = jwtUtil.createJWT(user.getIdentifier(), "ROLE_" + user.getRoleType().name(), true);
         String refreshToken = jwtUtil.createJWT(user.getIdentifier(), "ROLE_" + user.getRoleType().name(), false);
+
+
+        jwtService.saveRefreshToken(user.getIdentifier(), refreshToken);
 
         return new TokenResponse(accessToken, refreshToken);
     }

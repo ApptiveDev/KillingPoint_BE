@@ -2,6 +2,7 @@ package apptive.team5.user.service;
 
 import apptive.team5.jwt.component.JWTUtil;
 import apptive.team5.jwt.dto.TokenResponse;
+import apptive.team5.jwt.service.JwtService;
 import apptive.team5.oauth2.dto.GoogleOAuth2Rep;
 import apptive.team5.user.domain.UserEntity;
 import apptive.team5.util.TestUtil;
@@ -29,6 +30,9 @@ class UserServiceTest {
     @Mock
     private JWTUtil jwtUtil;
 
+    @Mock
+    private JwtService jwtService;
+
     @Test
     @DisplayName("소셜 로그인 - 존재하는 회원이면 로그인")
     void socialLoginCase1() {
@@ -52,8 +56,9 @@ class UserServiceTest {
         });
         verify(userLowService).existsByIdentifier(any());
         verify(userLowService).findByIdentifier(any());
+        verify(jwtService).saveRefreshToken(any(),any());
         verify(jwtUtil, times(2)).createJWT(any(), any(), any());
-        verifyNoMoreInteractions(userLowService, jwtUtil);
+        verifyNoMoreInteractions(userLowService, jwtUtil,jwtService);
     }
 
     @Test
@@ -79,8 +84,9 @@ class UserServiceTest {
         });
         verify(userLowService).existsByIdentifier(any());
         verify(userLowService).save(any());
+        verify(jwtService).saveRefreshToken(any(),any());
         verify(jwtUtil, times(2)).createJWT(any(), any(), any());
-        verifyNoMoreInteractions(userLowService, jwtUtil);
+        verifyNoMoreInteractions(userLowService, jwtUtil, jwtService);
     }
 
     private GoogleOAuth2Rep socialLoginCase() {
