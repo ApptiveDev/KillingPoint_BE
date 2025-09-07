@@ -74,6 +74,6 @@ public class SecurityConfig {
     private final String[] whiteList =
             {
                     "/api/jwt/exchange",
-                    "/api/auth/**"
+                    "/api/oauth2/**"
             };
 }
