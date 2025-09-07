@@ -10,6 +10,7 @@ import com.google.api.services.youtube.YouTube;
 import com.google.api.services.youtube.model.SearchListResponse;
 import com.google.api.services.youtube.model.VideoListResponse;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -57,7 +58,7 @@ public class YoutubeService {
                     .stream().map(YoutubeVideoResponse::new).toList();
 
         } catch (IOException e) {
-            throw new ExternalApiConnectException(ExceptionCode.YOUTUBE_API_EXCEPTION);
+            throw new ExternalApiConnectException(ExceptionCode.YOUTUBE_API_EXCEPTION.getDescription(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

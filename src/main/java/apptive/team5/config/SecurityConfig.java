@@ -4,8 +4,6 @@ import apptive.team5.filter.CustomLogoutFilter;
 import apptive.team5.filter.JWTFilter;
 import apptive.team5.jwt.component.JWTUtil;
 import apptive.team5.jwt.service.JwtService;
-import apptive.team5.oauth2.handler.SocialSuccessHandler;
-import apptive.team5.oauth2.service.OAuth2UserService;
 import apptive.team5.user.service.UserLowService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
@@ -33,7 +31,6 @@ public class SecurityConfig {
 
     private final JWTUtil jwtUtil;
     private final JwtService jwtService;
-    private final OAuth2UserService oAuth2UserService;
     private final UserLowService userLowService;
     private final ObjectMapper objectMapper;
 
@@ -44,25 +41,11 @@ public class SecurityConfig {
         http.cors(cors -> cors.configurationSource(corsConfigurationSource()));
         http.formLogin(AbstractHttpConfigurer::disable);
         http.httpBasic(AbstractHttpConfigurer::disable);
+        http.logout(AbstractHttpConfigurer::disable);
 
         http.authorizeHttpRequests(auth->auth
                 .requestMatchers(whiteList).permitAll()
                 .anyRequest().authenticated());
-
-        http.oauth2Login(oauth2->oauth2
-                .userInfoEndpoint((userInfoEndpointConfig ->
-                        userInfoEndpointConfig.userService(oAuth2UserService)))
-                .successHandler(new SocialSuccessHandler(jwtUtil, jwtService,objectMapper)))
-        ;
-
-        http.exceptionHandling(e->e
-                .authenticationEntryPoint((request, response, authException)-> {
-                    if (request.getRequestURI().startsWith("/admin")) response.sendRedirect("/login");
-                    else response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-                })
-                .accessDeniedHandler((request, response, authException)-> {
-                    response.sendError(HttpServletResponse.SC_FORBIDDEN);
-                }));
 
         http.sessionManagement(session->
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
@@ -91,7 +74,6 @@ public class SecurityConfig {
     private final String[] whiteList =
             {
                     "/api/jwt/exchange",
-                    "/login/oauth2/code/**",
-                    "/oauth2/authorization/**"
+                    "/api/auth/**"
             };
 }
