@@ -1,11 +1,10 @@
 package apptive.team5.oauth2.dto;
 
 import apptive.team5.user.domain.SocialType;
-
-import java.util.Map;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 
 public record GoogleOAuth2Rep
-        (Map<String, Object> attributes) implements OAuth2Response
+        (GoogleIdToken.Payload payload) implements OAuth2Response
 
 {
     @Override
@@ -15,16 +14,16 @@ public record GoogleOAuth2Rep
 
     @Override
     public String getProviderId() {
-        return attributes.get("sub").toString();
+        return payload.getSubject();
     }
 
     @Override
     public String getUsername() {
-        return attributes.get("name").toString();
+        return payload.getEmail();
     }
 
     @Override
     public String getEmail() {
-        return attributes.get("email").toString();
+        return (String) payload.get("name");
     }
 }

@@ -7,7 +7,6 @@ import apptive.team5.jwt.domain.RefreshToken;
 import apptive.team5.jwt.dto.TokenResponse;
 import apptive.team5.jwt.repository.RefreshTokenRepository;
 import apptive.team5.jwt.component.RefreshTokenEncoder;
-import apptive.team5.oauth2.service.OAuth2UserService;
 import apptive.team5.user.domain.UserEntity;
 import apptive.team5.user.service.UserLowService;
 import io.jsonwebtoken.Claims;
@@ -44,10 +43,10 @@ public class JwtService {
 
     public TokenResponse exchangeToken(String oldRefreshToken) {
 
-        if (oldRefreshToken == null) throw new AuthenticationException(ExceptionCode.NOT_EXIST_REFRESH_TOKEN);
+        if (oldRefreshToken == null) throw new AuthenticationException(ExceptionCode.NOT_EXIST_REFRESH_TOKEN.getDescription());
 
         if (!jwtUtil.validateToken(oldRefreshToken, false))
-            throw new AuthenticationException(ExceptionCode.INVALID_REFRESH_TOKEN);
+            throw new AuthenticationException(ExceptionCode.INVALID_REFRESH_TOKEN.getDescription());
 
         Claims claims = jwtUtil.getClaims(oldRefreshToken);
         String identifier = claims.get("identifier").toString();
@@ -56,7 +55,7 @@ public class JwtService {
         RefreshToken findRefreshToken = findByUserIdentifier(identifier);
 
         if (!tokenEncoder.match(findRefreshToken.getToken(), oldRefreshToken)) {
-            throw new AuthenticationException(ExceptionCode.INVALID_REFRESH_TOKEN);
+            throw new AuthenticationException(ExceptionCode.INVALID_REFRESH_TOKEN.getDescription());
         }
 
         String newAccessToken = jwtUtil.createJWT(identifier, role, true);
@@ -74,7 +73,7 @@ public class JwtService {
 
     public RefreshToken findByUserIdentifier(String identifier) {
         return refreshTokenRepository.findByUserIdentifier(identifier)
-                .orElseThrow(() -> new AuthenticationException(ExceptionCode.NOT_EXIST_REFRESH_TOKEN));
+                .orElseThrow(() -> new AuthenticationException(ExceptionCode.NOT_EXIST_REFRESH_TOKEN.getDescription()));
     }
 
     public void deleteExpiredRefreshTokens() {

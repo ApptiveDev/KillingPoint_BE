@@ -18,7 +18,7 @@ public class UserLowService {
 
     public UserEntity findByIdentifier(String identifier) {
         return userRepository.findByIdentifier(identifier)
-                .orElseThrow(()-> new NotFoundEntityException(ExceptionCode.NOT_FOUND_USER));
+                .orElseThrow(()-> new NotFoundEntityException(ExceptionCode.NOT_FOUND_USER.getDescription()));
     }
 
     public boolean existsByIdentifier(String identifier) {
