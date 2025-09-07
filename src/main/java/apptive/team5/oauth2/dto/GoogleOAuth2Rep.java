@@ -19,11 +19,11 @@ public record GoogleOAuth2Rep
 
     @Override
     public String getUsername() {
-        return payload.getEmail();
+        return (String) payload.get("name");
     }
 
     @Override
     public String getEmail() {
-        return (String) payload.get("name");
+        return payload.getEmail();
     }
 }
