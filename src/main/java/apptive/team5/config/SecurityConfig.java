@@ -50,7 +50,7 @@ public class SecurityConfig {
         http.sessionManagement(session->
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-        http.addFilterBefore(new JWTFilter(jwtUtil,userLowService), LogoutFilter.class);
+        http.addFilterBefore(new JWTFilter(jwtUtil,userLowService, objectMapper), LogoutFilter.class);
 
         http.addFilterAt(new CustomLogoutFilter(jwtUtil, jwtService), LogoutFilter.class);
 

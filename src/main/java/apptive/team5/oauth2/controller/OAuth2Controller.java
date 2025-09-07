@@ -28,7 +28,7 @@ public class OAuth2Controller {
     @PostMapping("/google")
     public ResponseEntity<TokenResponse> googleLogin(@RequestBody GoogleLoginRequest googleLoginRequest) {
 
-        TokenResponse tokenResponse = googleService.googleLogin(googleLoginRequest.IdToken());
+        TokenResponse tokenResponse = googleService.googleLogin(googleLoginRequest.idToken());
 
         return  ResponseEntity.ok(tokenResponse);
     }

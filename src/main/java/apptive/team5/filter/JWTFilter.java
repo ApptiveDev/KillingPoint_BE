@@ -4,6 +4,7 @@ import apptive.team5.global.exception.NotFoundEntityException;
 import apptive.team5.jwt.component.JWTUtil;
 import apptive.team5.user.domain.UserEntity;
 import apptive.team5.user.service.UserLowService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -20,12 +21,14 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @RequiredArgsConstructor
 public class JWTFilter extends OncePerRequestFilter {
 
     private final JWTUtil jwtUtil;
     private final UserLowService userLowService;
+    private final ObjectMapper objectMapper;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -47,7 +50,9 @@ public class JWTFilter extends OncePerRequestFilter {
 
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType("application/json;charset=UTF-8");
-            response.getWriter().write("유효하지 않은 토큰입니다.");
+            Map<String, String> message = Map.of("message", "Invalid Token");
+            String invalidTokenMessage = objectMapper.writeValueAsString(message);
+            response.getWriter().write(invalidTokenMessage);
             return;
         }
 
