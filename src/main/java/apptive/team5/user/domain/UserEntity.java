@@ -14,6 +14,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserEntity {
 
+    private static String defaultImage;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
@@ -39,12 +41,16 @@ public class UserEntity {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private RefreshToken refreshToken;
 
+    @Column(nullable = false)
+    private String profileImageUrl;
+
     public UserEntity(String identifier, String email, String username, UserRoleType roleType, SocialType socialType) {
         this.identifier = identifier;
         this.email = email;
         this.username = username;
         this.roleType = roleType;
         this.socialType = socialType;
+        this.profileImageUrl = defaultImage;
     }
 
     public UserEntity(Long id, String identifier, String email, String username, UserRoleType roleType, SocialType socialType) {
@@ -54,6 +60,7 @@ public class UserEntity {
         this.username = username;
         this.roleType = roleType;
         this.socialType = socialType;
+        this.profileImageUrl = defaultImage;
     }
 
     public UserEntity(OAuth2Response oAuth2Response) {
@@ -62,5 +69,9 @@ public class UserEntity {
         this.username = oAuth2Response.getUsername();
         this.roleType = UserRoleType.USER;
         this.socialType = oAuth2Response.getProvider();
+    }
+
+    public static void setDefaultImage(String url) {
+        defaultImage = url;
     }
 }
