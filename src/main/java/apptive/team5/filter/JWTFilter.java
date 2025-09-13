@@ -1,6 +1,7 @@
 package apptive.team5.filter;
 
 import apptive.team5.global.exception.NotFoundEntityException;
+import apptive.team5.jwt.TokenType;
 import apptive.team5.jwt.component.JWTUtil;
 import apptive.team5.user.domain.UserEntity;
 import apptive.team5.user.service.UserLowService;
@@ -46,7 +47,7 @@ public class JWTFilter extends OncePerRequestFilter {
 
         String accessToken = authorization.split(" ")[1];
 
-        if (!jwtUtil.validateToken(accessToken, true)) {
+        if (!jwtUtil.validateToken(accessToken, TokenType.ACCESS_TOKEN)) {
 
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType("application/json;charset=UTF-8");

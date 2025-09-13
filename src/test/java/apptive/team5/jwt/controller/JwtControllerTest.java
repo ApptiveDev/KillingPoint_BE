@@ -2,6 +2,7 @@ package apptive.team5.jwt.controller;
 
 
 import apptive.team5.global.exception.ExceptionCode;
+import apptive.team5.jwt.TokenType;
 import apptive.team5.jwt.component.JWTUtil;
 import apptive.team5.jwt.dto.TokenResponse;
 import apptive.team5.jwt.service.JwtService;
@@ -52,7 +53,7 @@ class JwtControllerTest {
         UserEntity user = TestUtil.makeUserEntity();
         UserEntity userEntity = userLowService.save(user);
 
-        String refreshToken = jwtUtil.createJWT(userEntity.getIdentifier(), userEntity.getRoleType().name(), false);
+        String refreshToken = jwtUtil.createJWT(userEntity.getIdentifier(), userEntity.getRoleType().name(), TokenType.REFRESH_TOKEN);
 
         jwtService.saveRefreshToken(userEntity.getIdentifier(), refreshToken);
 
@@ -92,7 +93,7 @@ class JwtControllerTest {
         UserEntity user = TestUtil.makeUserEntity();
         UserEntity userEntity = userLowService.save(user);
 
-        String refreshToken = jwtUtil.createJWT(userEntity.getIdentifier(), userEntity.getRoleType().name(), false, 0L);
+        String refreshToken = jwtUtil.createJWT(userEntity.getIdentifier(), userEntity.getRoleType().name(), TokenType.REFRESH_TOKEN, 0L);
 
         mockMvc.perform(post("/api/jwt/exchange")
                         .header("X-Refresh-Token", refreshToken))

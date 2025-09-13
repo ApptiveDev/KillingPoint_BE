@@ -1,4 +1,5 @@
 package apptive.team5.user.service;
+import apptive.team5.jwt.TokenType;
 import apptive.team5.jwt.component.JWTUtil;
 import apptive.team5.jwt.dto.TokenResponse;
 import apptive.team5.jwt.repository.RefreshTokenRepository;
@@ -30,8 +31,8 @@ public class UserService {
             user = userLowService.save(new UserEntity(identifier, oAuth2Response.getEmail(), oAuth2Response.getUsername(), UserRoleType.USER, oAuth2Response.getProvider()));
         }
 
-        String accessToken = jwtUtil.createJWT(user.getIdentifier(), "ROLE_" + user.getRoleType().name(), true);
-        String refreshToken = jwtUtil.createJWT(user.getIdentifier(), "ROLE_" + user.getRoleType().name(), false);
+        String accessToken = jwtUtil.createJWT(user.getIdentifier(), "ROLE_" + user.getRoleType().name(), TokenType.ACCESS_TOKEN);
+        String refreshToken = jwtUtil.createJWT(user.getIdentifier(), "ROLE_" + user.getRoleType().name(), TokenType.REFRESH_TOKEN);
 
 
         jwtService.saveRefreshToken(user.getIdentifier(), refreshToken);

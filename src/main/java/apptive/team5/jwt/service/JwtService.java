@@ -2,6 +2,7 @@ package apptive.team5.jwt.service;
 
 import apptive.team5.global.exception.AuthenticationException;
 import apptive.team5.global.exception.ExceptionCode;
+import apptive.team5.jwt.TokenType;
 import apptive.team5.jwt.component.JWTUtil;
 import apptive.team5.jwt.domain.RefreshToken;
 import apptive.team5.jwt.dto.TokenResponse;
@@ -45,7 +46,7 @@ public class JwtService {
 
         if (oldRefreshToken == null) throw new AuthenticationException(ExceptionCode.NOT_EXIST_REFRESH_TOKEN.getDescription());
 
-        if (!jwtUtil.validateToken(oldRefreshToken, false))
+        if (!jwtUtil.validateToken(oldRefreshToken, TokenType.REFRESH_TOKEN))
             throw new AuthenticationException(ExceptionCode.INVALID_REFRESH_TOKEN.getDescription());
 
         Claims claims = jwtUtil.getClaims(oldRefreshToken);
@@ -58,8 +59,8 @@ public class JwtService {
             throw new AuthenticationException(ExceptionCode.INVALID_REFRESH_TOKEN.getDescription());
         }
 
-        String newAccessToken = jwtUtil.createJWT(identifier, role, true);
-        String newRefreshToken = jwtUtil.createJWT(identifier, role, false);
+        String newAccessToken = jwtUtil.createJWT(identifier, role, TokenType.ACCESS_TOKEN);
+        String newRefreshToken = jwtUtil.createJWT(identifier, role, TokenType.REFRESH_TOKEN);
 
         saveRefreshToken(identifier, newRefreshToken);
 
