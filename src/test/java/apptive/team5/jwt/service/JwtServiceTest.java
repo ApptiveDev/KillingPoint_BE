@@ -88,7 +88,7 @@ class JwtServiceTest {
     void exchangeTokenSuccess() {
         // given
 
-        given(jwtUtil.validateToken(any(), anyBoolean()))
+        given(jwtUtil.validateToken(any(), any()))
                 .willReturn(true);
 
         Claims claims = mock(Claims.class);
@@ -134,7 +134,7 @@ class JwtServiceTest {
         verify(refreshTokenRepository).deleteByUser(any());
         verify(refreshTokenRepository).save(any());
         verify(jwtUtil).getClaims(any());
-        verify(jwtUtil).validateToken(any(), anyBoolean());
+        verify(jwtUtil).validateToken(any(), any());
         verify(jwtUtil, times(2)).createJWT(any(), any(), any());
         verifyNoMoreInteractions(userLowService, jwtUtil, refreshTokenRepository);
     }
@@ -162,14 +162,14 @@ class JwtServiceTest {
         // given
 
 
-        given(jwtUtil.validateToken(any(), anyBoolean()))
+        given(jwtUtil.validateToken(any(), any()))
                 .willReturn(false);
 
         // when & then
         assertThatThrownBy(()->jwtService.exchangeToken("refreshToken"))
                 .isInstanceOf(AuthenticationException.class)
                 .hasMessage(ExceptionCode.INVALID_REFRESH_TOKEN.getDescription());
-        verify(jwtUtil).validateToken(any(), anyBoolean());
+        verify(jwtUtil).validateToken(any(), any());
         verifyNoMoreInteractions(userLowService, jwtUtil, refreshTokenRepository);
     }
 
