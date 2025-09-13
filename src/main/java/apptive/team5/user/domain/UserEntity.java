@@ -1,5 +1,6 @@
 package apptive.team5.user.domain;
 
+import apptive.team5.jwt.domain.RefreshToken;
 import apptive.team5.oauth2.dto.OAuth2Response;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -34,6 +35,9 @@ public class UserEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private SocialType socialType;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private RefreshToken refreshToken;
 
     public UserEntity(String identifier, String email, String username, UserRoleType roleType, SocialType socialType) {
         this.identifier = identifier;
