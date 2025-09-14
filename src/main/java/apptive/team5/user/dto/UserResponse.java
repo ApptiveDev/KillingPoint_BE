@@ -14,7 +14,11 @@ public record UserResponse(
 ) {
 
     public UserResponse(UserEntity userEntity) {
-        this(userEntity.getUsername(), userEntity.getIdentifier(), userEntity.getEmail(),
-                userEntity.getProfileImageUrl(), userEntity.getRoleType(), userEntity.getSocialType());
+        this(userEntity.getUsername(),
+                userEntity.getIdentifier(),
+                userEntity.getEmail(),
+                userEntity.getProfileImageUrl(),
+                userEntity.getRoleType(),
+                userEntity.getSocialType());
     }
 }

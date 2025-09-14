@@ -24,7 +24,8 @@ public class DiaryController {
     @GetMapping("/my")
     public ResponseEntity<Page<DiaryResponse>> getMyMusicDiary(
             @AuthenticationPrincipal String identifier,
-            @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size) {
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size) {
 
 
         Page<DiaryResponse> response = diaryService.getMyDiaries(identifier, PageRequest.of(page, size));

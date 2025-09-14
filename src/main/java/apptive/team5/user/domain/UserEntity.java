@@ -38,7 +38,7 @@ public class UserEntity {
     @Column(nullable = false)
     private SocialType socialType;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch =  FetchType.EAGER)
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch =  FetchType.LAZY)
     private RefreshToken refreshToken;
 
     @Column(nullable = false)
