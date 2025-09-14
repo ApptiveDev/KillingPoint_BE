@@ -8,10 +8,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 import static org.springframework.data.web.config.EnableSpringDataWebSupport.PageSerializationMode.VIA_DTO;
 
-@EnableJpaAuditing
-@EnableScheduling
 @SpringBootApplication
-@EnableSpringDataWebSupport(pageSerializationMode = VIA_DTO)
 public class Team5Application {
 
 	public static void main(String[] args) {
