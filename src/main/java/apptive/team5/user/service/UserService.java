@@ -7,6 +7,7 @@ import apptive.team5.jwt.service.JwtService;
 import apptive.team5.oauth2.dto.OAuth2Response;
 import apptive.team5.user.domain.UserEntity;
 import apptive.team5.user.domain.UserRoleType;
+import apptive.team5.user.dto.UserResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,6 +39,12 @@ public class UserService {
         jwtService.saveRefreshToken(user.getIdentifier(), refreshToken);
 
         return new TokenResponse(accessToken, refreshToken);
+    }
+
+    public UserResponse getUserInfo(String identifier) {
+        UserEntity findUser = userLowService.findByIdentifier(identifier);
+
+        return new UserResponse(findUser);
     }
 
 
