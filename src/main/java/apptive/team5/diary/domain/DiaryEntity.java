@@ -14,6 +14,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 
 @Entity
 @Getter
@@ -62,5 +63,49 @@ public class DiaryEntity {
                 content,
                 user
         );
+    }
+
+    public void update(String musicTitle, String artist, String albumImageUrl, String videoUrl, String content) {
+        updateMusicTitle(musicTitle);
+        updateArtist(artist);
+        updateAlbumImageUrl(albumImageUrl);
+        updateVideoUrl(videoUrl);
+        updateContent(content);
+    }
+
+    private void updateMusicTitle(String musicTitle) {
+        if (musicTitle != null && musicTitle.isBlank()) {
+            this.musicTitle = musicTitle;
+        }
+    }
+
+    private void updateArtist(String artist) {
+        if (artist != null && artist.isBlank()) {
+            this.artist = artist;
+        }
+    }
+
+    private void updateAlbumImageUrl(String albumImageUrl) {
+        if (albumImageUrl != null && albumImageUrl.isBlank()) {
+            this.albumImageUrl = albumImageUrl;
+        }
+    }
+
+    private void updateVideoUrl(String videoUrl) {
+        if (videoUrl != null && videoUrl.isBlank()) {
+            this.videoUrl = videoUrl;
+        }
+    }
+
+    private void updateContent(String content) {
+        if (content != null && content.isBlank()) {
+            this.content = content;
+        }
+    }
+
+    public void validateOwner(UserEntity user) {
+        if (!this.user.equals(user)) {
+            throw new AccessDeniedException("해당 다이어리에 대한 권한이 없습니다.");
+        }
     }
 }

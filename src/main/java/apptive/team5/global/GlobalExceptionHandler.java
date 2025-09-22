@@ -7,6 +7,7 @@ import apptive.team5.global.exception.KakaoApiConnectException;
 import apptive.team5.global.exception.NotFoundEntityException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -45,5 +46,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InvalidInputException.class)
     public ResponseEntity<Map<String, String>> handleInvalidInputException(InvalidInputException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", e.getMessage()));
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<Map<String, String>> handleAccessDeniedException(AccessDeniedException e) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", e.getMessage()));
     }
 }

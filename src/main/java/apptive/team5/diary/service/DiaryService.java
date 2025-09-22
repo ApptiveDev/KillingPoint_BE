@@ -3,7 +3,9 @@ package apptive.team5.diary.service;
 import apptive.team5.diary.domain.DiaryEntity;
 import apptive.team5.diary.dto.DiaryRequest;
 import apptive.team5.diary.dto.DiaryResponse;
+import apptive.team5.diary.dto.DiaryUpdateRequest;
 import apptive.team5.diary.repository.DiaryRepository;
+import apptive.team5.global.exception.InvalidInputException;
 import apptive.team5.user.domain.UserEntity;
 import apptive.team5.user.service.UserLowService;
 import apptive.team5.youtube.dto.YoutubeSearchRequest;
@@ -79,9 +81,9 @@ public class DiaryService {
         UserEntity foundUser = userLowService.findByIdentifier(identifier);
 
         YoutubeSearchRequest searchRequest = new YoutubeSearchRequest(diaryRequest.artist(), diaryRequest.musicTitle());
-        List<YoutubeVideoResponse> youtubeVideoResponses = youtubeService.searchVideo(searchRequest);
+        List<YoutubeVideoResponse> videoList = youtubeService.searchVideo(searchRequest);
 
-        String videoUrl = youtubeVideoResponses.isEmpty() ? null : youtubeVideoResponses.getFirst().url();
+        String videoUrl = videoList.isEmpty() ? null : videoList.getFirst().url();
 
         DiaryEntity diary = new DiaryEntity(
                 diaryRequest.musicTitle(),
@@ -93,5 +95,26 @@ public class DiaryService {
         );
 
         diaryRepository.save(diary);
+    }
+
+    public void updateDiary(String identifier, Long diaryId, DiaryUpdateRequest updateRequest) {
+        UserEntity foundUser = userLowService.findByIdentifier(identifier);
+
+        DiaryEntity diary = diaryRepository.findById(diaryId)
+                .orElseThrow(() -> new InvalidInputException("그런 다이어리는 없습니다."));
+
+        diary.validateOwner(foundUser);
+
+        List<YoutubeVideoResponse> videoList = youtubeService.searchVideo(new YoutubeSearchRequest(updateRequest.artist(), updateRequest.musicTitle()));
+
+        String videoUrl = videoList.isEmpty() ? null : videoList.getFirst().url();
+
+        diary.update(
+                updateRequest.musicTitle(),
+                updateRequest.artist(),
+                updateRequest.albumImageUrl(),
+                videoUrl,
+                updateRequest.content()
+        );
     }
 }

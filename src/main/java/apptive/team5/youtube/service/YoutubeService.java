@@ -2,6 +2,7 @@ package apptive.team5.youtube.service;
 
 import apptive.team5.global.exception.ExceptionCode;
 import apptive.team5.global.exception.ExternalApiConnectException;
+import apptive.team5.global.exception.InvalidInputException;
 import apptive.team5.youtube.dto.YoutubeSearchRequest;
 import apptive.team5.youtube.dto.YoutubeVideoResponse;
 import com.google.api.client.http.javanet.NetHttpTransport;
@@ -26,7 +27,7 @@ public class YoutubeService {
     private static final GsonFactory gsonFactory = new GsonFactory();
 
     public List<YoutubeVideoResponse> searchVideo(YoutubeSearchRequest searchRequest) {
-
+        validateSearchInput(searchRequest.artist(), searchRequest.title());
 
         YouTube youtube = new YouTube.
                 Builder(
@@ -59,6 +60,13 @@ public class YoutubeService {
 
         } catch (IOException e) {
             throw new ExternalApiConnectException(ExceptionCode.YOUTUBE_API_EXCEPTION.getDescription(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    private void validateSearchInput(String artist, String title) {
+        if (artist == null || artist.isBlank() ||
+                title == null || title.isBlank()) {
+            throw new InvalidInputException("노래 제목과 아티스트 모두 입력해주세요!");
         }
     }
 
