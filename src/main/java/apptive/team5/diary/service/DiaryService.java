@@ -15,25 +15,21 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Iterator;
 import java.util.List;
-import java.util.function.Function;
 
 @Service
 @RequiredArgsConstructor
 public class DiaryService {
 
     private final UserLowService userLowService;
-    private final DiaryRepository diaryRepository;
     private final DiaryLowService diaryLowService;
     private final YoutubeService youtubeService;
 
     @Transactional(readOnly = true)
-    public Page<DiaryResponse> getMyDiaries(String identifier, Pageable pageable) {
+    public Page<DiaryResponse> getMyDiaries2(String identifier, Pageable pageable) {
 
         UserEntity findUser = findUserByIdentifier(identifier);
 
@@ -72,7 +68,7 @@ public class DiaryService {
     }
 
     @Transactional(readOnly = true)
-    public Page<DiaryResponse> getMyDiaries2(String identifier, Pageable pageable) {
+    public Page<DiaryResponse> getMyDiaries(String identifier, Pageable pageable) {
         UserEntity foundUser = findUserByIdentifier(identifier);
 
         return diaryLowService.findDiaryByUser(foundUser, pageable)
@@ -90,7 +86,7 @@ public class DiaryService {
 
         DiaryEntity diary = DiaryRequest.toEntity(diaryRequest, videoUrl, foundUser);
 
-        diaryRepository.save(diary);
+        diaryLowService.saveDiary(diary);
     }
 
     @Transactional
