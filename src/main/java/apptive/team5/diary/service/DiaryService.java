@@ -32,16 +32,23 @@ public class DiaryService {
 
 
         DiaryResponse data1 =
-                new DiaryResponse("목데이터1", "https://www.youtube-nocookie.com/embed/ki08IcGubwQ");
+                new DiaryResponse("artistName", "musicTitle", "https://www.sleek-mag.com/wp-content/uploads/2016/08/AlbumCovers_Blonde-1200x1200.jpg",
+                        "목데이터1", "https://www.youtube-nocookie.com/embed/ki08IcGubwQ");
 
         DiaryResponse data2 =
-                new DiaryResponse("목데이터2", "https://www.youtube-nocookie.com/embed/ki08IcGubwQ");
+                new DiaryResponse(
+                        "artistName", "musicTitle", "https://www.sleek-mag.com/wp-content/uploads/2016/08/AlbumCovers_Blonde-1200x1200.jpg",
+                        "목데이터2", "https://www.youtube-nocookie.com/embed/ki08IcGubwQ");
 
         DiaryResponse data3 =
-                new DiaryResponse("목데이터1", "https://www.youtube-nocookie.com/embed/ki08IcGubwQ");
+                new DiaryResponse(
+                        "artistName", "musicTitle", "https://www.sleek-mag.com/wp-content/uploads/2016/08/AlbumCovers_Blonde-1200x1200.jpg",
+                        "목데이터1", "https://www.youtube-nocookie.com/embed/ki08IcGubwQ");
 
         DiaryResponse data4 =
-                new DiaryResponse("목데이터2", "https://www.youtube-nocookie.com/embed/ki08IcGubwQ");
+                new DiaryResponse(
+                        "artistName", "musicTitle", "https://www.sleek-mag.com/wp-content/uploads/2016/08/AlbumCovers_Blonde-1200x1200.jpg",
+                        "목데이터2", "https://www.youtube-nocookie.com/embed/ki08IcGubwQ");
 
         List<DiaryResponse> datas = List.of(data1, data2, data3, data4);
 
