@@ -6,6 +6,7 @@ import apptive.team5.diary.dto.DiaryResponse;
 import apptive.team5.diary.dto.DiaryUpdateDto;
 import apptive.team5.diary.dto.DiaryUpdateRequest;
 import apptive.team5.diary.service.DiaryService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.apache.catalina.connector.Response;
 import org.springframework.data.domain.Page;
@@ -46,7 +47,7 @@ public class DiaryController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> createDiary(@AuthenticationPrincipal String identifier, @RequestBody DiaryRequest diaryRequest) {
+    public ResponseEntity<Void> createDiary(@AuthenticationPrincipal String identifier, @Valid @RequestBody DiaryRequest diaryRequest) {
         diaryService.createDiary(identifier, diaryRequest);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
@@ -67,7 +68,7 @@ public class DiaryController {
     }
 
     @DeleteMapping
-    public ResponseEntity<Void> deleteDiary(@AuthenticationPrincipal String identifier, @RequestBody DiaryDeleteRequest deleteRequest) {
+    public ResponseEntity<Void> deleteDiary(@AuthenticationPrincipal String identifier, @Valid @RequestBody DiaryDeleteRequest deleteRequest) {
         diaryService.deleteDiary(identifier, deleteRequest);
 
         return ResponseEntity.status(HttpStatus.OK).build();
