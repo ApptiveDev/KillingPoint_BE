@@ -1,8 +1,14 @@
 package apptive.team5.diary.service;
 
+import apptive.team5.diary.domain.DiaryEntity;
+import apptive.team5.diary.dto.DiaryRequest;
 import apptive.team5.diary.dto.DiaryResponse;
+import apptive.team5.diary.repository.DiaryRepository;
 import apptive.team5.user.domain.UserEntity;
 import apptive.team5.user.service.UserLowService;
+import apptive.team5.youtube.dto.YoutubeSearchRequest;
+import apptive.team5.youtube.dto.YoutubeVideoResponse;
+import apptive.team5.youtube.service.YoutubeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -21,6 +27,8 @@ import java.util.function.Function;
 public class DiaryService {
 
     private final UserLowService userLowService;
+    private final DiaryRepository diaryRepository;
+    private final YoutubeService youtubeService;
 
     public Page<DiaryResponse> getMyDiaries(String identifier, Pageable pageable) {
 
@@ -58,5 +66,32 @@ public class DiaryService {
 
         return new PageImpl<>(subList, pageable, datas.size());
 
+    }
+
+    public Page<DiaryResponse> getMyDiaries2(String identifier, Pageable pageable) {
+        UserEntity foundUser = userLowService.findByIdentifier(identifier);
+
+        return diaryRepository.findByUser(foundUser, pageable)
+                .map(DiaryResponse::from);
+    }
+
+    public void createDiary(String identifier, DiaryRequest diaryRequest) {
+        UserEntity foundUser = userLowService.findByIdentifier(identifier);
+
+        YoutubeSearchRequest searchRequest = new YoutubeSearchRequest(diaryRequest.artist(), diaryRequest.musicTitle());
+        List<YoutubeVideoResponse> youtubeVideoResponses = youtubeService.searchVideo(searchRequest);
+
+        String videoUrl = youtubeVideoResponses.isEmpty() ? null : youtubeVideoResponses.getFirst().url();
+
+        DiaryEntity diary = new DiaryEntity(
+                diaryRequest.musicTitle(),
+                diaryRequest.artist(),
+                diaryRequest.albumImageUrl(),
+                videoUrl,
+                diaryRequest.content(),
+                foundUser
+        );
+
+        diaryRepository.save(diary);
     }
 }

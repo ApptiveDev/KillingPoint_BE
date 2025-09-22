@@ -26,16 +26,16 @@ public class DiaryEntity {
     @Column(name = "diary_id")
     private Long id;
 
-    @Column(columnDefinition = "TEXT")
-    private String content;
-    @Column(nullable = false, length = 255)
-    private String artist;
     @Column(nullable = false, length = 255)
     private String musicTitle;
+    @Column(nullable = false, length = 255)
+    private String artist;
     @Column(columnDefinition = "TEXT")
     private String albumImageUrl;
     @Column(columnDefinition = "TEXT")
     private String videoUrl;
+    @Column(columnDefinition = "TEXT")
+    private String content;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(
@@ -44,4 +44,23 @@ public class DiaryEntity {
             foreignKey = @ForeignKey(name = "fk_diary_user_id_ref_user_id")
     )
     private UserEntity user;
+
+    public DiaryEntity(
+            String musicTitle,
+            String artist,
+            String albumImageUrl,
+            String videoUrl,
+            String content,
+            UserEntity user
+    ) {
+        this(
+                null,
+                musicTitle,
+                artist,
+                albumImageUrl,
+                videoUrl,
+                content,
+                user
+        );
+    }
 }
