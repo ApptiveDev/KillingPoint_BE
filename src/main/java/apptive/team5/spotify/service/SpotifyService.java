@@ -1,10 +1,13 @@
 package apptive.team5.spotify.service;
 
+import apptive.team5.global.exception.ExternalApiConnectException;
 import apptive.team5.spotify.dto.SpotifyTrackResponseDto;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -49,6 +52,12 @@ public class SpotifyService {
                                 .build())
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                         .retrieve()
+                        .onStatus(HttpStatusCode::is4xxClientError,
+                                response -> response.bodyToMono(String.class)
+                                        .map(body -> new ExternalApiConnectException("Spotify API 4xx 에러: " + body, HttpStatus.BAD_REQUEST)))
+                        .onStatus(HttpStatusCode::is5xxServerError,
+                                response -> response.bodyToMono(String.class)
+                                        .map(body -> new ExternalApiConnectException("Spotify API 5xx 에러: " + body, HttpStatus.BAD_GATEWAY)))
                         .bodyToMono(JsonNode.class)
                         .map(this::searchResultToTrackDto)
         );
