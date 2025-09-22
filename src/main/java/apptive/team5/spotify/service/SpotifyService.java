@@ -69,7 +69,7 @@ public class SpotifyService {
         return Base64.getEncoder().encodeToString((clientId + ":" + clientSecret).getBytes());
     }
 
-    private static MultiValueMap<String, String> createTokenRequestBody() {
+    private MultiValueMap<String, String> createTokenRequestBody() {
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
         formData.add("grant_type", "client_credentials");
         return formData;
@@ -80,29 +80,42 @@ public class SpotifyService {
         List<SpotifyTrackResponseDto> trackList = new ArrayList<>();
 
         for (JsonNode item : items) {
-            String artistNames = getArtists(item);
-
-            SpotifyTrackResponseDto track = new SpotifyTrackResponseDto(
-                    item.path("name").asText(),
-                    artistNames,
-                    item.path("album").path("name").asText(),
-                    item.path("album").path("images").get(0) != null ? item.path("album").path("imges").get(0).path("url").asText() : null,
-                    item.path("preview_url").asText(null),
-                    item.path("external_urls").path("spotify").asText()
-            );
+            SpotifyTrackResponseDto track = getTrackInfo(item);
             trackList.add(track);
         }
 
         return trackList;
     }
 
-    private static String getArtists(JsonNode item) {
+    private SpotifyTrackResponseDto getTrackInfo(JsonNode item) {
+        String artistNames = getArtists(item);
+        String albumImageUrl = getAlbumImageUrl(item);
+
+        SpotifyTrackResponseDto track = new SpotifyTrackResponseDto(
+                item.path("name").asText(),
+                artistNames,
+                item.path("album").path("name").asText(),
+                albumImageUrl,
+                item.path("preview_url").asText(null),
+                item.path("external_urls").path("spotify").asText()
+        );
+        return track;
+    }
+
+    private String getArtists(JsonNode item) {
         List<String> artistList = new ArrayList<>();
-        for (JsonNode artist : item.path("artist")) {
+        for (JsonNode artist : item.path("artists")) {
             artistList.add(artist.path("name").asText());
         }
         return String.join(", ", artistList);
     }
 
+    private String getAlbumImageUrl(JsonNode item) {
+        JsonNode images = item.path("album").path("images");
+        if (images.isArray() && !images.isEmpty()) {
+            return images.get(0).path("url").asText();
+        }
 
+        return null;
+    }
 }
