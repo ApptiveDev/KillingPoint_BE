@@ -33,22 +33,22 @@ public class DiaryService {
 
         DiaryResponse data1 =
                 new DiaryResponse("artistName", "musicTitle", "https://www.sleek-mag.com/wp-content/uploads/2016/08/AlbumCovers_Blonde-1200x1200.jpg",
-                        "목데이터1", "https://www.youtube-nocookie.com/embed/ki08IcGubwQ");
+                        "목데이터1", "https://www.youtube-nocookie.com/embed/UXSdbtfw9Rc");
 
         DiaryResponse data2 =
                 new DiaryResponse(
                         "artistName", "musicTitle", "https://www.sleek-mag.com/wp-content/uploads/2016/08/AlbumCovers_Blonde-1200x1200.jpg",
-                        "목데이터2", "https://www.youtube-nocookie.com/embed/ki08IcGubwQ");
+                        "목데이터2", "https://www.youtube-nocookie.com/embed/UXSdbtfw9Rc");
 
         DiaryResponse data3 =
                 new DiaryResponse(
                         "artistName", "musicTitle", "https://www.sleek-mag.com/wp-content/uploads/2016/08/AlbumCovers_Blonde-1200x1200.jpg",
-                        "목데이터1", "https://www.youtube-nocookie.com/embed/ki08IcGubwQ");
+                        "목데이터1", "https://www.youtube-nocookie.com/embed/UXSdbtfw9Rc");
 
         DiaryResponse data4 =
                 new DiaryResponse(
                         "artistName", "musicTitle", "https://www.sleek-mag.com/wp-content/uploads/2016/08/AlbumCovers_Blonde-1200x1200.jpg",
-                        "목데이터2", "https://www.youtube-nocookie.com/embed/ki08IcGubwQ");
+                        "목데이터2", "https://www.youtube-nocookie.com/embed/UXSdbtfw9Rc");
 
         List<DiaryResponse> datas = List.of(data1, data2, data3, data4);
 
