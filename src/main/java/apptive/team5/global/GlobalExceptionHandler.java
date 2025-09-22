@@ -2,6 +2,7 @@ package apptive.team5.global;
 
 import apptive.team5.global.exception.AuthenticationException;
 import apptive.team5.global.exception.ExternalApiConnectException;
+import apptive.team5.global.exception.InvalidInputException;
 import apptive.team5.global.exception.KakaoApiConnectException;
 import apptive.team5.global.exception.NotFoundEntityException;
 import org.springframework.http.HttpStatus;
@@ -39,5 +40,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ExternalApiConnectException.class)
     public ResponseEntity<Map<String,String>> handleExternalApiConnectException(ExternalApiConnectException e) {
         return ResponseEntity.status(e.getHttpStatus()).body(Map.of("message", e.getMessage()));
+    }
+
+    @ExceptionHandler(InvalidInputException.class)
+    public ResponseEntity<Map<String, String>> handleInvalidInputException(InvalidInputException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", e.getMessage()));
     }
 }

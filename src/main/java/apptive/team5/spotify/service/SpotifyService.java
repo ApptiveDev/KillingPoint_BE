@@ -34,6 +34,10 @@ public class SpotifyService {
     private int maxSearchResults = 20;
 
     public Mono<List<SpotifyTrackResponseDto>> searchMusic(String query) {
+        if (query == null || query.trim().isEmpty()) {
+            return Mono.error(new IllegalArgumentException("검색어가 없습니다."));
+        }
+
         return getSpotifyAccessToken().flatMap(token ->
                 webClient.get()
                         .uri(uriBuilder -> uriBuilder
