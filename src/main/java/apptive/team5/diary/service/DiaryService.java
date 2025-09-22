@@ -1,11 +1,11 @@
 package apptive.team5.diary.service;
 
 import apptive.team5.diary.domain.DiaryEntity;
+import apptive.team5.diary.dto.DiaryDeleteRequest;
 import apptive.team5.diary.dto.DiaryRequest;
 import apptive.team5.diary.dto.DiaryResponse;
 import apptive.team5.diary.dto.DiaryUpdateRequest;
 import apptive.team5.diary.repository.DiaryRepository;
-import apptive.team5.global.exception.InvalidInputException;
 import apptive.team5.user.domain.UserEntity;
 import apptive.team5.user.service.UserLowService;
 import apptive.team5.youtube.dto.YoutubeSearchRequest;
@@ -23,18 +23,19 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.function.Function;
 
-@Transactional
 @Service
 @RequiredArgsConstructor
 public class DiaryService {
 
     private final UserLowService userLowService;
     private final DiaryRepository diaryRepository;
+    private final DiaryLowService diaryLowService;
     private final YoutubeService youtubeService;
 
+    @Transactional(readOnly = true)
     public Page<DiaryResponse> getMyDiaries(String identifier, Pageable pageable) {
 
-        UserEntity findUser = userLowService.findByIdentifier(identifier);
+        UserEntity findUser = findUserByIdentifier(identifier);
 
         /**
          * 조회된 유저를 바탕으로 음악 일기 찾기
@@ -70,51 +71,55 @@ public class DiaryService {
 
     }
 
+    @Transactional(readOnly = true)
     public Page<DiaryResponse> getMyDiaries2(String identifier, Pageable pageable) {
-        UserEntity foundUser = userLowService.findByIdentifier(identifier);
+        UserEntity foundUser = findUserByIdentifier(identifier);
 
-        return diaryRepository.findByUser(foundUser, pageable)
+        return diaryLowService.findDiaryByUser(foundUser, pageable)
                 .map(DiaryResponse::from);
     }
 
+    @Transactional
     public void createDiary(String identifier, DiaryRequest diaryRequest) {
-        UserEntity foundUser = userLowService.findByIdentifier(identifier);
+        UserEntity foundUser = findUserByIdentifier(identifier);
 
         YoutubeSearchRequest searchRequest = new YoutubeSearchRequest(diaryRequest.artist(), diaryRequest.musicTitle());
         List<YoutubeVideoResponse> videoList = youtubeService.searchVideo(searchRequest);
 
-        String videoUrl = videoList.isEmpty() ? null : videoList.getFirst().url();
+        String videoUrl = getVideoUrl(videoList);
 
-        DiaryEntity diary = new DiaryEntity(
-                diaryRequest.musicTitle(),
-                diaryRequest.artist(),
-                diaryRequest.albumImageUrl(),
-                videoUrl,
-                diaryRequest.content(),
-                foundUser
-        );
+        DiaryEntity diary = DiaryRequest.toEntity(diaryRequest, videoUrl, foundUser);
 
         diaryRepository.save(diary);
     }
 
+    @Transactional
     public void updateDiary(String identifier, Long diaryId, DiaryUpdateRequest updateRequest) {
-        UserEntity foundUser = userLowService.findByIdentifier(identifier);
+        UserEntity foundUser = findUserByIdentifier(identifier);
 
-        DiaryEntity diary = diaryRepository.findById(diaryId)
-                .orElseThrow(() -> new InvalidInputException("그런 다이어리는 없습니다."));
-
-        diary.validateOwner(foundUser);
+        DiaryEntity diary = diaryLowService.findDiaryById(diaryId);
 
         List<YoutubeVideoResponse> videoList = youtubeService.searchVideo(new YoutubeSearchRequest(updateRequest.artist(), updateRequest.musicTitle()));
 
-        String videoUrl = videoList.isEmpty() ? null : videoList.getFirst().url();
+        String videoUrl = getVideoUrl(videoList);
 
-        diary.update(
-                updateRequest.musicTitle(),
-                updateRequest.artist(),
-                updateRequest.albumImageUrl(),
-                videoUrl,
-                updateRequest.content()
-        );
+        diaryLowService.updateDiary(foundUser, diary, DiaryUpdateRequest.toUpdateDto(updateRequest, videoUrl));
+    }
+
+    @Transactional
+    public void deleteDiary(String identifier, DiaryDeleteRequest deleteRequest) {
+        UserEntity foundUser = findUserByIdentifier(identifier);
+
+        DiaryEntity foundDiary = diaryLowService.findDiaryById(deleteRequest.diaryId());
+
+        diaryLowService.deleteDiary(foundUser, foundDiary);
+    }
+
+    private UserEntity findUserByIdentifier(String identifier) {
+        return userLowService.findByIdentifier(identifier);
+    }
+
+    private static String getVideoUrl(List<YoutubeVideoResponse> videoList) {
+        return videoList.isEmpty() ? null : videoList.getFirst().url();
     }
 }

@@ -6,4 +6,13 @@ public record DiaryUpdateRequest(
         String albumImageUrl,
         String content
 ) {
+    public static DiaryUpdateDto toUpdateDto(DiaryUpdateRequest updateRequest, String videoUrl) {
+        return new DiaryUpdateDto(
+                updateRequest.musicTitle,
+                updateRequest.artist,
+                updateRequest.albumImageUrl,
+                videoUrl,
+                updateRequest.content
+        );
+    }
 }
