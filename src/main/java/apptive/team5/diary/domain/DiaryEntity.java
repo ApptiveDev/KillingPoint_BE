@@ -28,12 +28,12 @@ public class DiaryEntity {
 
     @Column(columnDefinition = "TEXT")
     private String content;
-
     @Column(nullable = false, length = 255)
     private String artist;
     @Column(nullable = false, length = 255)
     private String musicTitle;
-
+    @Column(columnDefinition = "TEXT")
+    private String albumImageUrl;
     @Column(columnDefinition = "TEXT")
     private String videoUrl;
 
