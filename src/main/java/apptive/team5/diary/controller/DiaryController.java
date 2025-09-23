@@ -1,14 +1,11 @@
 package apptive.team5.diary.controller;
 
-import apptive.team5.diary.dto.DiaryDeleteRequest;
 import apptive.team5.diary.dto.DiaryRequest;
 import apptive.team5.diary.dto.DiaryResponse;
-import apptive.team5.diary.dto.DiaryUpdateDto;
 import apptive.team5.diary.dto.DiaryUpdateRequest;
 import apptive.team5.diary.service.DiaryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.apache.catalina.connector.Response;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -67,10 +64,10 @@ public class DiaryController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    @DeleteMapping
-    public ResponseEntity<Void> deleteDiary(@AuthenticationPrincipal String identifier, @Valid @RequestBody DiaryDeleteRequest deleteRequest) {
-        diaryService.deleteDiary(identifier, deleteRequest);
+    @DeleteMapping("/{diaryId}")
+    public ResponseEntity<Void> deleteDiary(@AuthenticationPrincipal String identifier, @PathVariable Long diaryId) {
+        diaryService.deleteDiary(identifier, diaryId);
 
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.noContent().build();
     }
 }

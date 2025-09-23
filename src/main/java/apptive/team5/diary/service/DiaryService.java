@@ -1,7 +1,6 @@
 package apptive.team5.diary.service;
 
 import apptive.team5.diary.domain.DiaryEntity;
-import apptive.team5.diary.dto.DiaryDeleteRequest;
 import apptive.team5.diary.dto.DiaryRequest;
 import apptive.team5.diary.dto.DiaryResponse;
 import apptive.team5.diary.dto.DiaryUpdateRequest;
@@ -62,10 +61,10 @@ public class DiaryService {
     }
 
     @Transactional
-    public void deleteDiary(String identifier, DiaryDeleteRequest deleteRequest) {
+    public void deleteDiary(String identifier, Long diaryId) {
         UserEntity foundUser = findUserByIdentifier(identifier);
 
-        DiaryEntity foundDiary = diaryLowService.findDiaryById(deleteRequest.diaryId());
+        DiaryEntity foundDiary = diaryLowService.findDiaryById(diaryId);
 
         diaryLowService.deleteDiary(foundUser, foundDiary);
     }
