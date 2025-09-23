@@ -25,7 +25,9 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 @ExtendWith(MockitoExtension.class)
 public class DiaryServiceTest {
@@ -61,6 +63,8 @@ public class DiaryServiceTest {
         assertThat(result.getContent().get(0).musicTitle()).isEqualTo("hihi music");
         verify(userLowService).findByIdentifier(any(String.class));
         verify(diaryLowService).findDiaryByUser(any(UserEntity.class), any(PageRequest.class));
+
+        verifyNoMoreInteractions(userLowService, diaryLowService);
     }
 
     @Test
@@ -81,6 +85,8 @@ public class DiaryServiceTest {
         verify(userLowService).findByIdentifier(any(String.class));
         verify(youtubeService).searchVideo(any());
         verify(diaryLowService).saveDiary(any(DiaryEntity.class));
+
+        verifyNoMoreInteractions(userLowService, youtubeService, diaryLowService);
     }
 
     @Test
@@ -97,6 +103,7 @@ public class DiaryServiceTest {
         given(diaryLowService.findDiaryById(diaryId)).willReturn(diary);
         given(youtubeService.searchVideo(any())).willReturn(Collections.singletonList(youtubeVideoResponse));
 
+
         // when
         diaryService.updateDiary(user.getIdentifier(), diaryId, updateRequest);
 
@@ -105,5 +112,7 @@ public class DiaryServiceTest {
         verify(diaryLowService).findDiaryById(any(Long.class));
         verify(youtubeService).searchVideo(any());
         verify(diaryLowService).updateDiary(any(UserEntity.class), any(DiaryEntity.class), any());
+
+        verifyNoMoreInteractions(userLowService, diaryLowService, youtubeService);
     }
 }
