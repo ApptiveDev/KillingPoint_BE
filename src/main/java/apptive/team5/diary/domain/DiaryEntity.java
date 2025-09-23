@@ -74,31 +74,31 @@ public class DiaryEntity {
     }
 
     private void updateMusicTitle(String musicTitle) {
-        if (musicTitle != null && musicTitle.isBlank()) {
+        if (musicTitle != null && !musicTitle.isBlank()) {
             this.musicTitle = musicTitle;
         }
     }
 
     private void updateArtist(String artist) {
-        if (artist != null && artist.isBlank()) {
+        if (artist != null && !artist.isBlank()) {
             this.artist = artist;
         }
     }
 
     private void updateAlbumImageUrl(String albumImageUrl) {
-        if (albumImageUrl != null && albumImageUrl.isBlank()) {
+        if (albumImageUrl != null && !albumImageUrl.isBlank()) {
             this.albumImageUrl = albumImageUrl;
         }
     }
 
     private void updateVideoUrl(String videoUrl) {
-        if (videoUrl != null && videoUrl.isBlank()) {
+        if (videoUrl != null && !videoUrl.isBlank()) {
             this.videoUrl = videoUrl;
         }
     }
 
     private void updateContent(String content) {
-        if (content != null && content.isBlank()) {
+        if (content != null && !content.isBlank()) {
             this.content = content;
         }
     }
