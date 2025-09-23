@@ -48,7 +48,7 @@ public class DiaryServiceTest {
     void getMyDiaries() {
         // given
         UserEntity user = TestUtil.makeUserEntity();
-        DiaryEntity diary = new DiaryEntity("hihi music", "chopin", "image.url", "video.url", "test content", user);
+        DiaryEntity diary = TestUtil.makeDiaryEntity(user);
         Page<DiaryEntity> diaryEntityPage = new PageImpl<>(List.of(diary));
         PageRequest pageRequest = PageRequest.of(0, 5);
 
@@ -60,7 +60,7 @@ public class DiaryServiceTest {
 
         // then
         assertThat(result.getContent()).hasSize(1);
-        assertThat(result.getContent().get(0).musicTitle()).isEqualTo("hihi music");
+        assertThat(result.getContent().get(0).musicTitle()).isEqualTo("Test Music");
         verify(userLowService).findByIdentifier(any(String.class));
         verify(diaryLowService).findDiaryByUser(any(UserEntity.class), any(PageRequest.class));
 
