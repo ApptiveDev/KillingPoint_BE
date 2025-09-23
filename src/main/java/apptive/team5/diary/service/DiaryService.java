@@ -74,7 +74,7 @@ public class DiaryService {
         return userLowService.findByIdentifier(identifier);
     }
 
-    private static String getVideoUrl(List<YoutubeVideoResponse> videoList) {
+    private String getVideoUrl(List<YoutubeVideoResponse> videoList) {
         return videoList.isEmpty() ? null : videoList.getFirst().url();
     }
 }
