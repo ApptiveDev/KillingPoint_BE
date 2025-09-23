@@ -3,7 +3,7 @@ package apptive.team5.diary.service;
 import apptive.team5.diary.domain.DiaryEntity;
 import apptive.team5.diary.dto.DiaryUpdateDto;
 import apptive.team5.diary.repository.DiaryRepository;
-import apptive.team5.global.exception.InvalidInputException;
+import apptive.team5.global.exception.NotFoundEntityException;
 import apptive.team5.user.domain.UserEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -24,7 +24,7 @@ public class DiaryLowService {
     @Transactional(readOnly = true)
     public DiaryEntity findDiaryById(Long diaryId) {
         return diaryRepository.findById(diaryId)
-                .orElseThrow(() -> new InvalidInputException("그런 다이어리는 없습니다."));
+                .orElseThrow(() -> new NotFoundEntityException("그런 다이어리는 없습니다."));
     }
 
     @Transactional(readOnly = true)
