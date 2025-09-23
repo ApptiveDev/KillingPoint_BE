@@ -12,6 +12,8 @@ import apptive.team5.util.TestUtil;
 import apptive.team5.util.mockuser.WithCustomMockUser;
 import apptive.team5.youtube.dto.YoutubeVideoResponse;
 import apptive.team5.youtube.service.YoutubeService;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -26,7 +28,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
+import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -72,11 +76,24 @@ public class DiaryControllerTest {
         diaryRepository.save(new DiaryEntity("Test Music", "Test Artist", "image.url", "video.url", "Test content", testUser));
 
         // when & then
-        mockMvc.perform(get("/api/diaries/my")
-                .param("page", "0")
-                .param("size", "5"))
+        String response = mockMvc.perform(get("/api/diaries/my")
+                        .param("page", "0")
+                        .param("size", "5"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content[0].musicTitle").value("Test Music"));
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        JsonNode jsonNode = objectMapper.readTree(response);
+
+        List<DiaryResponse> content = objectMapper.convertValue(
+                jsonNode.path("content"),
+                new TypeReference<List<DiaryResponse>>() {}
+        );
+
+        assertThat(content).hasSize(1);
+        assertThat(content.getFirst().musicTitle()).isEqualTo("Test Music");
+        assertThat(content.getFirst().artist()).isEqualTo("Test Artist");
     }
 
     @Test
