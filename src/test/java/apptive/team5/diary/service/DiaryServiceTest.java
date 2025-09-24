@@ -101,7 +101,7 @@ public class DiaryServiceTest {
         // then
         verify(userLowService).findByIdentifier(any(String.class));
         verify(diaryLowService).findDiaryById(any(Long.class));
-        verify(diaryLowService).updateDiary(any(UserEntity.class), any(DiaryEntity.class), any());
+        verify(diaryLowService).updateDiary(any(DiaryEntity.class), any());
 
         verifyNoMoreInteractions(userLowService, diaryLowService);
     }
@@ -123,7 +123,7 @@ public class DiaryServiceTest {
         // then
         verify(userLowService).findByIdentifier(any(String.class));
         verify(diaryLowService).findDiaryById(any(Long.class));
-        verify(diaryLowService).deleteDiary(any(UserEntity.class), any(DiaryEntity.class));
+        verify(diaryLowService).deleteDiary(any(DiaryEntity.class));
 
         verifyNoMoreInteractions(userLowService, diaryLowService);
     }

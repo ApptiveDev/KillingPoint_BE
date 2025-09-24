@@ -33,9 +33,7 @@ public class DiaryLowService {
     }
 
     @Transactional
-    public void updateDiary(UserEntity user, DiaryEntity diary, DiaryUpdateDto updateDto) {
-        diary.validateOwner(user);
-
+    public void updateDiary(DiaryEntity diary, DiaryUpdateDto updateDto) {
         diary.update(
                 updateDto.musicTitle(),
                 updateDto.artist(),
@@ -47,8 +45,7 @@ public class DiaryLowService {
     }
 
     @Transactional
-    public void deleteDiary(UserEntity user, DiaryEntity diary) {
-        diary.validateOwner(user);
+    public void deleteDiary(DiaryEntity diary) {
         diaryRepository.delete(diary);
     }
 

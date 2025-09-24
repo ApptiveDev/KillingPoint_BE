@@ -40,9 +40,11 @@ public class DiaryService {
     public void updateDiary(String identifier, Long diaryId, DiaryUpdateRequest updateRequest) {
         UserEntity foundUser = findUserByIdentifier(identifier);
 
-        DiaryEntity diary = diaryLowService.findDiaryById(diaryId);
+        DiaryEntity foundDiary = diaryLowService.findDiaryById(diaryId);
 
-        diaryLowService.updateDiary(foundUser, diary, DiaryUpdateRequest.toUpdateDto(updateRequest));
+        foundDiary.validateOwner(foundUser);
+
+        diaryLowService.updateDiary(foundDiary, DiaryUpdateRequest.toUpdateDto(updateRequest));
     }
 
     @Transactional
@@ -51,7 +53,9 @@ public class DiaryService {
 
         DiaryEntity foundDiary = diaryLowService.findDiaryById(diaryId);
 
-        diaryLowService.deleteDiary(foundUser, foundDiary);
+        foundDiary.validateOwner(foundUser);
+
+        diaryLowService.deleteDiary(foundDiary);
     }
 
     private UserEntity findUserByIdentifier(String identifier) {
