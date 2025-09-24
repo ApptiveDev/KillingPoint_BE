@@ -6,14 +6,11 @@ import apptive.team5.diary.dto.DiaryResponse;
 import apptive.team5.diary.dto.DiaryUpdateRequest;
 import apptive.team5.user.domain.UserEntity;
 import apptive.team5.user.service.UserLowService;
-import apptive.team5.youtube.dto.YoutubeVideoResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -59,9 +56,5 @@ public class DiaryService {
 
     private UserEntity findUserByIdentifier(String identifier) {
         return userLowService.findByIdentifier(identifier);
-    }
-
-    private String getVideoUrl(List<YoutubeVideoResponse> videoList) {
-        return videoList.isEmpty() ? null : videoList.getFirst().url();
     }
 }
