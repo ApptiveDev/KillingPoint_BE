@@ -30,4 +30,16 @@ public final class TestUtil {
                 user
         );
     }
+
+    public static DiaryEntity makeDiaryEntityWithId(Long diaryId, UserEntity user) {
+        return new DiaryEntity(
+                diaryId,
+                "Test Music",
+                "Test Artist",
+                "image.url",
+                "video.url",
+                "Test content",
+                user
+        );
+    }
 }

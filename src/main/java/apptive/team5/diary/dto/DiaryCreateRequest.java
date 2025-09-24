@@ -1,8 +1,10 @@
 package apptive.team5.diary.dto;
 
 import apptive.team5.diary.domain.DiaryEntity;
+import apptive.team5.diary.domain.DiaryScope;
 import apptive.team5.user.domain.UserEntity;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 public record DiaryCreateRequest(
         @NotBlank(message = "아티스트는 필수 입력입니다.")
@@ -14,7 +16,9 @@ public record DiaryCreateRequest(
         @NotBlank(message = "video URL은 필수 입력입니다.")
         String videoUrl,
         @NotBlank(message = "내용을 입력해주세요")
-        String content
+        String content,
+        @NotNull(message = "공개 범위는 필수 입력입니다.")
+        DiaryScope scope
 ) {
         public static DiaryEntity toEntity(DiaryCreateRequest diaryRequest, UserEntity user) {
                 return new DiaryEntity(
@@ -22,7 +26,8 @@ public record DiaryCreateRequest(
                         diaryRequest.artist,
                         diaryRequest.albumImageUrl,
                         diaryRequest.videoUrl,
-                        diaryRequest.content(),
+                        diaryRequest.content,
+                        diaryRequest.scope,
                         user
                 );
         }

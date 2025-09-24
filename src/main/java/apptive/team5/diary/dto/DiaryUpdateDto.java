@@ -1,10 +1,13 @@
 package apptive.team5.diary.dto;
 
+import apptive.team5.diary.domain.DiaryScope;
+
 public record DiaryUpdateDto(
         String musicTitle,
         String artist,
         String albumImageUrl,
         String videoUrl,
-        String content
+        String content,
+        DiaryScope scope
 ) {
 }

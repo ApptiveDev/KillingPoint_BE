@@ -41,7 +41,8 @@ public class DiaryLowService {
                 updateDto.artist(),
                 updateDto.albumImageUrl(),
                 updateDto.videoUrl(),
-                updateDto.content()
+                updateDto.content(),
+                updateDto.scope()
         );
     }
 

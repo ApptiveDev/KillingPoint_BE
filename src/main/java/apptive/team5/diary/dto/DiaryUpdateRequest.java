@@ -1,11 +1,14 @@
 package apptive.team5.diary.dto;
 
+import apptive.team5.diary.domain.DiaryScope;
+
 public record DiaryUpdateRequest(
         String artist,
         String musicTitle,
         String albumImageUrl,
         String videoUrl,
-        String content
+        String content,
+        DiaryScope scope
 ) {
     public static DiaryUpdateDto toUpdateDto(DiaryUpdateRequest updateRequest) {
         return new DiaryUpdateDto(
@@ -13,7 +16,8 @@ public record DiaryUpdateRequest(
                 updateRequest.artist,
                 updateRequest.albumImageUrl,
                 updateRequest.videoUrl,
-                updateRequest.content
+                updateRequest.content,
+                updateRequest.scope
         );
     }
 }

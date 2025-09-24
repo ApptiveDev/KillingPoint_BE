@@ -88,8 +88,7 @@ public class DiaryServiceTest {
         UserEntity user = TestUtil.makeUserEntity();
         Long diaryId = 1L;
         DiaryUpdateRequest updateRequest = new DiaryUpdateRequest("Updated Artist", "concerto 2", "updated image url", "video url", "updated content");
-        DiaryEntity diary = new DiaryEntity("Test Music", "Test Artist", "image.url", "video.url", "Test content", user);
-        YoutubeVideoResponse youtubeVideoResponse = new YoutubeVideoResponse("Updated Title", "PT3M5S", "updated.video.url");
+        DiaryEntity diary = TestUtil.makeDiaryEntity(user);
 
         given(userLowService.findByIdentifier(user.getIdentifier())).willReturn(user);
         given(diaryLowService.findDiaryById(diaryId)).willReturn(diary);
@@ -102,6 +101,28 @@ public class DiaryServiceTest {
         verify(userLowService).findByIdentifier(any(String.class));
         verify(diaryLowService).findDiaryById(any(Long.class));
         verify(diaryLowService).updateDiary(any(UserEntity.class), any(DiaryEntity.class), any());
+
+        verifyNoMoreInteractions(userLowService, diaryLowService);
+    }
+
+    @Test
+    @DisplayName("다이어리 삭제")
+    void deleteDiary() {
+        // given
+        UserEntity user = TestUtil.makeUserEntity();
+        Long diaryId = 1L;
+        DiaryEntity diary = TestUtil.makeDiaryEntityWithId(diaryId, user);
+
+        given(userLowService.findByIdentifier(user.getIdentifier())).willReturn(user);
+        given(diaryLowService.findDiaryById(diaryId)).willReturn(diary);
+
+        // when
+        diaryService.deleteDiary(user.getIdentifier(), diaryId);
+
+        // then
+        verify(userLowService).findByIdentifier(any(String.class));
+        verify(diaryLowService).findDiaryById(any(Long.class));
+        verify(diaryLowService).deleteDiary(any(UserEntity.class), any(DiaryEntity.class));
 
         verifyNoMoreInteractions(userLowService, diaryLowService);
     }

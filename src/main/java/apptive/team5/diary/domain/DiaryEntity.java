@@ -3,6 +3,8 @@ package apptive.team5.diary.domain;
 import apptive.team5.user.domain.UserEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
@@ -37,6 +39,9 @@ public class DiaryEntity {
     private String videoUrl;
     @Column(columnDefinition = "TEXT")
     private String content;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private DiaryScope scope;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(
@@ -52,6 +57,7 @@ public class DiaryEntity {
             String albumImageUrl,
             String videoUrl,
             String content,
+            DiaryScope scope,
             UserEntity user
     ) {
         this(
@@ -61,16 +67,31 @@ public class DiaryEntity {
                 albumImageUrl,
                 videoUrl,
                 content,
+                scope,
                 user
         );
     }
 
-    public void update(String musicTitle, String artist, String albumImageUrl, String videoUrl, String content) {
+    public void validateOwner(UserEntity user) {
+        if (!this.user.equals(user)) {
+            throw new AccessDeniedException("해당 다이어리에 대한 권한이 없습니다.");
+        }
+    }
+
+    public void update(
+            String musicTitle,
+            String artist,
+            String albumImageUrl,
+            String videoUrl,
+            String content,
+            DiaryScope scope
+    ) {
         updateMusicTitle(musicTitle);
         updateArtist(artist);
         updateAlbumImageUrl(albumImageUrl);
         updateVideoUrl(videoUrl);
         updateContent(content);
+        updateScope(scope);
     }
 
     private void updateMusicTitle(String musicTitle) {
@@ -103,9 +124,9 @@ public class DiaryEntity {
         }
     }
 
-    public void validateOwner(UserEntity user) {
-        if (!this.user.equals(user)) {
-            throw new AccessDeniedException("해당 다이어리에 대한 권한이 없습니다.");
+    private void updateScope(DiaryScope scope) {
+        if (scope != null) {
+            this.scope = scope;
         }
     }
 }
