@@ -68,7 +68,7 @@ public class DiaryServiceTest {
     void createDiary() {
         // given
         UserEntity user = TestUtil.makeUserEntity();
-        DiaryCreateRequest diaryRequest = new DiaryCreateRequest("rach", "concerto", "image.url", "video.url", "test content", DiaryScope.PUBLIC);
+        DiaryCreateRequest diaryRequest = TestUtil.makeDiaryCreateRequest();
 
         given(userLowService.findByIdentifier(user.getIdentifier())).willReturn(user);
 
@@ -88,7 +88,7 @@ public class DiaryServiceTest {
         // given
         UserEntity user = TestUtil.makeUserEntity();
         Long diaryId = 1L;
-        DiaryUpdateRequest updateRequest = new DiaryUpdateRequest("Updated Artist", "concerto 2", "updated image url", "video url", "updated content", DiaryScope.PUBLIC);
+        DiaryUpdateRequest updateRequest = TestUtil.makeDiaryUpdateRequest();
         DiaryEntity diary = TestUtil.makeDiaryEntity(user);
 
         given(userLowService.findByIdentifier(user.getIdentifier())).willReturn(user);

@@ -1,17 +1,14 @@
 package apptive.team5.diary.controller;
 
 import apptive.team5.diary.domain.DiaryEntity;
-import apptive.team5.diary.domain.DiaryScope;
 import apptive.team5.diary.dto.DiaryCreateRequest;
 import apptive.team5.diary.dto.DiaryResponse;
+import apptive.team5.diary.dto.DiaryUpdateRequest;
 import apptive.team5.diary.repository.DiaryRepository;
-import apptive.team5.spotify.service.SpotifyService;
 import apptive.team5.user.domain.UserEntity;
 import apptive.team5.user.repository.UserRepository;
 import apptive.team5.util.TestUtil;
 import apptive.team5.util.mockuser.WithCustomMockUser;
-import apptive.team5.youtube.dto.YoutubeVideoResponse;
-import apptive.team5.youtube.service.YoutubeService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,13 +23,14 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.mockito.Mockito.mock;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -91,12 +89,39 @@ public class DiaryControllerTest {
     @WithCustomMockUser(identifier = TestUtil.userIdentifier)
     void createDiary() throws Exception {
         // given
-        DiaryCreateRequest diaryRequest = new DiaryCreateRequest("Test Artist", "Test Music", "image.url", "url","Test Content", DiaryScope.PUBLIC);
+        DiaryCreateRequest diaryRequest = TestUtil.makeDiaryCreateRequest();
 
         // when & then
         mockMvc.perform(post("/api/diaries")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(diaryRequest)))
                 .andExpect(status().isCreated());
+    }
+
+    @Test
+    @DisplayName("다이어리 수정 API")
+    @WithCustomMockUser(identifier = TestUtil.userIdentifier)
+    void updateDiary() throws Exception {
+        // given
+        DiaryEntity diary = diaryRepository.save(TestUtil.makeDiaryEntity(testUser));
+        DiaryUpdateRequest updateRequest = TestUtil.makeDiaryUpdateRequest();
+
+        // when
+        mockMvc.perform(put("/api/diaries/{diaryId}", diary.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateRequest)))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("다이어리 삭제 API")
+    @WithCustomMockUser(identifier = TestUtil.userIdentifier)
+    void deleteDiary() throws Exception {
+        // given
+        DiaryEntity diary = diaryRepository.save(TestUtil.makeDiaryEntity(testUser));
+
+        // when & then
+        mockMvc.perform(delete("/api/diaries/{diaryId}", diary.getId()))
+                .andExpect(status().isNoContent());
     }
 }

@@ -2,6 +2,8 @@ package apptive.team5.util;
 
 import apptive.team5.diary.domain.DiaryEntity;
 import apptive.team5.diary.domain.DiaryScope;
+import apptive.team5.diary.dto.DiaryCreateRequest;
+import apptive.team5.diary.dto.DiaryUpdateRequest;
 import apptive.team5.diary.service.DiaryService;
 import apptive.team5.user.domain.SocialType;
 import apptive.team5.user.domain.UserEntity;
@@ -44,6 +46,28 @@ public final class TestUtil {
                 "Test content",
                 DiaryScope.PUBLIC,
                 user
+        );
+    }
+
+    public static DiaryCreateRequest makeDiaryCreateRequest() {
+        return new DiaryCreateRequest(
+                "Test Artist",
+                "Test Music",
+                "image.url",
+                "url",
+                "Test Content",
+                DiaryScope.PUBLIC
+        );
+    }
+
+    public static DiaryUpdateRequest makeDiaryUpdateRequest() {
+        return new DiaryUpdateRequest(
+                "Updated Artist",
+                "Updated Music",
+                "updated.image.url",
+                "updated.video.url",
+                "Updated Content",
+                DiaryScope.PUBLIC
         );
     }
 }
