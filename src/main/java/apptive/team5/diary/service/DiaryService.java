@@ -1,7 +1,7 @@
 package apptive.team5.diary.service;
 
 import apptive.team5.diary.domain.DiaryEntity;
-import apptive.team5.diary.dto.DiaryRequest;
+import apptive.team5.diary.dto.DiaryCreateRequest;
 import apptive.team5.diary.dto.DiaryResponse;
 import apptive.team5.diary.dto.DiaryUpdateRequest;
 import apptive.team5.user.domain.UserEntity;
@@ -34,15 +34,10 @@ public class DiaryService {
     }
 
     @Transactional
-    public void createDiary(String identifier, DiaryRequest diaryRequest) {
+    public void createDiary(String identifier, DiaryCreateRequest diaryRequest) {
         UserEntity foundUser = findUserByIdentifier(identifier);
 
-        YoutubeSearchRequest searchRequest = new YoutubeSearchRequest(diaryRequest.artist(), diaryRequest.musicTitle());
-        List<YoutubeVideoResponse> videoList = youtubeService.searchVideo(searchRequest);
-
-        String videoUrl = getVideoUrl(videoList);
-
-        DiaryEntity diary = DiaryRequest.toEntity(diaryRequest, videoUrl, foundUser);
+        DiaryEntity diary = DiaryCreateRequest.toEntity(diaryRequest, foundUser);
 
         diaryLowService.saveDiary(diary);
     }

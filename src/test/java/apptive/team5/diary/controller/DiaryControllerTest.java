@@ -1,10 +1,9 @@
 package apptive.team5.diary.controller;
 
 import apptive.team5.diary.domain.DiaryEntity;
-import apptive.team5.diary.dto.DiaryRequest;
+import apptive.team5.diary.dto.DiaryCreateRequest;
 import apptive.team5.diary.dto.DiaryResponse;
 import apptive.team5.diary.repository.DiaryRepository;
-import apptive.team5.diary.service.DiaryService;
 import apptive.team5.spotify.service.SpotifyService;
 import apptive.team5.user.domain.UserEntity;
 import apptive.team5.user.repository.UserRepository;
@@ -21,7 +20,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -101,11 +99,7 @@ public class DiaryControllerTest {
     @WithCustomMockUser(identifier = TestUtil.userIdentifier)
     void createDiary() throws Exception {
         // given
-        DiaryRequest diaryRequest = new DiaryRequest("Test Artist", "Test Music", "image.url", "Test Content");
-
-        given(youtubeService.searchVideo(any())).willReturn(Collections.singletonList(
-                new YoutubeVideoResponse("Test Title", "PT3M5S", "video.url")
-        ));
+        DiaryCreateRequest diaryRequest = new DiaryCreateRequest("Test Artist", "Test Music", "image.url", "url","Test Content");
 
         // when & then
         mockMvc.perform(post("/api/diaries")

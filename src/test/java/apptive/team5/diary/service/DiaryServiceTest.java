@@ -1,7 +1,7 @@
 package apptive.team5.diary.service;
 
 import apptive.team5.diary.domain.DiaryEntity;
-import apptive.team5.diary.dto.DiaryRequest;
+import apptive.team5.diary.dto.DiaryCreateRequest;
 import apptive.team5.diary.dto.DiaryResponse;
 import apptive.team5.diary.dto.DiaryUpdateRequest;
 import apptive.team5.user.domain.UserEntity;
@@ -72,21 +72,19 @@ public class DiaryServiceTest {
     void createDiary() {
         // given
         UserEntity user = TestUtil.makeUserEntity();
-        DiaryRequest diaryRequest = new DiaryRequest("rach", "concerto", "image.url", "test content");
+        DiaryCreateRequest diaryRequest = new DiaryCreateRequest("rach", "concerto", "image.url", "video.url", "test content");
         YoutubeVideoResponse youtubeVideoResponse = new YoutubeVideoResponse("Test Title", "PT3M5S", "video.url");
 
         given(userLowService.findByIdentifier(user.getIdentifier())).willReturn(user);
-        given(youtubeService.searchVideo(any())).willReturn(Collections.singletonList(youtubeVideoResponse));
 
         // when
         diaryService.createDiary(user.getIdentifier(), diaryRequest);
 
         // then
         verify(userLowService).findByIdentifier(any(String.class));
-        verify(youtubeService).searchVideo(any());
         verify(diaryLowService).saveDiary(any(DiaryEntity.class));
 
-        verifyNoMoreInteractions(userLowService, youtubeService, diaryLowService);
+        verifyNoMoreInteractions(userLowService, diaryLowService);
     }
 
     @Test
