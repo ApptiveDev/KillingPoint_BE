@@ -1,6 +1,7 @@
 package apptive.team5.diary.service;
 
 import apptive.team5.diary.domain.DiaryEntity;
+import apptive.team5.diary.domain.DiaryScope;
 import apptive.team5.diary.dto.DiaryCreateRequest;
 import apptive.team5.diary.dto.DiaryResponse;
 import apptive.team5.diary.dto.DiaryUpdateRequest;
@@ -67,7 +68,7 @@ public class DiaryServiceTest {
     void createDiary() {
         // given
         UserEntity user = TestUtil.makeUserEntity();
-        DiaryCreateRequest diaryRequest = new DiaryCreateRequest("rach", "concerto", "image.url", "video.url", "test content");
+        DiaryCreateRequest diaryRequest = new DiaryCreateRequest("rach", "concerto", "image.url", "video.url", "test content", DiaryScope.PUBLIC);
 
         given(userLowService.findByIdentifier(user.getIdentifier())).willReturn(user);
 
@@ -87,7 +88,7 @@ public class DiaryServiceTest {
         // given
         UserEntity user = TestUtil.makeUserEntity();
         Long diaryId = 1L;
-        DiaryUpdateRequest updateRequest = new DiaryUpdateRequest("Updated Artist", "concerto 2", "updated image url", "video url", "updated content");
+        DiaryUpdateRequest updateRequest = new DiaryUpdateRequest("Updated Artist", "concerto 2", "updated image url", "video url", "updated content", DiaryScope.PUBLIC);
         DiaryEntity diary = TestUtil.makeDiaryEntity(user);
 
         given(userLowService.findByIdentifier(user.getIdentifier())).willReturn(user);

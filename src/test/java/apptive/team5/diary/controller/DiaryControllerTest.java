@@ -1,6 +1,7 @@
 package apptive.team5.diary.controller;
 
 import apptive.team5.diary.domain.DiaryEntity;
+import apptive.team5.diary.domain.DiaryScope;
 import apptive.team5.diary.dto.DiaryCreateRequest;
 import apptive.team5.diary.dto.DiaryResponse;
 import apptive.team5.diary.repository.DiaryRepository;
@@ -29,12 +30,9 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.mockito.Mockito.mock;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -52,12 +50,6 @@ public class DiaryControllerTest {
     @Autowired
     private DiaryRepository diaryRepository;
 
-    @MockitoBean
-    private YoutubeService youtubeService;
-
-    @MockitoBean
-    private SpotifyService spotifyService;
-
     private UserEntity testUser;
 
     @BeforeEach
@@ -71,7 +63,7 @@ public class DiaryControllerTest {
     @WithCustomMockUser(identifier = TestUtil.userIdentifier)
     void getMyMusicDiary() throws Exception {
         // given
-        diaryRepository.save(new DiaryEntity("Test Music", "Test Artist", "image.url", "video.url", "Test content", testUser));
+        diaryRepository.save(TestUtil.makeDiaryEntity(testUser));
 
         // when & then
         String response = mockMvc.perform(get("/api/diaries/my")
@@ -99,7 +91,7 @@ public class DiaryControllerTest {
     @WithCustomMockUser(identifier = TestUtil.userIdentifier)
     void createDiary() throws Exception {
         // given
-        DiaryCreateRequest diaryRequest = new DiaryCreateRequest("Test Artist", "Test Music", "image.url", "url","Test Content");
+        DiaryCreateRequest diaryRequest = new DiaryCreateRequest("Test Artist", "Test Music", "image.url", "url","Test Content", DiaryScope.PUBLIC);
 
         // when & then
         mockMvc.perform(post("/api/diaries")

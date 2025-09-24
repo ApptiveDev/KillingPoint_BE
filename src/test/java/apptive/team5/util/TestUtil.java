@@ -1,6 +1,8 @@
 package apptive.team5.util;
 
 import apptive.team5.diary.domain.DiaryEntity;
+import apptive.team5.diary.domain.DiaryScope;
+import apptive.team5.diary.service.DiaryService;
 import apptive.team5.user.domain.SocialType;
 import apptive.team5.user.domain.UserEntity;
 import apptive.team5.user.domain.UserRoleType;
@@ -27,6 +29,7 @@ public final class TestUtil {
                 "image.url",
                 "video.url",
                 "Test content",
+                DiaryScope.PUBLIC,
                 user
         );
     }
@@ -39,6 +42,7 @@ public final class TestUtil {
                 "image.url",
                 "video.url",
                 "Test content",
+                DiaryScope.PUBLIC,
                 user
         );
     }
