@@ -8,7 +8,6 @@ import apptive.team5.user.domain.UserEntity;
 import apptive.team5.user.service.UserLowService;
 import apptive.team5.util.TestUtil;
 import apptive.team5.youtube.dto.YoutubeVideoResponse;
-import apptive.team5.youtube.service.YoutubeService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,7 +18,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
-import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -39,9 +37,6 @@ public class DiaryServiceTest {
 
     @Mock
     private DiaryLowService diaryLowService;
-
-    @Mock
-    private YoutubeService youtubeService;
 
     @Test
     @DisplayName("내 다이어리 목록 조회")
@@ -73,7 +68,6 @@ public class DiaryServiceTest {
         // given
         UserEntity user = TestUtil.makeUserEntity();
         DiaryCreateRequest diaryRequest = new DiaryCreateRequest("rach", "concerto", "image.url", "video.url", "test content");
-        YoutubeVideoResponse youtubeVideoResponse = new YoutubeVideoResponse("Test Title", "PT3M5S", "video.url");
 
         given(userLowService.findByIdentifier(user.getIdentifier())).willReturn(user);
 
@@ -93,13 +87,12 @@ public class DiaryServiceTest {
         // given
         UserEntity user = TestUtil.makeUserEntity();
         Long diaryId = 1L;
-        DiaryUpdateRequest updateRequest = new DiaryUpdateRequest("Updated Artist", "concerto 2", "updated image url", "updated content");
+        DiaryUpdateRequest updateRequest = new DiaryUpdateRequest("Updated Artist", "concerto 2", "updated image url", "video url", "updated content");
         DiaryEntity diary = new DiaryEntity("Test Music", "Test Artist", "image.url", "video.url", "Test content", user);
         YoutubeVideoResponse youtubeVideoResponse = new YoutubeVideoResponse("Updated Title", "PT3M5S", "updated.video.url");
 
         given(userLowService.findByIdentifier(user.getIdentifier())).willReturn(user);
         given(diaryLowService.findDiaryById(diaryId)).willReturn(diary);
-        given(youtubeService.searchVideo(any())).willReturn(Collections.singletonList(youtubeVideoResponse));
 
 
         // when
@@ -108,9 +101,8 @@ public class DiaryServiceTest {
         // then
         verify(userLowService).findByIdentifier(any(String.class));
         verify(diaryLowService).findDiaryById(any(Long.class));
-        verify(youtubeService).searchVideo(any());
         verify(diaryLowService).updateDiary(any(UserEntity.class), any(DiaryEntity.class), any());
 
-        verifyNoMoreInteractions(userLowService, diaryLowService, youtubeService);
+        verifyNoMoreInteractions(userLowService, diaryLowService);
     }
 }

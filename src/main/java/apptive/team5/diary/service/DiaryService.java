@@ -6,9 +6,7 @@ import apptive.team5.diary.dto.DiaryResponse;
 import apptive.team5.diary.dto.DiaryUpdateRequest;
 import apptive.team5.user.domain.UserEntity;
 import apptive.team5.user.service.UserLowService;
-import apptive.team5.youtube.dto.YoutubeSearchRequest;
 import apptive.team5.youtube.dto.YoutubeVideoResponse;
-import apptive.team5.youtube.service.YoutubeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,7 +21,6 @@ public class DiaryService {
 
     private final UserLowService userLowService;
     private final DiaryLowService diaryLowService;
-    private final YoutubeService youtubeService;
 
     @Transactional(readOnly = true)
     public Page<DiaryResponse> getMyDiaries(String identifier, Pageable pageable) {
@@ -48,11 +45,7 @@ public class DiaryService {
 
         DiaryEntity diary = diaryLowService.findDiaryById(diaryId);
 
-        List<YoutubeVideoResponse> videoList = youtubeService.searchVideo(new YoutubeSearchRequest(updateRequest.artist(), updateRequest.musicTitle()));
-
-        String videoUrl = getVideoUrl(videoList);
-
-        diaryLowService.updateDiary(foundUser, diary, DiaryUpdateRequest.toUpdateDto(updateRequest, videoUrl));
+        diaryLowService.updateDiary(foundUser, diary, DiaryUpdateRequest.toUpdateDto(updateRequest));
     }
 
     @Transactional
