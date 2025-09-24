@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Transactional
 @Service
 @RequiredArgsConstructor
 public class UserLowService {
@@ -16,15 +15,18 @@ public class UserLowService {
     private final UserRepository userRepository;
 
 
+    @Transactional(readOnly = true)
     public UserEntity findByIdentifier(String identifier) {
         return userRepository.findByIdentifier(identifier)
                 .orElseThrow(()-> new NotFoundEntityException(ExceptionCode.NOT_FOUND_USER.getDescription()));
     }
 
+    @Transactional(readOnly = true)
     public boolean existsByIdentifier(String identifier) {
         return userRepository.findByIdentifier(identifier).isPresent();
     }
 
+    @Transactional
     public UserEntity save(UserEntity userEntity) {
         return userRepository.save(userEntity);
     }

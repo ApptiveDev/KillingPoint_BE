@@ -26,8 +26,6 @@ public class YoutubeService {
     private static final GsonFactory gsonFactory = new GsonFactory();
 
     public List<YoutubeVideoResponse> searchVideo(YoutubeSearchRequest searchRequest) {
-
-
         YouTube youtube = new YouTube.
                 Builder(
                 new NetHttpTransport(), gsonFactory, request -> {}
@@ -61,5 +59,4 @@ public class YoutubeService {
             throw new ExternalApiConnectException(ExceptionCode.YOUTUBE_API_EXCEPTION.getDescription(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
 }

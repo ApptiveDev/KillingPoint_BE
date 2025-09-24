@@ -1,62 +1,64 @@
 package apptive.team5.diary.service;
 
+import apptive.team5.diary.domain.DiaryEntity;
+import apptive.team5.diary.dto.DiaryCreateRequest;
 import apptive.team5.diary.dto.DiaryResponse;
+import apptive.team5.diary.dto.DiaryUpdateRequest;
 import apptive.team5.user.domain.UserEntity;
 import apptive.team5.user.service.UserLowService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.function.Function;
-
-@Transactional
 @Service
 @RequiredArgsConstructor
 public class DiaryService {
 
     private final UserLowService userLowService;
+    private final DiaryLowService diaryLowService;
 
+    @Transactional(readOnly = true)
     public Page<DiaryResponse> getMyDiaries(String identifier, Pageable pageable) {
+        UserEntity foundUser = findUserByIdentifier(identifier);
 
-        UserEntity findUser = userLowService.findByIdentifier(identifier);
+        return diaryLowService.findDiaryByUser(foundUser, pageable)
+                .map(DiaryResponse::from);
+    }
 
-        /**
-         * 조회된 유저를 바탕으로 음악 일기 찾기
-         */
+    @Transactional
+    public void createDiary(String identifier, DiaryCreateRequest diaryRequest) {
+        UserEntity foundUser = findUserByIdentifier(identifier);
 
+        DiaryEntity diary = DiaryCreateRequest.toEntity(diaryRequest, foundUser);
 
-        DiaryResponse data1 =
-                new DiaryResponse("artistName", "musicTitle", "https://www.sleek-mag.com/wp-content/uploads/2016/08/AlbumCovers_Blonde-1200x1200.jpg",
-                        "목데이터1", "https://www.youtube-nocookie.com/embed/UXSdbtfw9Rc");
+        diaryLowService.saveDiary(diary);
+    }
 
-        DiaryResponse data2 =
-                new DiaryResponse(
-                        "artistName", "musicTitle", "https://www.sleek-mag.com/wp-content/uploads/2016/08/AlbumCovers_Blonde-1200x1200.jpg",
-                        "목데이터2", "https://www.youtube-nocookie.com/embed/UXSdbtfw9Rc");
+    @Transactional
+    public void updateDiary(String identifier, Long diaryId, DiaryUpdateRequest updateRequest) {
+        UserEntity foundUser = findUserByIdentifier(identifier);
 
-        DiaryResponse data3 =
-                new DiaryResponse(
-                        "artistName", "musicTitle", "https://www.sleek-mag.com/wp-content/uploads/2016/08/AlbumCovers_Blonde-1200x1200.jpg",
-                        "목데이터1", "https://www.youtube-nocookie.com/embed/UXSdbtfw9Rc");
+        DiaryEntity foundDiary = diaryLowService.findDiaryById(diaryId);
 
-        DiaryResponse data4 =
-                new DiaryResponse(
-                        "artistName", "musicTitle", "https://www.sleek-mag.com/wp-content/uploads/2016/08/AlbumCovers_Blonde-1200x1200.jpg",
-                        "목데이터2", "https://www.youtube-nocookie.com/embed/UXSdbtfw9Rc");
+        foundDiary.validateOwner(foundUser);
 
-        List<DiaryResponse> datas = List.of(data1, data2, data3, data4);
+        diaryLowService.updateDiary(foundDiary, DiaryUpdateRequest.toUpdateDto(updateRequest));
+    }
 
-        int start = (int) pageable.getOffset();
-        int end = Math.min(start + pageable.getPageSize(), datas.size());
-        List<DiaryResponse> subList = datas.subList(start, end);
+    @Transactional
+    public void deleteDiary(String identifier, Long diaryId) {
+        UserEntity foundUser = findUserByIdentifier(identifier);
 
-        return new PageImpl<>(subList, pageable, datas.size());
+        DiaryEntity foundDiary = diaryLowService.findDiaryById(diaryId);
 
+        foundDiary.validateOwner(foundUser);
+
+        diaryLowService.deleteDiary(foundDiary);
+    }
+
+    private UserEntity findUserByIdentifier(String identifier) {
+        return userLowService.findByIdentifier(identifier);
     }
 }
