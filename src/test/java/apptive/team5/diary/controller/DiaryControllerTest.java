@@ -12,6 +12,7 @@ import apptive.team5.util.mockuser.WithCustomMockUser;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,11 +22,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.SoftAssertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -61,7 +65,7 @@ public class DiaryControllerTest {
     @WithCustomMockUser(identifier = TestUtil.userIdentifier)
     void getMyMusicDiary() throws Exception {
         // given
-        diaryRepository.save(TestUtil.makeDiaryEntity(testUser));
+        DiaryEntity diary = diaryRepository.save(TestUtil.makeDiaryEntity(testUser));
 
         // when & then
         String response = mockMvc.perform(get("/api/diaries/my")
@@ -79,9 +83,16 @@ public class DiaryControllerTest {
                 new TypeReference<List<DiaryResponse>>() {}
         );
 
-        assertThat(content).hasSize(1);
-        assertThat(content.getFirst().musicTitle()).isEqualTo("Test Music");
-        assertThat(content.getFirst().artist()).isEqualTo("Test Artist");
+        DiaryResponse diaryResponse = content.getFirst();
+
+        assertSoftly(softly-> {
+            softly.assertThat(content).hasSize(1);
+            softly.assertThat(diaryResponse.musicTitle()).isEqualTo(diary.getMusicTitle());
+            softly.assertThat(diaryResponse.artist()).isEqualTo(diary.getArtist());
+            softly.assertThat(diaryResponse.duration()).isEqualTo(diary.getDuration());
+            softly.assertThat(diaryResponse.start()).isEqualTo(diary.getStart());
+            softly.assertThat(diaryResponse.end()).isEqualTo(diary.getEnd());
+        });
     }
 
     @Test
@@ -92,10 +103,26 @@ public class DiaryControllerTest {
         DiaryCreateRequest diaryRequest = TestUtil.makeDiaryCreateRequest();
 
         // when & then
-        mockMvc.perform(post("/api/diaries")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(diaryRequest)))
-                .andExpect(status().isCreated());
+        String header = mockMvc.perform(post("/api/diaries")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(diaryRequest)))
+                .andExpect(MockMvcResultMatchers.header().exists("location"))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse().getHeader("location");
+
+        Long id = Long.parseLong(header.substring(header.lastIndexOf("/") + 1));
+
+        DiaryEntity diaryEntity = diaryRepository.findById(id).get();
+
+        assertSoftly(softly-> {
+            softly.assertThat(diaryEntity.getAlbumImageUrl()).isEqualTo(diaryRequest.albumImageUrl());
+            softly.assertThat(diaryEntity.getEnd()).isEqualTo(diaryRequest.end());
+            softly.assertThat(diaryEntity.getDuration()).isEqualTo(diaryRequest.duration());
+            softly.assertThat(diaryEntity.getStart()).isEqualTo(diaryRequest.start());
+            softly.assertThat(diaryEntity.getArtist()).isEqualTo(diaryRequest.artist());
+            softly.assertThat(diaryEntity.getMusicTitle()).isEqualTo(diaryRequest.musicTitle());
+            softly.assertThat(diaryEntity.getScope()).isEqualTo(diaryRequest.scope());
+        });
     }
 
     @Test

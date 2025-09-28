@@ -10,7 +10,10 @@ public record DiaryResponse(
         String albumImageUrl,
         String content,
         String videoUrl,
-        DiaryScope scope
+        DiaryScope scope,
+        String duration,
+        String start,
+        String end
 ) {
     public static DiaryResponse from(DiaryEntity diary) {
         return new DiaryResponse(
@@ -19,7 +22,10 @@ public record DiaryResponse(
                 diary.getAlbumImageUrl(),
                 diary.getContent(),
                 diary.getVideoUrl(),
-                diary.getScope()
+                diary.getScope(),
+                diary.getDuration(),
+                diary.getStart(),
+                diary.getEnd()
         );
     }
 }

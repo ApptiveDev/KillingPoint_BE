@@ -17,8 +17,8 @@ public class DiaryLowService {
     private final DiaryRepository diaryRepository;
 
     @Transactional
-    public void saveDiary(DiaryEntity diary) {
-        diaryRepository.save(diary);
+    public DiaryEntity saveDiary(DiaryEntity diary) {
+        return diaryRepository.save(diary);
     }
 
     @Transactional(readOnly = true)

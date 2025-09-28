@@ -8,7 +8,10 @@ public record DiaryUpdateRequest(
         String albumImageUrl,
         String videoUrl,
         String content,
-        DiaryScope scope
+        DiaryScope scope,
+        String duration,
+        String start,
+        String end
 ) {
     public static DiaryUpdateDto toUpdateDto(DiaryUpdateRequest updateRequest) {
         return new DiaryUpdateDto(
@@ -17,7 +20,10 @@ public record DiaryUpdateRequest(
                 updateRequest.albumImageUrl,
                 updateRequest.videoUrl,
                 updateRequest.content,
-                updateRequest.scope
+                updateRequest.scope,
+                updateRequest.duration(),
+                updateRequest.start(),
+                updateRequest.end()
         );
     }
 }

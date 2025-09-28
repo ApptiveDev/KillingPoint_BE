@@ -34,15 +34,22 @@ public class DiaryEntity extends BaseTimeEntity {
     private String musicTitle;
     @Column(nullable = false, length = 255)
     private String artist;
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String albumImageUrl;
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String videoUrl;
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private DiaryScope scope;
+
+    @Column(nullable = false)
+    private String duration;
+    @Column(nullable = false)
+    private String start;
+    @Column(nullable = false)
+    private String end;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(
@@ -59,6 +66,9 @@ public class DiaryEntity extends BaseTimeEntity {
             String videoUrl,
             String content,
             DiaryScope scope,
+            String duration,
+            String start,
+            String end,
             UserEntity user
     ) {
         this(
@@ -69,6 +79,9 @@ public class DiaryEntity extends BaseTimeEntity {
                 videoUrl,
                 content,
                 scope,
+                duration,
+                start,
+                end,
                 user
         );
     }

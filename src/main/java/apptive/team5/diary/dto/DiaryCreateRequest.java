@@ -18,7 +18,13 @@ public record DiaryCreateRequest(
         @NotBlank(message = "내용을 입력해주세요")
         String content,
         @NotNull(message = "공개 범위는 필수 입력입니다.")
-        DiaryScope scope
+        DiaryScope scope,
+        @NotBlank(message = "영상 길이는 필수 입력입니다.")
+        String duration,
+        @NotBlank(message = "킬링파트 시작 시간은 필수 입력입니다.")
+        String start,
+        @NotBlank(message = "킬링파트 종료 시간은 필수 입력입니다.")
+        String end
 ) {
         public static DiaryEntity toEntity(DiaryCreateRequest diaryRequest, UserEntity user) {
                 return new DiaryEntity(
@@ -28,6 +34,9 @@ public record DiaryCreateRequest(
                         diaryRequest.videoUrl,
                         diaryRequest.content,
                         diaryRequest.scope,
+                        diaryRequest.duration,
+                        diaryRequest.start(),
+                        diaryRequest.end,
                         user
                 );
         }
