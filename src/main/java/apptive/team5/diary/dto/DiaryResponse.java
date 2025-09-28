@@ -4,6 +4,8 @@ package apptive.team5.diary.dto;
 import apptive.team5.diary.domain.DiaryEntity;
 import apptive.team5.diary.domain.DiaryScope;
 
+import java.time.LocalDate;
+
 public record DiaryResponse(
         String artist,
         String musicTitle,
@@ -13,7 +15,9 @@ public record DiaryResponse(
         DiaryScope scope,
         String duration,
         String start,
-        String end
+        String end,
+        LocalDate createDate,
+        LocalDate updateDate
 ) {
     public static DiaryResponse from(DiaryEntity diary) {
         return new DiaryResponse(
@@ -25,7 +29,9 @@ public record DiaryResponse(
                 diary.getScope(),
                 diary.getDuration(),
                 diary.getStart(),
-                diary.getEnd()
+                diary.getEnd(),
+                diary.getCreateDateTime().toLocalDate(),
+                diary.getUpdateDateTime().toLocalDate()
         );
     }
 }
