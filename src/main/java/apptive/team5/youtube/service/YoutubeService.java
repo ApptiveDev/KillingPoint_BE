@@ -53,7 +53,9 @@ public class YoutubeService {
                     .execute();
 
             return videoResponse.getItems()
-                    .stream().map(YoutubeVideoResponse::new).toList();
+                    .stream().map(YoutubeVideoResponse::new)
+                    .sorted()
+                    .toList();
 
         } catch (IOException e) {
             throw new ExternalApiConnectException(ExceptionCode.YOUTUBE_API_EXCEPTION.getDescription(), HttpStatus.INTERNAL_SERVER_ERROR);
