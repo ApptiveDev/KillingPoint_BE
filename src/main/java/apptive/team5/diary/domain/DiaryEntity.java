@@ -1,5 +1,6 @@
 package apptive.team5.diary.domain;
 
+import apptive.team5.global.entity.BaseTimeEntity;
 import apptive.team5.user.domain.UserEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -22,7 +23,7 @@ import org.springframework.security.access.AccessDeniedException;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class DiaryEntity {
+public class DiaryEntity extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

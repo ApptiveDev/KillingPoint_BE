@@ -1,5 +1,6 @@
 package apptive.team5.user.domain;
 
+import apptive.team5.global.entity.BaseTimeEntity;
 import apptive.team5.jwt.domain.RefreshToken;
 import apptive.team5.oauth2.dto.OAuth2Response;
 import jakarta.persistence.*;
@@ -12,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class UserEntity {
+public class UserEntity extends BaseTimeEntity {
 
     private static String defaultImage;
 
