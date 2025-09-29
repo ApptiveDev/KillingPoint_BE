@@ -3,8 +3,7 @@ package apptive.team5.diary.dto;
 
 import apptive.team5.diary.domain.DiaryEntity;
 import apptive.team5.diary.domain.DiaryScope;
-
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public record DiaryResponse(
         String artist,
@@ -16,8 +15,8 @@ public record DiaryResponse(
         String duration,
         String start,
         String end,
-        LocalDate createDate,
-        LocalDate updateDate
+        LocalDateTime createDate,
+        LocalDateTime updateDate
 ) {
     public static DiaryResponse from(DiaryEntity diary) {
         return new DiaryResponse(
@@ -30,8 +29,8 @@ public record DiaryResponse(
                 diary.getDuration(),
                 diary.getStart(),
                 diary.getEnd(),
-                diary.getCreateDateTime().toLocalDate(),
-                diary.getUpdateDateTime().toLocalDate()
+                diary.getCreateDateTime(),
+                diary.getUpdateDateTime()
         );
     }
 }

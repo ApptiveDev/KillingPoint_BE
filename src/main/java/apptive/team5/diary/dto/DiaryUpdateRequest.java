@@ -21,9 +21,9 @@ public record DiaryUpdateRequest(
                 updateRequest.videoUrl,
                 updateRequest.content,
                 updateRequest.scope,
-                updateRequest.duration(),
-                updateRequest.start(),
-                updateRequest.end()
+                updateRequest.duration,
+                updateRequest.start,
+                updateRequest.end
         );
     }
 }
