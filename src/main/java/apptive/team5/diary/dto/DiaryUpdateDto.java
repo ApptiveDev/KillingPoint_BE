@@ -8,6 +8,9 @@ public record DiaryUpdateDto(
         String albumImageUrl,
         String videoUrl,
         String content,
-        DiaryScope scope
+        DiaryScope scope,
+        String duration,
+        String start,
+        String end
 ) {
 }

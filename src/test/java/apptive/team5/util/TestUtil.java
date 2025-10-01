@@ -32,6 +32,9 @@ public final class TestUtil {
                 "video.url",
                 "Test content",
                 DiaryScope.PUBLIC,
+                "PT2M58S",
+                "PT1M1S",
+                "PT1M31S",
                 user
         );
     }
@@ -45,6 +48,9 @@ public final class TestUtil {
                 "video.url",
                 "Test content",
                 DiaryScope.PUBLIC,
+                "PT2M58S",
+                "PT1M1S",
+                "PT1M31S",
                 user
         );
     }
@@ -56,7 +62,10 @@ public final class TestUtil {
                 "image.url",
                 "url",
                 "Test Content",
-                DiaryScope.PUBLIC
+                DiaryScope.PUBLIC,
+                "PT2M58S",
+                "PT1M1S",
+                "PT1M31S"
         );
     }
 
@@ -67,7 +76,10 @@ public final class TestUtil {
                 "updated.image.url",
                 "updated.video.url",
                 "Updated Content",
-                DiaryScope.PUBLIC
+                DiaryScope.PUBLIC,
+                "PT2M58S",
+                "PT1M1S",
+                "PT1M31S"
         );
     }
 }

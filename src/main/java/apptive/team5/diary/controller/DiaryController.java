@@ -1,5 +1,6 @@
 package apptive.team5.diary.controller;
 
+import apptive.team5.diary.domain.DiaryEntity;
 import apptive.team5.diary.dto.DiaryCreateRequest;
 import apptive.team5.diary.dto.DiaryResponse;
 import apptive.team5.diary.dto.DiaryUpdateRequest;
@@ -20,6 +21,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.net.URI;
 
 @RestController
 @RequiredArgsConstructor
@@ -45,9 +48,9 @@ public class DiaryController {
 
     @PostMapping
     public ResponseEntity<Void> createDiary(@AuthenticationPrincipal String identifier, @Valid @RequestBody DiaryCreateRequest diaryRequest) {
-        diaryService.createDiary(identifier, diaryRequest);
+        DiaryEntity diary = diaryService.createDiary(identifier, diaryRequest);
 
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        return ResponseEntity.status(HttpStatus.CREATED).location(URI.create("/api/diaries/" + diary.getId())).build();
     }
 
     @PutMapping("/{diaryId}")

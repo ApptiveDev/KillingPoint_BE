@@ -28,12 +28,12 @@ public class DiaryService {
     }
 
     @Transactional
-    public void createDiary(String identifier, DiaryCreateRequest diaryRequest) {
+    public DiaryEntity createDiary(String identifier, DiaryCreateRequest diaryRequest) {
         UserEntity foundUser = findUserByIdentifier(identifier);
 
         DiaryEntity diary = DiaryCreateRequest.toEntity(diaryRequest, foundUser);
 
-        diaryLowService.saveDiary(diary);
+        return diaryLowService.saveDiary(diary);
     }
 
     @Transactional
