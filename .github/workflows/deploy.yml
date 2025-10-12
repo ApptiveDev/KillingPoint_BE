@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - feat/logging
 
 jobs:
   deploy:
@@ -68,7 +69,9 @@ jobs:
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script_stop: true
           script: |
-            docker pull ${{ steps.login-ecr.outputs.registry }}/music:${{env.date}}
-            docker stop music || true
-            docker rm music || true
-            docker run -d -e TZ=Asia/Seoul --name music -p 8080:8080 ${{ steps.login-ecr.outputs.registry }}/music:${{env.date}}
+            docker run -d \
+            -e TZ=Asia/Seoul \
+            --name music \
+            -p 8080:8080 \
+            -v /home/ubuntu/logs:/app/logs \
+            ${{ steps.login-ecr.outputs.registry }}/music:${{env.date}}
