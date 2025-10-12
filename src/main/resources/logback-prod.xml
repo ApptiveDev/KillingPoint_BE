@@ -1,5 +1,5 @@
 <configuration>
-    <property name="LOG_FILE" value="application.log"/>
+    <property name="LOG_FILE" value="/app/logs/application.log"/>
 
     <!-- 콘솔 출력 -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
@@ -12,7 +12,7 @@
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOG_FILE}</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>application.%d{yyyy-MM-dd_HH-mm}.log.gz</fileNamePattern>
+            <fileNamePattern>/app/logs/application.%d{yyyy-MM-dd_HH-mm}.log.gz</fileNamePattern>
             <maxHistory>5</maxHistory>
         </rollingPolicy>
         <encoder>
