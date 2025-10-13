@@ -73,6 +73,7 @@ jobs:
             docker stop music || true
             docker rm music || true
             docker run -d \
+            --restart=always \
             -e TZ=Asia/Seoul \
             --name music \
             -p 8080:8080 \
