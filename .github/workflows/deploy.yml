@@ -71,4 +71,10 @@ jobs:
             docker pull ${{ steps.login-ecr.outputs.registry }}/music:${{env.date}}
             docker stop music || true
             docker rm music || true
-            docker run -d -e TZ=Asia/Seoul --name music -p 8080:8080 ${{ steps.login-ecr.outputs.registry }}/music:${{env.date}}
+            docker run -d \
+            --restart=always \
+            -e TZ=Asia/Seoul \
+            --name music \
+            -p 8080:8080 \
+            -v /home/ubuntu/logs:/app/logs \
+            ${{ steps.login-ecr.outputs.registry }}/music:${{env.date}}
