@@ -24,9 +24,4 @@ public class UserController {
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
-
-    @GetMapping("/throw")
-    public ResponseEntity<?> throwException() {
-        throw new RuntimeException("This is a test");
-    }
 }
