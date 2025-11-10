@@ -65,7 +65,6 @@ public class UserService {
             return new UserResponse(findUser);
 
         if (userLowService.existsByTag(userTagUpdateRequest.tag())) {
-            System.out.println("hi");
             throw new DuplicateException(ExceptionCode.DUPLICATE_USER_TAG.getDescription());
         }
 

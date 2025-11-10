@@ -1,12 +1,17 @@
 package apptive.team5.user.service;
 
+import apptive.team5.global.exception.DuplicateException;
+import apptive.team5.global.exception.ExceptionCode;
 import apptive.team5.jwt.component.JWTUtil;
 import apptive.team5.jwt.dto.TokenResponse;
 import apptive.team5.jwt.service.JwtService;
 import apptive.team5.oauth2.dto.GoogleOAuth2Rep;
 import apptive.team5.user.domain.UserEntity;
+import apptive.team5.user.dto.UserResponse;
+import apptive.team5.user.dto.UserTagUpdateRequest;
 import apptive.team5.util.TestUtil;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import org.assertj.core.api.Assertions;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,6 +20,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import static org.assertj.core.api.SoftAssertions.*;
 import static org.mockito.BDDMockito.*;
 
 
@@ -50,7 +56,7 @@ class UserServiceTest {
 
         TokenResponse tokenResponse = userService.socialLogin(socialLoginCase());
 
-        SoftAssertions.assertSoftly(softly -> {
+        assertSoftly(softly -> {
             softly.assertThat(tokenResponse.accessToken()).isEqualTo("accessToken");
             softly.assertThat(tokenResponse.refreshToken()).isEqualTo("refreshToken");
         });
@@ -78,7 +84,7 @@ class UserServiceTest {
 
         TokenResponse tokenResponse = userService.socialLogin(socialLoginCase());
 
-        SoftAssertions.assertSoftly(softly -> {
+        assertSoftly(softly -> {
             softly.assertThat(tokenResponse.accessToken()).isEqualTo("accessToken");
             softly.assertThat(tokenResponse.refreshToken()).isEqualTo("refreshToken");
         });
@@ -86,6 +92,57 @@ class UserServiceTest {
         verify(userLowService).save(any());
         verify(jwtService).saveRefreshToken(any(),any());
         verify(jwtUtil, times(2)).createJWT(any(), any(), any());
+        verifyNoMoreInteractions(userLowService, jwtUtil, jwtService);
+    }
+
+    @Test
+    @DisplayName("tag 변경 성공")
+    void changeTagSuccess() {
+        // given
+        UserEntity user = TestUtil.makeUserEntityWithId();
+        UserTagUpdateRequest userTagUpdateRequest = new UserTagUpdateRequest("aaa");
+
+        given(userLowService.findById(any()))
+               .willReturn(user);
+
+       given((userLowService.existsByTag(any())))
+               .willReturn(false);
+
+       // when
+        UserResponse userResponse = userService.changeTag(userTagUpdateRequest, user.getId());
+
+        // then
+        assertSoftly(softly -> {
+            softly.assertThat(userResponse.tag()).isEqualTo(userTagUpdateRequest.tag());
+            softly.assertThat(userResponse.userId()).isEqualTo(user.getId());
+        });
+
+        verify(userLowService).existsByTag(any());
+        verify(userLowService).findById(any());
+        verifyNoMoreInteractions(userLowService, jwtUtil, jwtService);
+    }
+
+    @Test
+    @DisplayName("tag 변경 실패 - 중복된 태그")
+    void changeTagFail() {
+        // given
+        UserEntity user = TestUtil.makeUserEntityWithId();
+        UserTagUpdateRequest userTagUpdateRequest = new UserTagUpdateRequest("aaa");
+
+        given(userLowService.findById(any()))
+                .willReturn(user);
+
+        given((userLowService.existsByTag(any())))
+                .willReturn(true);
+
+        // when
+        Assertions.assertThatThrownBy(()->userService.changeTag(userTagUpdateRequest, user.getId()))
+                .isInstanceOf(DuplicateException.class)
+                .hasMessage(ExceptionCode.DUPLICATE_USER_TAG.getDescription());
+
+
+        verify(userLowService).existsByTag(any());
+        verify(userLowService).findById(any());
         verifyNoMoreInteractions(userLowService, jwtUtil, jwtService);
     }
 

@@ -10,8 +10,6 @@ import apptive.team5.user.domain.UserEntity;
 import apptive.team5.user.domain.UserRoleType;
 import apptive.team5.user.util.TagGenerator;
 
-import java.util.UUID;
-
 public final class TestUtil {
 
     public static final String userIdentifier = "GOOGLE-1234";
@@ -29,14 +27,18 @@ public final class TestUtil {
         );
     }
 
+    public static UserEntity makeDifferentUserEntity(UserEntity user) {
+        return new UserEntity(user.getIdentifier() + "1", user.getEmail() + "1", user.getUsername(), user.getTag() + "1", user.getRoleType(), user.getSocialType());
+    }
+
     public static UserEntity makeUserEntityWithId() {
         String tag = TagGenerator.generateTag();
         return new UserEntity(
                 1L,
                 userIdentifier,
                 "example@gmail.com",
-                tag,
                 "exampleName",
+                tag,
                 UserRoleType.USER,
                 SocialType.GOOGLE
         );

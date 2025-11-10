@@ -5,6 +5,7 @@ import apptive.team5.user.domain.UserEntity;
 import apptive.team5.user.domain.UserRoleType;
 
 public record UserResponse(
+        Long userId,
         String username,
         String tag,
         String identifier,
@@ -15,7 +16,8 @@ public record UserResponse(
 ) {
 
     public UserResponse(UserEntity userEntity) {
-        this(userEntity.getUsername(),
+        this(   userEntity.getId(),
+                userEntity.getUsername(),
                 userEntity.getTag(),
                 userEntity.getIdentifier(),
                 userEntity.getEmail(),
