@@ -1,29 +1,29 @@
-package apptive.team5.util.mockuser;
+package apptive.team5.util;
 
+import apptive.team5.user.domain.UserRoleType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.test.context.support.WithSecurityContextFactory;
 
 import java.util.Collections;
 import java.util.List;
 
-public class WithMockCustomSecurityContextFactory implements WithSecurityContextFactory<WithCustomMockUser> {
-    @Override
-    public SecurityContext createSecurityContext(WithCustomMockUser annotation) {
+public final class TestSecurityContextHolderInjection {
 
-        String identifier = annotation.identifier();
-        String role = annotation.role();
+
+    public static void inject(Long userId, UserRoleType roleType) {
+
+        String role = "ROLE_" + roleType.name();
+
         List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(role));
 
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(identifier, null, authorities);
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userId, null, authorities);
 
         SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
 
         securityContext.setAuthentication(authenticationToken);
-
-        return securityContext;
+        SecurityContextHolder.setContext(securityContext);
     }
 }

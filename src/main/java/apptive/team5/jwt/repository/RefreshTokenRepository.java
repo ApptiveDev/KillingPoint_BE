@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 public interface RefreshTokenRepository extends JpaRepository<RefreshToken,String> {
@@ -20,4 +21,8 @@ public interface RefreshTokenRepository extends JpaRepository<RefreshToken,Strin
     @Modifying(clearAutomatically = true)
     @Query("delete from RefreshToken r where r.createdDate < :date")
     void deleteExpiredRefreshToken(LocalDateTime date);
+
+    @Query("select r from RefreshToken r where r.user.id = :userId")
+    Optional<RefreshToken> findByUserId(Long userId);
+
 }

@@ -34,21 +34,21 @@ public class DiaryController {
     @GetMapping("/my")
     public ResponseEntity<Page<DiaryResponse>> getMyMusicDiary(
             @AuthenticationPrincipal
-            String identifier,
+            Long userId,
             @RequestParam(defaultValue = "0")
             int page,
             @RequestParam(defaultValue = "5")
             int size
     ) {
 
-        Page<DiaryResponse> response = diaryService.getMyDiaries(identifier, PageRequest.of(page, size));
+        Page<DiaryResponse> response = diaryService.getMyDiaries(userId, PageRequest.of(page, size));
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PostMapping
-    public ResponseEntity<Void> createDiary(@AuthenticationPrincipal String identifier, @Valid @RequestBody DiaryCreateRequest diaryRequest) {
-        DiaryEntity diary = diaryService.createDiary(identifier, diaryRequest);
+    public ResponseEntity<Void> createDiary(@AuthenticationPrincipal Long userId, @Valid @RequestBody DiaryCreateRequest diaryRequest) {
+        DiaryEntity diary = diaryService.createDiary(userId, diaryRequest);
 
         return ResponseEntity.status(HttpStatus.CREATED).location(URI.create("/api/diaries/" + diary.getId())).build();
     }
@@ -56,20 +56,20 @@ public class DiaryController {
     @PutMapping("/{diaryId}")
     public ResponseEntity<Void> updateDiary(
             @AuthenticationPrincipal
-            String identifier,
+            Long userId,
             @PathVariable
             Long diaryId,
             @RequestBody
             DiaryUpdateRequest updateRequest
     ) {
-        diaryService.updateDiary(identifier, diaryId, updateRequest);
+        diaryService.updateDiary(userId, diaryId, updateRequest);
 
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @DeleteMapping("/{diaryId}")
-    public ResponseEntity<Void> deleteDiary(@AuthenticationPrincipal String identifier, @PathVariable Long diaryId) {
-        diaryService.deleteDiary(identifier, diaryId);
+    public ResponseEntity<Void> deleteDiary(@AuthenticationPrincipal Long userId, @PathVariable Long diaryId) {
+        diaryService.deleteDiary(userId, diaryId);
 
         return ResponseEntity.noContent().build();
     }

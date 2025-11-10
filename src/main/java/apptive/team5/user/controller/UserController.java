@@ -18,9 +18,9 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/my")
-    public ResponseEntity<UserResponse> getMyInfo(@AuthenticationPrincipal String identifier) {
+    public ResponseEntity<UserResponse> getMyInfo(@AuthenticationPrincipal Long userId) {
 
-        UserResponse response = userService.getUserInfo(identifier);
+        UserResponse response = userService.getUserInfo(userId);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }

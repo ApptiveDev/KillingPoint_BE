@@ -1,4 +1,4 @@
-package apptive.team5.filter;
+package apptive.team5.global.filter;
 
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;

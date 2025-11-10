@@ -22,6 +22,9 @@ public class OAuth2Controller {
 
         TokenResponse tokenResponse = kakaoService.kakaoLogin(kakaoLoginRequest.accessToken());
 
+
+        System.out.println(tokenResponse);
+
         return ResponseEntity.ok(tokenResponse);
     }
 

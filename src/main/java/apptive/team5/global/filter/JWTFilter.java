@@ -1,4 +1,4 @@
-package apptive.team5.filter;
+package apptive.team5.global.filter;
 
 import apptive.team5.global.exception.NotFoundEntityException;
 import apptive.team5.jwt.TokenType;
@@ -58,12 +58,12 @@ public class JWTFilter extends OncePerRequestFilter {
         }
 
         Claims claims = jwtUtil.getClaims(accessToken);
-        String identifier = claims.get("identifier").toString();
+        Long userId = Long.valueOf(claims.get("userId").toString());
 
         try {
-            UserEntity findUser = userLowService.findByIdentifier(identifier);
+            UserEntity findUser = userLowService.findById(userId);
             List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_"+findUser.getRoleType().name()));
-            Authentication auth = new UsernamePasswordAuthenticationToken(identifier, null, authorities);
+            Authentication auth = new UsernamePasswordAuthenticationToken(userId, null, authorities);
             SecurityContextHolder.getContext().setAuthentication(auth);
             filterChain.doFilter(request, response);
         } catch (NotFoundEntityException ex) {

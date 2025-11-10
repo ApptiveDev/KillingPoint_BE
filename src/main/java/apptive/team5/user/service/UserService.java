@@ -32,17 +32,17 @@ public class UserService {
             user = userLowService.save(new UserEntity(identifier, oAuth2Response.getEmail(), oAuth2Response.getUsername(), UserRoleType.USER, oAuth2Response.getProvider()));
         }
 
-        String accessToken = jwtUtil.createJWT(user.getIdentifier(), "ROLE_" + user.getRoleType().name(), TokenType.ACCESS_TOKEN);
-        String refreshToken = jwtUtil.createJWT(user.getIdentifier(), "ROLE_" + user.getRoleType().name(), TokenType.REFRESH_TOKEN);
+        String accessToken = jwtUtil.createJWT(user.getId(), "ROLE_" + user.getRoleType().name(), TokenType.ACCESS_TOKEN);
+        String refreshToken = jwtUtil.createJWT(user.getId(), "ROLE_" + user.getRoleType().name(), TokenType.REFRESH_TOKEN);
 
 
-        jwtService.saveRefreshToken(user.getIdentifier(), refreshToken);
+        jwtService.saveRefreshToken(user.getId(), refreshToken);
 
         return new TokenResponse(accessToken, refreshToken);
     }
 
-    public UserResponse getUserInfo(String identifier) {
-        UserEntity findUser = userLowService.findByIdentifier(identifier);
+    public UserResponse getUserInfo(Long userId) {
+        UserEntity findUser = userLowService.findById(userId);
 
         return new UserResponse(findUser);
     }

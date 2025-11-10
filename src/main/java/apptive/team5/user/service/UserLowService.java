@@ -22,6 +22,17 @@ public class UserLowService {
     }
 
     @Transactional(readOnly = true)
+    public UserEntity findById(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(()-> new NotFoundEntityException(ExceptionCode.NOT_FOUND_USER.getDescription()));
+    }
+
+    @Transactional(readOnly = true)
+    public UserEntity getReferenceById(Long id) {
+        return userRepository.getReferenceById(id);
+    }
+
+    @Transactional(readOnly = true)
     public boolean existsByIdentifier(String identifier) {
         return userRepository.findByIdentifier(identifier).isPresent();
     }

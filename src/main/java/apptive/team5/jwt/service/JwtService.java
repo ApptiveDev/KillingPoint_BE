@@ -6,40 +6,35 @@ import apptive.team5.jwt.TokenType;
 import apptive.team5.jwt.component.JWTUtil;
 import apptive.team5.jwt.domain.RefreshToken;
 import apptive.team5.jwt.dto.TokenResponse;
-import apptive.team5.jwt.repository.RefreshTokenRepository;
 import apptive.team5.jwt.component.RefreshTokenEncoder;
 import apptive.team5.user.domain.UserEntity;
 import apptive.team5.user.service.UserLowService;
 import io.jsonwebtoken.Claims;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class JwtService {
 
-    private final RefreshTokenRepository refreshTokenRepository;
     private final JWTUtil jwtUtil;
     private final RefreshTokenEncoder tokenEncoder;
     private final UserLowService userLowService;
+    private final JwtLowService jwtLowService;
 
-    public RefreshToken saveRefreshToken(String identifier, String refreshToken) {
+    public RefreshToken saveRefreshToken(Long userId, String refreshToken) {
 
-        UserEntity findUser = userLowService.findByIdentifier(identifier);
+        UserEntity findUser = userLowService.findById(userId);
 
         String encodedRefreshToken = tokenEncoder.encode(refreshToken);
 
-        refreshTokenRepository.deleteByUser(findUser);
+        jwtLowService.deleteByUser(findUser);
 
-        return refreshTokenRepository.save(new RefreshToken(findUser, encodedRefreshToken));
+        return jwtLowService.save(new RefreshToken(findUser, encodedRefreshToken));
     }
 
     public TokenResponse exchangeToken(String oldRefreshToken) {
@@ -50,35 +45,30 @@ public class JwtService {
             throw new AuthenticationException(ExceptionCode.INVALID_REFRESH_TOKEN.getDescription());
 
         Claims claims = jwtUtil.getClaims(oldRefreshToken);
-        String identifier = claims.get("identifier").toString();
+        Long userId = Long.valueOf(claims.get("userId").toString());
         String role = claims.get("role").toString();
 
-        RefreshToken findRefreshToken = findByUserIdentifier(identifier);
+        RefreshToken findRefreshToken = jwtLowService.findByUserId(userId);
 
         if (!tokenEncoder.match(findRefreshToken.getToken(), oldRefreshToken)) {
             throw new AuthenticationException(ExceptionCode.INVALID_REFRESH_TOKEN.getDescription());
         }
 
-        String newAccessToken = jwtUtil.createJWT(identifier, role, TokenType.ACCESS_TOKEN);
-        String newRefreshToken = jwtUtil.createJWT(identifier, role, TokenType.REFRESH_TOKEN);
+        String newAccessToken = jwtUtil.createJWT(userId, role, TokenType.ACCESS_TOKEN);
+        String newRefreshToken = jwtUtil.createJWT(userId, role, TokenType.REFRESH_TOKEN);
 
-        saveRefreshToken(identifier, newRefreshToken);
+        saveRefreshToken(userId, newRefreshToken);
 
         return new TokenResponse(newAccessToken, newRefreshToken);
     }
 
-    public void deleteRefreshTokenByIdentifier(String identifier) {
-        UserEntity findUser = userLowService.findByIdentifier(identifier);
-        refreshTokenRepository.deleteByUser(findUser);
-    }
-
-    public RefreshToken findByUserIdentifier(String identifier) {
-        return refreshTokenRepository.findByUserIdentifier(identifier)
-                .orElseThrow(() -> new AuthenticationException(ExceptionCode.NOT_EXIST_REFRESH_TOKEN.getDescription()));
+    public void deleteRefreshTokenByUserId(Long userId) {
+        UserEntity findUser = userLowService.getReferenceById(userId);
+        jwtLowService.deleteByUser(findUser);
     }
 
     public void deleteExpiredRefreshTokens() {
         LocalDateTime cutoff = LocalDateTime.now().minusDays(8);
-        refreshTokenRepository.deleteExpiredRefreshToken(cutoff);
+        jwtLowService.deleteExpiredRefreshToken(cutoff);
     }
 }

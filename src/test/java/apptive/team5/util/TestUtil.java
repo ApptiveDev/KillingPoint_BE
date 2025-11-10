@@ -24,6 +24,17 @@ public final class TestUtil {
         );
     }
 
+    public static UserEntity makeUserEntityWithId() {
+        return new UserEntity(
+                1L,
+                userIdentifier,
+                "example@gmail.com",
+                "exampleName",
+                UserRoleType.USER,
+                SocialType.GOOGLE
+        );
+    }
+
     public static DiaryEntity makeDiaryEntity(UserEntity user) {
         return new DiaryEntity(
                 "Test Music",

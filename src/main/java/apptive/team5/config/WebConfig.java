@@ -1,6 +1,6 @@
 package apptive.team5.config;
 
-import apptive.team5.filter.LoggingFilter;
+import apptive.team5.global.filter.LoggingFilter;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

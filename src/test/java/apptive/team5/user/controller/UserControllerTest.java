@@ -1,15 +1,14 @@
 package apptive.team5.user.controller;
 
 import apptive.team5.global.exception.ExceptionCode;
-import apptive.team5.jwt.TokenType;
 import apptive.team5.jwt.component.JWTUtil;
 import apptive.team5.user.domain.UserEntity;
+import apptive.team5.user.domain.UserRoleType;
 import apptive.team5.user.dto.UserResponse;
 import apptive.team5.user.repository.UserRepository;
+import apptive.team5.util.TestSecurityContextHolderInjection;
 import apptive.team5.util.TestUtil;
-import apptive.team5.util.mockuser.WithCustomMockUser;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +16,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Map;
 
 import static org.assertj.core.api.SoftAssertions.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.securityContext;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 
@@ -48,13 +49,15 @@ class UserControllerTest {
 
     @DisplayName("회원 정보 조회 성공")
     @Test
-    @WithCustomMockUser(identifier = TestUtil.userIdentifier)
     void getMyInfoSuccess() throws Exception {
 
         UserEntity user = TestUtil.makeUserEntity();
         userRepository.save(user);
+        TestSecurityContextHolderInjection.inject(user.getId(), user.getRoleType());
 
-        String response = mockMvc.perform(get("/api/users/my"))
+        String response = mockMvc.perform(get("/api/users/my")
+                        .with(securityContext(SecurityContextHolder.getContext()))
+                )
                 .andReturn().getResponse().getContentAsString();
 
         UserResponse userResponse = objectMapper.readValue(response, UserResponse.class);
@@ -70,11 +73,14 @@ class UserControllerTest {
 
     @DisplayName("회원 정보 조회 실패 - 존재하지 않는 회원")
     @Test
-    @WithCustomMockUser
     void getMyInfoFail() throws Exception {
 
+        TestSecurityContextHolderInjection.inject(1L, UserRoleType.USER);
 
-        MockHttpServletResponse response = mockMvc.perform(get("/api/users/my"))
+
+        MockHttpServletResponse response = mockMvc.perform(get("/api/users/my")
+                        .with(securityContext(SecurityContextHolder.getContext()))
+                )
                 .andReturn().getResponse();
 
         String content = response.getContentAsString();
