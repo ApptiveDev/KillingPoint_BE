@@ -31,6 +31,9 @@ public class UserEntity extends BaseTimeEntity {
     @Column(nullable = false)
     private String username;
 
+    @Column(unique = true, nullable = false)
+    private String tag;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private UserRoleType roleType;
@@ -45,31 +48,29 @@ public class UserEntity extends BaseTimeEntity {
     @Column(nullable = false)
     private String profileImageUrl;
 
-    public UserEntity(String identifier, String email, String username, UserRoleType roleType, SocialType socialType) {
+    public UserEntity(String identifier, String email, String username, String tag, UserRoleType roleType, SocialType socialType) {
         this.identifier = identifier;
         this.email = email;
         this.username = username;
+        this.tag = tag;
         this.roleType = roleType;
         this.socialType = socialType;
         this.profileImageUrl = defaultImage;
     }
 
-    public UserEntity(Long id, String identifier, String email, String username, UserRoleType roleType, SocialType socialType) {
+    public UserEntity(Long id, String identifier, String email, String username, String tag, UserRoleType roleType, SocialType socialType) {
         this.id = id;
         this.identifier = identifier;
         this.email = email;
         this.username = username;
+        this.tag = tag;
         this.roleType = roleType;
         this.socialType = socialType;
         this.profileImageUrl = defaultImage;
     }
 
-    public UserEntity(OAuth2Response oAuth2Response) {
-        this.identifier = oAuth2Response.getProvider() + "-" + oAuth2Response.getProviderId();
-        this.email = oAuth2Response.getEmail();
-        this.username = oAuth2Response.getUsername();
-        this.roleType = UserRoleType.USER;
-        this.socialType = oAuth2Response.getProvider();
+    public void changeTag(String tag) {
+        this.tag = tag;
     }
 
     public static void setDefaultImage(String url) {

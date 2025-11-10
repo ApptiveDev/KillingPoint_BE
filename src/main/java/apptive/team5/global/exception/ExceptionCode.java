@@ -10,7 +10,8 @@ public enum ExceptionCode {
     INVALID_REFRESH_TOKEN("잘못된 리프래시 토큰입니다."),
     YOUTUBE_API_EXCEPTION("유튜브 api 호출 실패"),
     KAKAO_API_EXCEPTION("카카오 api 호출 실패"),
-    GOOGLE_API_EXCEPTION("구글 api 호출 실패");
+    GOOGLE_API_EXCEPTION("구글 api 호출 실패"),
+    DUPLICATE_USER_TAG("이미 존재하는 tag입니다.");
 
     private final String description;
 

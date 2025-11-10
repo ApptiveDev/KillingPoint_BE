@@ -8,6 +8,9 @@ import apptive.team5.diary.service.DiaryService;
 import apptive.team5.user.domain.SocialType;
 import apptive.team5.user.domain.UserEntity;
 import apptive.team5.user.domain.UserRoleType;
+import apptive.team5.user.util.TagGenerator;
+
+import java.util.UUID;
 
 public final class TestUtil {
 
@@ -15,20 +18,24 @@ public final class TestUtil {
 
 
     public static UserEntity makeUserEntity() {
+        String tag = TagGenerator.generateTag();
         return new UserEntity(
                 userIdentifier,
                 "example@gmail.com",
                 "exampleName",
+                tag,
                 UserRoleType.USER,
                 SocialType.GOOGLE
         );
     }
 
     public static UserEntity makeUserEntityWithId() {
+        String tag = TagGenerator.generateTag();
         return new UserEntity(
                 1L,
                 userIdentifier,
                 "example@gmail.com",
+                tag,
                 "exampleName",
                 UserRoleType.USER,
                 SocialType.GOOGLE

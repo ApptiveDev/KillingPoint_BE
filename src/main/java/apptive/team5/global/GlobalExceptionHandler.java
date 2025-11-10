@@ -1,20 +1,34 @@
 package apptive.team5.global;
 
-import apptive.team5.global.exception.AuthenticationException;
-import apptive.team5.global.exception.ExternalApiConnectException;
-import apptive.team5.global.exception.KakaoApiConnectException;
-import apptive.team5.global.exception.NotFoundEntityException;
+import apptive.team5.global.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Map<String, List<Map<String,String>>>>  handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
+        List<Map<String, String>> fieldErrors = ex.getBindingResult().getFieldErrors()
+                .stream().map(error -> Map.of(error.getField(), Optional.ofNullable(error.getDefaultMessage()).orElse("Invalid value")))
+                .toList();
+
+        List<Map<String, String>> globalErrors = ex.getBindingResult().getGlobalErrors()
+                .stream().map(error -> Map.of("message", Optional.ofNullable(error.getDefaultMessage()).orElse("Invalid value")))
+                .toList();
+
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("globalErrors", globalErrors, "fieldErrors", fieldErrors));
+    }
 
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<Map<String,String>> handleAuthenticationException(AuthenticationException e) {
@@ -45,5 +59,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<Map<String, String>> handleAccessDeniedException(AccessDeniedException e) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", e.getMessage()));
+    }
+
+    @ExceptionHandler(DuplicateException.class)
+    public ResponseEntity<Map<String, String>> handleDuplicateException(DuplicateException e) {
+        System.out.println(e.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", e.getMessage()));
     }
 }

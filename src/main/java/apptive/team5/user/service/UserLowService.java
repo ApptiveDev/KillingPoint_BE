@@ -37,8 +37,16 @@ public class UserLowService {
         return userRepository.findByIdentifier(identifier).isPresent();
     }
 
-    @Transactional
     public UserEntity save(UserEntity userEntity) {
         return userRepository.save(userEntity);
+    }
+
+    public void deleteByUser(UserEntity userEntity) {
+        userRepository.delete(userEntity);
+    }
+
+    @Transactional(readOnly = true)
+    public boolean existsByTag(String tag) {
+        return userRepository.findByTag(tag).isPresent();
     }
 }

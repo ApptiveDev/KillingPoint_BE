@@ -6,6 +6,7 @@ import apptive.team5.user.domain.UserRoleType;
 
 public record UserResponse(
         String username,
+        String tag,
         String identifier,
         String email,
         String profileImageUrl,
@@ -15,6 +16,7 @@ public record UserResponse(
 
     public UserResponse(UserEntity userEntity) {
         this(userEntity.getUsername(),
+                userEntity.getTag(),
                 userEntity.getIdentifier(),
                 userEntity.getEmail(),
                 userEntity.getProfileImageUrl(),

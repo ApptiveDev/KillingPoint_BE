@@ -172,9 +172,4 @@ class JwtServiceTest {
         verifyNoMoreInteractions(userLowService, jwtUtil, jwtLowService);
     }
 
-    private UserEntity createUserEntity() {
-        return new UserEntity(1L, "GOOGLE_1234", "example@gmail.com",
-                "exampleName", UserRoleType.USER, SocialType.GOOGLE);
-    }
-
 }
