@@ -63,7 +63,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(DuplicateException.class)
     public ResponseEntity<Map<String, String>> handleDuplicateException(DuplicateException e) {
-        System.out.println(e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", e.getMessage()));
     }
 }
