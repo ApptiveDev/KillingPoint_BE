@@ -9,6 +9,8 @@ import apptive.team5.user.dto.UserTagUpdateRequest;
 import apptive.team5.user.repository.UserRepository;
 import apptive.team5.util.TestSecurityContextHolderInjection;
 import apptive.team5.util.TestUtil;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,8 +25,12 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 
+import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Map;
 
+import static java.nio.charset.StandardCharsets.*;
+import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.SoftAssertions.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.securityContext;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -151,6 +157,53 @@ class UserControllerTest {
         assertSoftly(softly -> {
             softly.assertThat(apiResponse.get("message")).isEqualTo(ExceptionCode.DUPLICATE_USER_TAG.getDescription());
         });
+
+    }
+
+    @DisplayName("tag를 통해 유저 조회 성공")
+    @Test
+    void getUserByTagSuccess() throws Exception {
+
+        UserEntity user = TestUtil.makeUserEntity();
+        userRepository.save(user);
+        TestSecurityContextHolderInjection.inject(user.getId(), user.getRoleType());
+
+
+        String response = mockMvc.perform(get("/api/users")
+                        .param("tag", user.getTag())
+                        .with(securityContext(SecurityContextHolder.getContext()))
+                )
+                .andReturn().getResponse().getContentAsString(UTF_8);
+
+        JsonNode jsonNode = objectMapper.readTree(response);
+
+        List<UserResponse> content = objectMapper.convertValue(
+                jsonNode.path("content"),
+                new TypeReference<List<UserResponse>>() {}
+        );
+
+        assertSoftly(softly -> {
+            softly.assertThat(content.size()).isEqualTo(1);
+            softly.assertThat(content.get(0).userId()).isEqualTo(user.getId());
+        });
+
+    }
+
+    @DisplayName("회원 탈퇴 성공")
+    @Test
+    void withDrawSuccess() throws Exception {
+
+        UserEntity user = TestUtil.makeUserEntity();
+        userRepository.save(user);
+        TestSecurityContextHolderInjection.inject(user.getId(), user.getRoleType());
+
+
+        mockMvc.perform(delete("/api/users/my")
+                        .with(securityContext(SecurityContextHolder.getContext()))
+                )
+                .andExpect(status().isNoContent());
+
+        assertThat(userRepository.existsById(user.getId())).isFalse();
 
     }
 
