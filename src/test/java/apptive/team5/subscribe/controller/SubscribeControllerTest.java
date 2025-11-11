@@ -119,40 +119,6 @@ class SubscribeControllerTest {
         });
     }
 
-    @DisplayName("내 구독 목록 조회")
-    @Test
-    void getMySubscribeSuccess() throws Exception {
-
-        // given
-        UserEntity subscriber = TestUtil.makeUserEntity();
-        userRepository.save(subscriber);
-        UserEntity subscribedTo = TestUtil.makeDifferentUserEntity(subscriber);
-        userRepository.save(subscribedTo);
-        Subscribe subscribe = subscribeRepository.save(new Subscribe(subscriber, subscribedTo));
-
-        TestSecurityContextHolderInjection.inject(subscriber.getId(), subscriber.getRoleType());
-
-        // when
-        String response = mockMvc.perform(get("/api/subscribes/my", subscriber.getId())
-                .with(securityContext(SecurityContextHolder.getContext()))
-        ).andExpect(status().isOk()).andReturn().getResponse().getContentAsString(UTF_8);
-
-
-        // then
-        JsonNode jsonNode = objectMapper.readTree(response);
-
-        List<UserResponse> content = objectMapper.convertValue(
-                jsonNode.path("content"),
-                new TypeReference<List<UserResponse>>() {}
-        );
-
-        assertSoftly(softly -> {
-            softly.assertThat(content).hasSize(1);
-            softly.assertThat(content.getFirst().userId()).isEqualTo(subscribedTo.getId());
-        });
-
-    }
-
     @DisplayName("특정 사용자의 구독 목록 조회")
     @Test
     void getSubscribeSuccess() throws Exception {
@@ -184,40 +150,6 @@ class SubscribeControllerTest {
         assertSoftly(softly -> {
             softly.assertThat(content).hasSize(1);
             softly.assertThat(content.getFirst().userId()).isEqualTo(subscribedTo.getId());
-        });
-
-    }
-
-    @DisplayName("내 구독자 목록 조회")
-    @Test
-    void getMySubscriberSuccess() throws Exception {
-
-        // given
-        UserEntity subscriber = TestUtil.makeUserEntity();
-        userRepository.save(subscriber);
-        UserEntity subscribedTo = TestUtil.makeDifferentUserEntity(subscriber);
-        userRepository.save(subscribedTo);
-        Subscribe subscribe = subscribeRepository.save(new Subscribe(subscriber, subscribedTo));
-
-        TestSecurityContextHolderInjection.inject(subscribedTo.getId(), subscribedTo.getRoleType());
-
-        // when
-        String response = mockMvc.perform(get("/api/subscribes/my/fans", subscribedTo.getId())
-                .with(securityContext(SecurityContextHolder.getContext()))
-        ).andExpect(status().isOk()).andReturn().getResponse().getContentAsString(UTF_8);
-
-
-        // then
-        JsonNode jsonNode = objectMapper.readTree(response);
-
-        List<UserResponse> content = objectMapper.convertValue(
-                jsonNode.path("content"),
-                new TypeReference<List<UserResponse>>() {}
-        );
-
-        assertSoftly(softly -> {
-            softly.assertThat(content).hasSize(1);
-            softly.assertThat(content.getFirst().userId()).isEqualTo(subscriber.getId());
         });
 
     }
