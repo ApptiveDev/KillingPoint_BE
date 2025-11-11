@@ -2,6 +2,7 @@ package apptive.team5.user.controller;
 
 import apptive.team5.file.dto.FileUploadRequest;
 import apptive.team5.user.dto.UserResponse;
+import apptive.team5.user.dto.UserStaticsResponse;
 import apptive.team5.user.dto.UserTagUpdateRequest;
 import apptive.team5.user.service.UserService;
 import jakarta.validation.Valid;
@@ -62,5 +63,12 @@ public class UserController {
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
 
+    }
+
+    @GetMapping("/{userId}/statics")
+    public ResponseEntity<UserStaticsResponse> getUserStatics(@PathVariable Long userId) {
+        UserStaticsResponse response = userService.getUserStatics(userId);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }

@@ -1,4 +1,5 @@
 package apptive.team5.user.service;
+import apptive.team5.diary.service.DiaryLowService;
 import apptive.team5.file.dto.FileUploadRequest;
 import apptive.team5.file.service.S3Service;
 import apptive.team5.file.service.TemporalLowService;
@@ -10,9 +11,11 @@ import apptive.team5.jwt.component.JWTUtil;
 import apptive.team5.jwt.dto.TokenResponse;
 import apptive.team5.jwt.service.JwtService;
 import apptive.team5.oauth2.dto.OAuth2Response;
+import apptive.team5.subscribe.service.SubscribeLowService;
 import apptive.team5.user.domain.UserEntity;
 import apptive.team5.user.domain.UserRoleType;
 import apptive.team5.user.dto.UserResponse;
+import apptive.team5.user.dto.UserStaticsResponse;
 import apptive.team5.user.dto.UserTagUpdateRequest;
 import apptive.team5.user.util.TagGenerator;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +34,8 @@ public class UserService {
     private final JWTUtil jwtUtil;
     private final S3Service s3Service;
     private final TemporalLowService temporalLowService;
+    private final SubscribeLowService subscribeLowService;
+    private final DiaryLowService diaryLowService;
 
     public TokenResponse socialLogin(OAuth2Response oAuth2Response) {
         String identifier = oAuth2Response.getProvider() + "-" +oAuth2Response.getProviderId();
@@ -81,6 +86,7 @@ public class UserService {
         return new UserResponse(findUser);
     }
 
+    @Transactional(readOnly = true)
     public Page<UserResponse> findByTag(String tag, Pageable pageable) {
         return userLowService.findByTag(tag,pageable)
                 .map(UserResponse::new);
@@ -100,6 +106,15 @@ public class UserService {
         s3Service.deleteS3File(oldProfileImage);
 
         return new UserResponse(findUser);
+    }
+
+    @Transactional(readOnly = true)
+    public UserStaticsResponse getUserStatics(Long userId) {
+        int killingPartCount = diaryLowService.countByUserId(userId);
+        int fanCount = subscribeLowService.countSubscriberBySubscribedToId(userId);
+        int pickCount = subscribeLowService.countSubscribedTobySubscriberId(userId);
+
+        return new UserStaticsResponse(fanCount, pickCount, killingPartCount);
     }
 
 

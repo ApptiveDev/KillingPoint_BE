@@ -30,4 +30,12 @@ public class SubscribeLowService {
     public Page<Subscribe> findBySubscribedToIdWithSubscriberToPage(Long subscribedToId, Pageable pageable) {
         return subscribeRepository.findBySubscribedToIdWithSubscriberPage(subscribedToId, pageable);
     }
+
+    public int countSubscriberBySubscribedToId(Long subscribedToId) {
+        return subscribeRepository.countSubscriberBySubscribedToId(subscribedToId);
+    }
+
+    public int countSubscribedTobySubscriberId(Long subscribedToId) {
+        return subscribeRepository.countSubscribedTobySubscriberId(subscribedToId);
+    }
 }

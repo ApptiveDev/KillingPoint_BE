@@ -49,4 +49,9 @@ public class DiaryLowService {
         diaryRepository.delete(diary);
     }
 
+    @Transactional(readOnly = true)
+    public int countByUserId(Long userId) {
+        return diaryRepository.countByUserId(userId);
+    }
+
 }
