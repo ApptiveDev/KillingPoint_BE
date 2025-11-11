@@ -16,14 +16,18 @@ public class SubscribeService {
     private final SubscribeLowService subscribeLowService;
     private final UserLowService userLowService;
 
-    public void save(Long subscribeToUserId, Long userId) {
+    public void save(Long subscribeToUserId, Long subscriberId) {
 
         UserEntity subscribedTo = userLowService.findById(subscribeToUserId);
-        UserEntity subscriber = userLowService.getReferenceById(userId);
+        UserEntity subscriber = userLowService.getReferenceById(subscriberId);
 
         Subscribe subscribe = new Subscribe(subscriber, subscribedTo);
 
         subscribeLowService.save(subscribe);
+    }
+
+    public void deleteBySubscriberIdAndSubscribedToId(Long subscriberToUserId, Long subscriberId) {
+        subscribeLowService.deleteBySubscriberIdAndSubscribedToId(subscriberToUserId, subscriberId);
     }
 }
 

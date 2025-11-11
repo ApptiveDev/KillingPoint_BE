@@ -16,4 +16,8 @@ public class SubscribeLowService {
     public Subscribe save(Subscribe subscribe) {
         return subscribeRepository.save(subscribe);
     }
+
+    public void deleteBySubscriberIdAndSubscribedToId(Long subscribedToId, Long subscriberId) {
+        subscribeRepository.deleteBySubscriberIdAndSubscribedToId(subscribedToId, subscriberId);
+    }
 }
