@@ -5,6 +5,8 @@ import apptive.team5.user.dto.UserTagUpdateRequest;
 import apptive.team5.user.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -40,5 +42,16 @@ public class UserController {
         UserResponse response = userService.changeTag(userTagUpdateRequest, userId);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping
+    public ResponseEntity<Page<UserResponse>> getUserList(@RequestParam(required = false) String tag,
+                                                          @RequestParam(defaultValue = "0") int page,
+                                                          @RequestParam(defaultValue = "5") int size) {
+        Page<UserResponse> response = userService.findByTag(tag, PageRequest.of(page, size));
+
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+
     }
 }

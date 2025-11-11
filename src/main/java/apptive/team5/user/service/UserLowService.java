@@ -3,8 +3,11 @@ package apptive.team5.user.service;
 import apptive.team5.global.exception.ExceptionCode;
 import apptive.team5.global.exception.NotFoundEntityException;
 import apptive.team5.user.domain.UserEntity;
+import apptive.team5.user.repository.QUserRepository;
 import apptive.team5.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserLowService {
 
     private final UserRepository userRepository;
+    private final QUserRepository qUserRepository;
 
 
     @Transactional(readOnly = true)
@@ -48,5 +52,10 @@ public class UserLowService {
     @Transactional(readOnly = true)
     public boolean existsByTag(String tag) {
         return userRepository.findByTag(tag).isPresent();
+    }
+
+    @Transactional(readOnly = true)
+    public Page<UserEntity> findByTag(String tag, Pageable pageable) {
+        return qUserRepository.findByTag(tag,pageable);
     }
 }

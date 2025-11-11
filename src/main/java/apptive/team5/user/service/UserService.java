@@ -12,6 +12,8 @@ import apptive.team5.user.dto.UserResponse;
 import apptive.team5.user.dto.UserTagUpdateRequest;
 import apptive.team5.user.util.TagGenerator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -71,6 +73,11 @@ public class UserService {
         findUser.changeTag(userTagUpdateRequest.tag());
 
         return new UserResponse(findUser);
+    }
+
+    public Page<UserResponse> findByTag(String tag, Pageable pageable) {
+        return userLowService.findByTag(tag,pageable)
+                .map(UserResponse::new);
     }
 
 
