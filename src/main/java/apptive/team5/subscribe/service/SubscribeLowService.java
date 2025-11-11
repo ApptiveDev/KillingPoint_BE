@@ -23,19 +23,27 @@ public class SubscribeLowService {
         subscribeRepository.deleteBySubscriberIdAndSubscribedToId(subscribedToId, subscriberId);
     }
 
+    @Transactional(readOnly = true)
     public Page<Subscribe> findBySubscriberIdWithSubscribedToPage(Long subscriberId, Pageable pageable) {
         return subscribeRepository.findBySubscriberIdWithSubscribedToPage(subscriberId, pageable);
     }
 
+    @Transactional(readOnly = true)
     public Page<Subscribe> findBySubscribedToIdWithSubscriberToPage(Long subscribedToId, Pageable pageable) {
         return subscribeRepository.findBySubscribedToIdWithSubscriberPage(subscribedToId, pageable);
     }
 
+    @Transactional(readOnly = true)
     public int countSubscriberBySubscribedToId(Long subscribedToId) {
         return subscribeRepository.countSubscriberBySubscribedToId(subscribedToId);
     }
 
+    @Transactional(readOnly = true)
     public int countSubscribedTobySubscriberId(Long subscribedToId) {
         return subscribeRepository.countSubscribedTobySubscriberId(subscribedToId);
+    }
+
+    public void deleteByUserId(Long userId) {
+        subscribeRepository.deleteByUserId(userId);
     }
 }

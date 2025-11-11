@@ -35,4 +35,8 @@ public interface SubscribeRepository extends JpaRepository<Subscribe, Long> {
 
     @Query("select count(s) from Subscribe s where s.subscriber.id = :subscriberId")
     int countSubscribedTobySubscriberId(Long subscriberId);
+
+    @Modifying(clearAutomatically = true)
+    @Query("delete from Subscribe s where s.subscriber.id = :userId or s.subscribedTo.id = :userId")
+    void deleteByUserId(Long userId);
 }

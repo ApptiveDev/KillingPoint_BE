@@ -13,10 +13,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class DiaryLowService {
     private final DiaryRepository diaryRepository;
 
-    @Transactional
     public DiaryEntity saveDiary(DiaryEntity diary) {
         return diaryRepository.save(diary);
     }
@@ -32,7 +32,6 @@ public class DiaryLowService {
         return diaryRepository.findByUser(user, pageable);
     }
 
-    @Transactional
     public void updateDiary(DiaryEntity diary, DiaryUpdateDto updateDto) {
         diary.update(
                 updateDto.musicTitle(),
@@ -44,7 +43,6 @@ public class DiaryLowService {
         );
     }
 
-    @Transactional
     public void deleteDiary(DiaryEntity diary) {
         diaryRepository.delete(diary);
     }
@@ -52,6 +50,10 @@ public class DiaryLowService {
     @Transactional(readOnly = true)
     public int countByUserId(Long userId) {
         return diaryRepository.countByUserId(userId);
+    }
+
+    public void deleteByUserId(Long userId) {
+        diaryRepository.deleteByUserId(userId);
     }
 
 }
