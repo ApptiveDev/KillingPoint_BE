@@ -1,6 +1,7 @@
 package apptive.team5.user.controller;
 
 import apptive.team5.global.exception.ExceptionCode;
+import apptive.team5.global.util.S3Util;
 import apptive.team5.jwt.component.JWTUtil;
 import apptive.team5.user.domain.UserEntity;
 import apptive.team5.user.domain.UserRoleType;
@@ -75,7 +76,7 @@ class UserControllerTest {
             softly.assertThat(userResponse.identifier()).isEqualTo(user.getIdentifier());
             softly.assertThat(userResponse.socialType()).isEqualTo(user.getSocialType());
             softly.assertThat(userResponse.userRoleType()).isEqualTo(user.getRoleType());
-            softly.assertThat(userResponse.profileImageUrl()).isEqualTo(user.getProfileImageUrl());
+            softly.assertThat(S3Util.extractFileName(userResponse.profileImageUrl())).isEqualTo(user.getProfileImage());
         });
     }
 

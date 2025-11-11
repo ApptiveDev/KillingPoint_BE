@@ -1,5 +1,6 @@
 package apptive.team5.user.controller;
 
+import apptive.team5.file.dto.FileUploadRequest;
 import apptive.team5.user.dto.UserResponse;
 import apptive.team5.user.dto.UserTagUpdateRequest;
 import apptive.team5.user.service.UserService;
@@ -42,6 +43,14 @@ public class UserController {
         UserResponse response = userService.changeTag(userTagUpdateRequest, userId);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @PatchMapping("/my/profile-image")
+    public ResponseEntity<UserResponse> changeProfileImage(@Valid @RequestBody FileUploadRequest fileUploadRequest,
+                                                           @AuthenticationPrincipal Long userId) {
+        UserResponse userResponse = userService.changeProfileImage(fileUploadRequest, userId);
+
+        return  ResponseEntity.status(HttpStatus.OK).body(userResponse);
     }
 
     @GetMapping

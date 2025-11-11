@@ -1,5 +1,6 @@
 package apptive.team5.user.dto;
 
+import apptive.team5.global.util.S3Util;
 import apptive.team5.user.domain.SocialType;
 import apptive.team5.user.domain.UserEntity;
 import apptive.team5.user.domain.UserRoleType;
@@ -21,7 +22,7 @@ public record UserResponse(
                 userEntity.getTag(),
                 userEntity.getIdentifier(),
                 userEntity.getEmail(),
-                userEntity.getProfileImageUrl(),
+                S3Util.s3Url + userEntity.getProfileImage(),
                 userEntity.getRoleType(),
                 userEntity.getSocialType());
     }

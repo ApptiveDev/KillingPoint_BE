@@ -1,6 +1,10 @@
 package apptive.team5.user.service;
+import apptive.team5.file.dto.FileUploadRequest;
+import apptive.team5.file.service.S3Service;
+import apptive.team5.file.service.TemporalLowService;
 import apptive.team5.global.exception.DuplicateException;
 import apptive.team5.global.exception.ExceptionCode;
+import apptive.team5.global.util.S3Util;
 import apptive.team5.jwt.TokenType;
 import apptive.team5.jwt.component.JWTUtil;
 import apptive.team5.jwt.dto.TokenResponse;
@@ -25,6 +29,8 @@ public class UserService {
     private final UserLowService userLowService;
     private final JwtService jwtService;
     private final JWTUtil jwtUtil;
+    private final S3Service s3Service;
+    private final TemporalLowService temporalLowService;
 
     public TokenResponse socialLogin(OAuth2Response oAuth2Response) {
         String identifier = oAuth2Response.getProvider() + "-" +oAuth2Response.getProviderId();
@@ -78,6 +84,22 @@ public class UserService {
     public Page<UserResponse> findByTag(String tag, Pageable pageable) {
         return userLowService.findByTag(tag,pageable)
                 .map(UserResponse::new);
+    }
+
+    public UserResponse changeProfileImage(FileUploadRequest fileUploadRequest, Long userId) {
+        UserEntity findUser = userLowService.findById(userId);
+
+        String oldProfileImage = findUser.getProfileImage();
+
+        String fileName = S3Util.extractFileName(fileUploadRequest.presignedUrl());
+
+        findUser.changeProfileImage(fileName);
+
+        temporalLowService.deleteById(fileUploadRequest.id());
+
+        s3Service.deleteS3File(oldProfileImage);
+
+        return new UserResponse(findUser);
     }
 
 

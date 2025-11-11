@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserEntity extends BaseTimeEntity {
 
-    private static String defaultImage;
+    private static String DEFAULT_IMAGE = "defaultImage/userDefaultImage.png";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -46,7 +46,7 @@ public class UserEntity extends BaseTimeEntity {
     private RefreshToken refreshToken;
 
     @Column(nullable = false)
-    private String profileImageUrl;
+    private String profileImage;
 
     public UserEntity(String identifier, String email, String username, String tag, UserRoleType roleType, SocialType socialType) {
         this.identifier = identifier;
@@ -55,7 +55,7 @@ public class UserEntity extends BaseTimeEntity {
         this.tag = tag;
         this.roleType = roleType;
         this.socialType = socialType;
-        this.profileImageUrl = defaultImage;
+        this.profileImage = DEFAULT_IMAGE;
     }
 
     public UserEntity(Long id, String identifier, String email, String username, String tag, UserRoleType roleType, SocialType socialType) {
@@ -66,14 +66,14 @@ public class UserEntity extends BaseTimeEntity {
         this.tag = tag;
         this.roleType = roleType;
         this.socialType = socialType;
-        this.profileImageUrl = defaultImage;
+        this.profileImage = DEFAULT_IMAGE;
     }
 
     public void changeTag(String tag) {
         this.tag = tag;
     }
 
-    public static void setDefaultImage(String url) {
-        defaultImage = url;
+    public void changeProfileImage(String profileImage) {
+        this.profileImage = profileImage;
     }
 }
