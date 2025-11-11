@@ -50,10 +50,13 @@ class SubscribeControllerTest {
 
         TestSecurityContextHolderInjection.inject(subscriber.getId(), subscriber.getRoleType());
 
+        // when
         mockMvc.perform(post("/api/subscribes/{subscribeToId}", subscribedTo.getId())
                 .with(securityContext(SecurityContextHolder.getContext()))
         ).andExpect(status().isCreated());
 
+
+        // then
         List<Subscribe> subscribes = subscribeRepository.findBySubscriberId(subscriber.getId());
 
         assertSoftly(softly -> {
@@ -72,11 +75,41 @@ class SubscribeControllerTest {
 
         TestSecurityContextHolderInjection.inject(subscriber.getId(), subscriber.getRoleType());
 
-        // when
+        // when & then
         mockMvc.perform(post("/api/subscribes/{subscribeToId}", 100L)
                 .with(securityContext(SecurityContextHolder.getContext()))
         ).andExpect(status().isNotFound());
 
     }
+
+    @DisplayName("구독 취소 성공")
+    @Test
+    void cancelSubscribeSuccess() throws Exception {
+
+        // given
+        UserEntity subscriber = TestUtil.makeUserEntity();
+        userRepository.save(subscriber);
+        UserEntity subscribedTo = TestUtil.makeDifferentUserEntity(subscriber);
+        userRepository.save(subscribedTo);
+        Subscribe subscribe = subscribeRepository.save(new Subscribe(subscriber, subscribedTo));
+
+        TestSecurityContextHolderInjection.inject(subscriber.getId(), subscriber.getRoleType());
+
+        // when
+        mockMvc.perform(delete("/api/subscribes/{subscribeToId}", subscribedTo.getId())
+                .with(securityContext(SecurityContextHolder.getContext()))
+        ).andExpect(status().isNoContent());
+
+
+        // then
+        List<Subscribe> subscribes = subscribeRepository.findBySubscriberId(subscriber.getId());
+        boolean isPresent = subscribeRepository.findById(subscribe.getId()).isPresent();
+
+        assertSoftly(softly -> {
+            softly.assertThat(subscribes).hasSize(0);
+            softly.assertThat(isPresent).isFalse();
+        });
+    }
+
 
 }

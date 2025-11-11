@@ -52,6 +52,7 @@ class JwtControllerTest {
     @DisplayName("토큰 교환 성공")
     void exchangeTokenSuccess() throws Exception {
 
+        // given
         UserEntity user = TestUtil.makeUserEntity();
         UserEntity userEntity = userLowService.save(user);
 
@@ -61,6 +62,7 @@ class JwtControllerTest {
 
         jwtService.saveRefreshToken(userEntity.getId(), refreshToken);
 
+        // when
         String response = mockMvc.perform(post("/api/jwt/exchange")
                         .header("X-Refresh-Token", refreshToken)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -71,6 +73,7 @@ class JwtControllerTest {
 
         TokenResponse tokenResponse = objectMapper.readValue(response, TokenResponse.class);
 
+        // then
         assertSoftly(softly-> {
             softly.assertThat(tokenResponse.accessToken()).isNotBlank();
             softly.assertThat(tokenResponse.refreshToken()).isNotBlank();
@@ -84,8 +87,10 @@ class JwtControllerTest {
     @DisplayName("토큰 교환 실패 - 리프래시 토큰이 존재하지 않음")
     void exchangeTokenFailure() throws Exception {
 
+        // given
         TestSecurityContextHolderInjection.inject(1L, UserRoleType.USER);
 
+        // when & then
         mockMvc.perform(post("/api/jwt/exchange")
                         .with(securityContext(SecurityContextHolder.getContext()))
                 )
@@ -98,6 +103,7 @@ class JwtControllerTest {
     @DisplayName("토큰 교환 실패 - 리프래시 토큰이 만료되었음")
     void exchangeTokenFailure3() throws Exception {
 
+        // given
         UserEntity user = TestUtil.makeUserEntity();
         UserEntity userEntity = userLowService.save(user);
 
@@ -105,6 +111,7 @@ class JwtControllerTest {
 
         String refreshToken = jwtUtil.createJWT(userEntity.getIdentifier(), userEntity.getRoleType().name(), TokenType.REFRESH_TOKEN, 0L);
 
+        // when & then
         mockMvc.perform(post("/api/jwt/exchange")
                         .header("X-Refresh-Token", refreshToken)
                         .with(securityContext(SecurityContextHolder.getContext()))

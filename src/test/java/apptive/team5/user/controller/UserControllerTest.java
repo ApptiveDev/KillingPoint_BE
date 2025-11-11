@@ -50,9 +50,6 @@ class UserControllerTest {
     private UserRepository userRepository;
 
     @Autowired
-    private JWTUtil jwtUtil;
-
-    @Autowired
     private ObjectMapper objectMapper;
 
 
@@ -60,15 +57,18 @@ class UserControllerTest {
     @Test
     void getMyInfoSuccess() throws Exception {
 
+        // given
         UserEntity user = TestUtil.makeUserEntity();
         userRepository.save(user);
         TestSecurityContextHolderInjection.inject(user.getId(), user.getRoleType());
 
+        // when
         String response = mockMvc.perform(get("/api/users/my")
                         .with(securityContext(SecurityContextHolder.getContext()))
                 )
                 .andReturn().getResponse().getContentAsString();
 
+        // then
         UserResponse userResponse = objectMapper.readValue(response, UserResponse.class);
 
         assertSoftly(softly -> {
@@ -84,9 +84,11 @@ class UserControllerTest {
     @Test
     void getMyInfoFail() throws Exception {
 
+        // given
         TestSecurityContextHolderInjection.inject(1L, UserRoleType.USER);
 
 
+        // when
         MockHttpServletResponse response = mockMvc.perform(get("/api/users/my")
                         .with(securityContext(SecurityContextHolder.getContext()))
                 )
@@ -95,6 +97,7 @@ class UserControllerTest {
         String content = response.getContentAsString();
 
 
+        // then
         assertSoftly(softly -> {
             softly.assertThat(response.getStatus()).isEqualTo(HttpStatus.NOT_FOUND.value());
             softly.assertThat(content.contains(ExceptionCode.NOT_FOUND_USER.getDescription()));
@@ -106,12 +109,14 @@ class UserControllerTest {
     @Test
     void changeUserTagSuccess() throws Exception {
 
+        // given
         UserEntity user = TestUtil.makeUserEntity();
         userRepository.save(user);
         TestSecurityContextHolderInjection.inject(user.getId(), user.getRoleType());
         UserTagUpdateRequest userTagUpdateRequest = new UserTagUpdateRequest("abc_dd");
 
 
+        // when
         MockHttpServletResponse response = mockMvc.perform(patch("/api/users/my/tags")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userTagUpdateRequest))
@@ -120,6 +125,7 @@ class UserControllerTest {
                 .andExpect(status().isOk())
                 .andReturn().getResponse();
 
+        // then
         String content = response.getContentAsString();
 
         UserResponse userResponse = objectMapper.readValue(content, UserResponse.class);
@@ -136,6 +142,8 @@ class UserControllerTest {
     @Test
     void changeUserTagFail() throws Exception {
 
+        // given
+
         UserEntity user = TestUtil.makeUserEntity();
         UserEntity user2 = TestUtil.makeDifferentUserEntity(user);
         userRepository.save(user);
@@ -144,6 +152,7 @@ class UserControllerTest {
         UserTagUpdateRequest userTagUpdateRequest = new UserTagUpdateRequest(user2.getTag());
 
 
+        // when
         MockHttpServletResponse response = mockMvc.perform(patch("/api/users/my/tags")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userTagUpdateRequest))
@@ -151,6 +160,7 @@ class UserControllerTest {
                 )
                 .andReturn().getResponse();
 
+        // then
         String content = response.getContentAsString();
 
         Map<String,String> apiResponse = objectMapper.readValue(content, Map.class);
@@ -165,17 +175,19 @@ class UserControllerTest {
     @Test
     void getUserByTagSuccess() throws Exception {
 
+        // given
         UserEntity user = TestUtil.makeUserEntity();
         userRepository.save(user);
         TestSecurityContextHolderInjection.inject(user.getId(), user.getRoleType());
 
-
+        // when
         String response = mockMvc.perform(get("/api/users")
                         .param("tag", user.getTag())
                         .with(securityContext(SecurityContextHolder.getContext()))
                 )
                 .andReturn().getResponse().getContentAsString(UTF_8);
 
+        // then
         JsonNode jsonNode = objectMapper.readTree(response);
 
         List<UserResponse> content = objectMapper.convertValue(
@@ -194,16 +206,19 @@ class UserControllerTest {
     @Test
     void withDrawSuccess() throws Exception {
 
+        // given
         UserEntity user = TestUtil.makeUserEntity();
         userRepository.save(user);
         TestSecurityContextHolderInjection.inject(user.getId(), user.getRoleType());
 
 
+        // when
         mockMvc.perform(delete("/api/users/my")
                         .with(securityContext(SecurityContextHolder.getContext()))
                 )
                 .andExpect(status().isNoContent());
 
+        // then
         assertThat(userRepository.existsById(user.getId())).isFalse();
 
     }
