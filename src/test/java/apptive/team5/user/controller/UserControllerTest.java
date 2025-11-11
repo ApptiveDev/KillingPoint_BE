@@ -72,7 +72,6 @@ class UserControllerTest {
         UserResponse userResponse = objectMapper.readValue(response, UserResponse.class);
 
         assertSoftly(softly -> {
-            softly.assertThat(userResponse.email()).isEqualTo(user.getEmail());
             softly.assertThat(userResponse.identifier()).isEqualTo(user.getIdentifier());
             softly.assertThat(userResponse.socialType()).isEqualTo(user.getSocialType());
             softly.assertThat(userResponse.userRoleType()).isEqualTo(user.getRoleType());

@@ -10,7 +10,6 @@ public record UserResponse(
         String username,
         String tag,
         String identifier,
-        String email,
         String profileImageUrl,
         UserRoleType userRoleType,
         SocialType socialType
@@ -21,7 +20,6 @@ public record UserResponse(
                 userEntity.getUsername(),
                 userEntity.getTag(),
                 userEntity.getIdentifier(),
-                userEntity.getEmail(),
                 S3Util.s3Url + userEntity.getProfileImage(),
                 userEntity.getRoleType(),
                 userEntity.getSocialType());

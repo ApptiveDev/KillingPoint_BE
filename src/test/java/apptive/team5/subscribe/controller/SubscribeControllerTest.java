@@ -4,9 +4,13 @@ package apptive.team5.subscribe.controller;
 import apptive.team5.subscribe.domain.Subscribe;
 import apptive.team5.subscribe.repository.SubscribeRepository;
 import apptive.team5.user.domain.UserEntity;
+import apptive.team5.user.dto.UserResponse;
 import apptive.team5.user.repository.UserRepository;
 import apptive.team5.util.TestSecurityContextHolderInjection;
 import apptive.team5.util.TestUtil;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import static java.nio.charset.StandardCharsets.*;
 import static org.assertj.core.api.SoftAssertions.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.securityContext;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -36,6 +41,9 @@ class SubscribeControllerTest {
 
     @Autowired
     private SubscribeRepository subscribeRepository;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
 
     @DisplayName("구독 추가 성공")
@@ -109,6 +117,144 @@ class SubscribeControllerTest {
             softly.assertThat(subscribes).hasSize(0);
             softly.assertThat(isPresent).isFalse();
         });
+    }
+
+    @DisplayName("내 구독 목록 조회")
+    @Test
+    void getMySubscribeSuccess() throws Exception {
+
+        // given
+        UserEntity subscriber = TestUtil.makeUserEntity();
+        userRepository.save(subscriber);
+        UserEntity subscribedTo = TestUtil.makeDifferentUserEntity(subscriber);
+        userRepository.save(subscribedTo);
+        Subscribe subscribe = subscribeRepository.save(new Subscribe(subscriber, subscribedTo));
+
+        TestSecurityContextHolderInjection.inject(subscriber.getId(), subscriber.getRoleType());
+
+        // when
+        String response = mockMvc.perform(get("/api/subscribes/my", subscriber.getId())
+                .with(securityContext(SecurityContextHolder.getContext()))
+        ).andExpect(status().isOk()).andReturn().getResponse().getContentAsString(UTF_8);
+
+
+        // then
+        JsonNode jsonNode = objectMapper.readTree(response);
+
+        List<UserResponse> content = objectMapper.convertValue(
+                jsonNode.path("content"),
+                new TypeReference<List<UserResponse>>() {}
+        );
+
+        assertSoftly(softly -> {
+            softly.assertThat(content).hasSize(1);
+            softly.assertThat(content.getFirst().userId()).isEqualTo(subscribedTo.getId());
+        });
+
+    }
+
+    @DisplayName("특정 사용자의 구독 목록 조회")
+    @Test
+    void getSubscribeSuccess() throws Exception {
+
+        // given
+        UserEntity subscriber = TestUtil.makeUserEntity();
+        userRepository.save(subscriber);
+        UserEntity subscribedTo = TestUtil.makeDifferentUserEntity(subscriber);
+        userRepository.save(subscribedTo);
+        UserEntity otherUser = TestUtil.makeDifferentUserEntity(subscribedTo);
+        Subscribe subscribe = subscribeRepository.save(new Subscribe(subscriber, subscribedTo));
+
+        TestSecurityContextHolderInjection.inject(otherUser.getId(), otherUser.getRoleType());
+
+        // when
+        String response = mockMvc.perform(get("/api/subscribes/{userId}", subscriber.getId())
+                .with(securityContext(SecurityContextHolder.getContext()))
+        ).andExpect(status().isOk()).andReturn().getResponse().getContentAsString(UTF_8);
+
+
+        // then
+        JsonNode jsonNode = objectMapper.readTree(response);
+
+        List<UserResponse> content = objectMapper.convertValue(
+                jsonNode.path("content"),
+                new TypeReference<List<UserResponse>>() {}
+        );
+
+        assertSoftly(softly -> {
+            softly.assertThat(content).hasSize(1);
+            softly.assertThat(content.getFirst().userId()).isEqualTo(subscribedTo.getId());
+        });
+
+    }
+
+    @DisplayName("내 구독자 목록 조회")
+    @Test
+    void getMySubscriberSuccess() throws Exception {
+
+        // given
+        UserEntity subscriber = TestUtil.makeUserEntity();
+        userRepository.save(subscriber);
+        UserEntity subscribedTo = TestUtil.makeDifferentUserEntity(subscriber);
+        userRepository.save(subscribedTo);
+        Subscribe subscribe = subscribeRepository.save(new Subscribe(subscriber, subscribedTo));
+
+        TestSecurityContextHolderInjection.inject(subscribedTo.getId(), subscribedTo.getRoleType());
+
+        // when
+        String response = mockMvc.perform(get("/api/subscribes/my/fans", subscribedTo.getId())
+                .with(securityContext(SecurityContextHolder.getContext()))
+        ).andExpect(status().isOk()).andReturn().getResponse().getContentAsString(UTF_8);
+
+
+        // then
+        JsonNode jsonNode = objectMapper.readTree(response);
+
+        List<UserResponse> content = objectMapper.convertValue(
+                jsonNode.path("content"),
+                new TypeReference<List<UserResponse>>() {}
+        );
+
+        assertSoftly(softly -> {
+            softly.assertThat(content).hasSize(1);
+            softly.assertThat(content.getFirst().userId()).isEqualTo(subscriber.getId());
+        });
+
+    }
+
+    @DisplayName("특정 사용자의 구독자 목록 조회")
+    @Test
+    void getSubscriberSuccess() throws Exception {
+
+        // given
+        UserEntity subscriber = TestUtil.makeUserEntity();
+        userRepository.save(subscriber);
+        UserEntity subscribedTo = TestUtil.makeDifferentUserEntity(subscriber);
+        userRepository.save(subscribedTo);
+        UserEntity otherUser = TestUtil.makeDifferentUserEntity(subscribedTo);
+        Subscribe subscribe = subscribeRepository.save(new Subscribe(subscriber, subscribedTo));
+
+        TestSecurityContextHolderInjection.inject(otherUser.getId(), otherUser.getRoleType());
+
+        // when
+        String response = mockMvc.perform(get("/api/subscribes/{userId}/fans", subscribedTo.getId())
+                .with(securityContext(SecurityContextHolder.getContext()))
+        ).andExpect(status().isOk()).andReturn().getResponse().getContentAsString(UTF_8);
+
+
+        // then
+        JsonNode jsonNode = objectMapper.readTree(response);
+
+        List<UserResponse> content = objectMapper.convertValue(
+                jsonNode.path("content"),
+                new TypeReference<List<UserResponse>>() {}
+        );
+
+        assertSoftly(softly -> {
+            softly.assertThat(content).hasSize(1);
+            softly.assertThat(content.getFirst().userId()).isEqualTo(subscriber.getId());
+        });
+
     }
 
 
