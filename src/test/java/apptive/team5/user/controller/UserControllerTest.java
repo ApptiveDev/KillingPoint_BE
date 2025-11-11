@@ -1,11 +1,15 @@
 package apptive.team5.user.controller;
 
+import apptive.team5.diary.domain.DiaryEntity;
+import apptive.team5.diary.repository.DiaryRepository;
 import apptive.team5.global.exception.ExceptionCode;
 import apptive.team5.global.util.S3Util;
-import apptive.team5.jwt.component.JWTUtil;
+import apptive.team5.subscribe.domain.Subscribe;
+import apptive.team5.subscribe.repository.SubscribeRepository;
 import apptive.team5.user.domain.UserEntity;
 import apptive.team5.user.domain.UserRoleType;
 import apptive.team5.user.dto.UserResponse;
+import apptive.team5.user.dto.UserStaticsResponse;
 import apptive.team5.user.dto.UserTagUpdateRequest;
 import apptive.team5.user.repository.UserRepository;
 import apptive.team5.util.TestSecurityContextHolderInjection;
@@ -26,7 +30,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
@@ -51,6 +54,12 @@ class UserControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private DiaryRepository diaryRepository;
+
+    @Autowired
+    private SubscribeRepository subscribeRepository;
 
 
     @DisplayName("회원 정보 조회 성공")
@@ -220,6 +229,37 @@ class UserControllerTest {
         // then
         assertThat(userRepository.existsById(user.getId())).isFalse();
 
+    }
+
+    @DisplayName("회원 통계 조회")
+    @Test
+    void getUserStaticsSuccess() throws Exception {
+
+        // given
+        UserEntity subscriber = TestUtil.makeUserEntity();
+        userRepository.save(subscriber);
+        UserEntity subscribedTo = TestUtil.makeDifferentUserEntity(subscriber);
+        userRepository.save(subscribedTo);
+        Subscribe subscribe = subscribeRepository.save(new Subscribe(subscriber, subscribedTo));
+        DiaryEntity diaryEntity = diaryRepository.save(TestUtil.makeDiaryEntity(subscriber));
+
+        TestSecurityContextHolderInjection.inject(subscriber.getId(), subscriber.getRoleType());
+
+        // when
+        String response = mockMvc.perform(get("/api/users/{userId}/statics", subscriber.getId())
+                        .with(securityContext(SecurityContextHolder.getContext()))
+                )
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+        UserStaticsResponse userStaticsResponse = objectMapper.readValue(response, UserStaticsResponse.class);
+
+
+        assertSoftly(softly -> {
+            softly.assertThat(userStaticsResponse.fanCount()).isEqualTo(0);
+            softly.assertThat(userStaticsResponse.pickCount()).isEqualTo(1);
+            softly.assertThat(userStaticsResponse.killingPartCount()).isEqualTo(1);
+        });
     }
 
 
