@@ -14,7 +14,7 @@ public class S3Util {
 
         int pathEndIdx = fileUrl.contains("?") ? fileUrl.indexOf("?") : fileUrl.length();
 
-        return fileUrl.substring(pathStartIdx, pathEndIdx);
+        return fileUrl.substring(pathStartIdx, pathEndIdx).trim();
     }
 
 }

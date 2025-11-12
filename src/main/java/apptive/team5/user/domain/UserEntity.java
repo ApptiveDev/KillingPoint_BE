@@ -76,4 +76,8 @@ public class UserEntity extends BaseTimeEntity {
     public void changeProfileImage(String profileImage) {
         this.profileImage = profileImage;
     }
+
+    public void setDefaultImage() {
+        this.profileImage = DEFAULT_IMAGE;
+    }
 }
