@@ -28,6 +28,10 @@ public class JwtLowService {
         refreshTokenRepository.deleteByUser(user);
     }
 
+    public void deleteByUserId(Long userId) {
+        refreshTokenRepository.deleteByUserId(userId);
+    }
+
     public RefreshToken save(RefreshToken refreshToken) {
         return refreshTokenRepository.save(refreshToken);
     }

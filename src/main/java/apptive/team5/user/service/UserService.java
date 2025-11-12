@@ -66,10 +66,9 @@ public class UserService {
     }
 
     public void deleteUser(Long userId) {
-        UserEntity userEntity = userLowService.getReferenceById(userId);
         subscribeLowService.deleteByUserId(userId);
         diaryLowService.deleteByUserId(userId);
-        userLowService.deleteByUser(userEntity);
+        userLowService.deleteByUserId(userId);
 
     }
 

@@ -63,8 +63,7 @@ public class JwtService {
     }
 
     public void deleteRefreshTokenByUserId(Long userId) {
-        UserEntity findUser = userLowService.getReferenceById(userId);
-        jwtLowService.deleteByUser(findUser);
+        jwtLowService.deleteByUserId(userId);
     }
 
     public void deleteExpiredRefreshTokens() {

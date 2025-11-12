@@ -45,8 +45,8 @@ public class UserLowService {
         return userRepository.save(userEntity);
     }
 
-    public void deleteByUser(UserEntity userEntity) {
-        userRepository.delete(userEntity);
+    public void deleteByUserId(Long userId) {
+        userRepository.deleteById(userId);
     }
 
     @Transactional(readOnly = true)

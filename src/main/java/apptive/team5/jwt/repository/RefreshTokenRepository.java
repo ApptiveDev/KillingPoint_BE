@@ -15,8 +15,10 @@ public interface RefreshTokenRepository extends JpaRepository<RefreshToken,Strin
     @Query("delete from RefreshToken r where r.user = :user")
     void deleteByUser(UserEntity user);
 
-    @Query("select r from RefreshToken r where r.user.identifier = :identifier")
-    Optional<RefreshToken> findByUserIdentifier(String identifier);
+    @Modifying(clearAutomatically = true)
+    @Query("delete from RefreshToken r where r.user.id = :userId")
+    void deleteByUserId(Long userId);
+
 
     @Modifying(clearAutomatically = true)
     @Query("delete from RefreshToken r where r.createdDate < :date")
@@ -25,4 +27,5 @@ public interface RefreshTokenRepository extends JpaRepository<RefreshToken,Strin
     @Query("select r from RefreshToken r where r.user.id = :userId")
     Optional<RefreshToken> findByUserId(Long userId);
 
+    Long user(UserEntity user);
 }
