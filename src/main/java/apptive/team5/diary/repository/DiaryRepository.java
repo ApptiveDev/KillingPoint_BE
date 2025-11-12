@@ -5,7 +5,16 @@ import apptive.team5.user.domain.UserEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 
 public interface DiaryRepository extends JpaRepository<DiaryEntity, Long> {
     Page<DiaryEntity> findByUser(UserEntity user, Pageable pageable);
+
+    @Query("select count(d) from DiaryEntity d where d.user.id = :userId")
+    int countByUserId(Long userId);
+
+    @Query("delete from DiaryEntity d where d.user.id = :userId")
+    @Modifying(clearAutomatically = true)
+    void deleteByUserId(Long userId);
 }

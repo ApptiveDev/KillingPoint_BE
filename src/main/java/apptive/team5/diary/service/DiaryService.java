@@ -20,16 +20,16 @@ public class DiaryService {
     private final DiaryLowService diaryLowService;
 
     @Transactional(readOnly = true)
-    public Page<DiaryResponse> getMyDiaries(String identifier, Pageable pageable) {
-        UserEntity foundUser = findUserByIdentifier(identifier);
+    public Page<DiaryResponse> getMyDiaries(Long userId, Pageable pageable) {
+        UserEntity foundUser = userLowService.getReferenceById(userId);
 
         return diaryLowService.findDiaryByUser(foundUser, pageable)
                 .map(DiaryResponse::from);
     }
 
     @Transactional
-    public DiaryEntity createDiary(String identifier, DiaryCreateRequest diaryRequest) {
-        UserEntity foundUser = findUserByIdentifier(identifier);
+    public DiaryEntity createDiary(Long userId, DiaryCreateRequest diaryRequest) {
+        UserEntity foundUser = userLowService.getReferenceById(userId);
 
         DiaryEntity diary = DiaryCreateRequest.toEntity(diaryRequest, foundUser);
 
@@ -37,8 +37,8 @@ public class DiaryService {
     }
 
     @Transactional
-    public void updateDiary(String identifier, Long diaryId, DiaryUpdateRequest updateRequest) {
-        UserEntity foundUser = findUserByIdentifier(identifier);
+    public void updateDiary(Long userId, Long diaryId, DiaryUpdateRequest updateRequest) {
+        UserEntity foundUser = userLowService.getReferenceById(userId);
 
         DiaryEntity foundDiary = diaryLowService.findDiaryById(diaryId);
 
@@ -48,8 +48,8 @@ public class DiaryService {
     }
 
     @Transactional
-    public void deleteDiary(String identifier, Long diaryId) {
-        UserEntity foundUser = findUserByIdentifier(identifier);
+    public void deleteDiary(Long userId, Long diaryId) {
+        UserEntity foundUser = userLowService.getReferenceById(userId);
 
         DiaryEntity foundDiary = diaryLowService.findDiaryById(diaryId);
 
@@ -58,7 +58,4 @@ public class DiaryService {
         diaryLowService.deleteDiary(foundDiary);
     }
 
-    private UserEntity findUserByIdentifier(String identifier) {
-        return userLowService.findByIdentifier(identifier);
-    }
 }

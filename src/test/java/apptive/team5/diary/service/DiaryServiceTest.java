@@ -43,21 +43,21 @@ public class DiaryServiceTest {
     @DisplayName("내 다이어리 목록 조회")
     void getMyDiaries() {
         // given
-        UserEntity user = TestUtil.makeUserEntity();
+        UserEntity user = TestUtil.makeUserEntityWithId();
         DiaryEntity diary = TestUtil.makeDiaryEntity(user);
         Page<DiaryEntity> diaryEntityPage = new PageImpl<>(List.of(diary));
         PageRequest pageRequest = PageRequest.of(0, 5);
 
-        given(userLowService.findByIdentifier(user.getIdentifier())).willReturn(user);
+        given(userLowService.getReferenceById(user.getId())).willReturn(user);
         given(diaryLowService.findDiaryByUser(user, pageRequest)).willReturn(diaryEntityPage);
 
         // when
-        Page<DiaryResponse> result = diaryService.getMyDiaries(user.getIdentifier(), pageRequest);
+        Page<DiaryResponse> result = diaryService.getMyDiaries(user.getId(), pageRequest);
 
         // then
         assertThat(result.getContent()).hasSize(1);
         assertThat(result.getContent().get(0).musicTitle()).isEqualTo("Test Music");
-        verify(userLowService).findByIdentifier(any(String.class));
+        verify(userLowService).getReferenceById(any(Long.class));
         verify(diaryLowService).findDiaryByUser(any(UserEntity.class), any(PageRequest.class));
 
         verifyNoMoreInteractions(userLowService, diaryLowService);
@@ -67,16 +67,16 @@ public class DiaryServiceTest {
     @DisplayName("다이어리 생성")
     void createDiary() {
         // given
-        UserEntity user = TestUtil.makeUserEntity();
+        UserEntity user = TestUtil.makeUserEntityWithId();
         DiaryCreateRequest diaryRequest = TestUtil.makeDiaryCreateRequest();
 
-        given(userLowService.findByIdentifier(user.getIdentifier())).willReturn(user);
+        given(userLowService.getReferenceById(user.getId())).willReturn(user);
 
         // when
-        diaryService.createDiary(user.getIdentifier(), diaryRequest);
+        diaryService.createDiary(user.getId(), diaryRequest);
 
         // then
-        verify(userLowService).findByIdentifier(any(String.class));
+        verify(userLowService).getReferenceById(any(Long.class));
         verify(diaryLowService).saveDiary(any(DiaryEntity.class));
 
         verifyNoMoreInteractions(userLowService, diaryLowService);
@@ -86,20 +86,20 @@ public class DiaryServiceTest {
     @DisplayName("다이어리 수정")
     void updateDiary() {
         // given
-        UserEntity user = TestUtil.makeUserEntity();
+        UserEntity user = TestUtil.makeUserEntityWithId();
         Long diaryId = 1L;
         DiaryUpdateRequest updateRequest = TestUtil.makeDiaryUpdateRequest();
         DiaryEntity diary = TestUtil.makeDiaryEntity(user);
 
-        given(userLowService.findByIdentifier(user.getIdentifier())).willReturn(user);
+        given(userLowService.getReferenceById(user.getId())).willReturn(user);
         given(diaryLowService.findDiaryById(diaryId)).willReturn(diary);
 
 
         // when
-        diaryService.updateDiary(user.getIdentifier(), diaryId, updateRequest);
+        diaryService.updateDiary(user.getId(), diaryId, updateRequest);
 
         // then
-        verify(userLowService).findByIdentifier(any(String.class));
+        verify(userLowService).getReferenceById(any(Long.class));
         verify(diaryLowService).findDiaryById(any(Long.class));
         verify(diaryLowService).updateDiary(any(DiaryEntity.class), any());
 
@@ -110,18 +110,18 @@ public class DiaryServiceTest {
     @DisplayName("다이어리 삭제")
     void deleteDiary() {
         // given
-        UserEntity user = TestUtil.makeUserEntity();
+        UserEntity user = TestUtil.makeUserEntityWithId();
         Long diaryId = 1L;
         DiaryEntity diary = TestUtil.makeDiaryEntityWithId(diaryId, user);
 
-        given(userLowService.findByIdentifier(user.getIdentifier())).willReturn(user);
+        given(userLowService.getReferenceById(user.getId())).willReturn(user);
         given(diaryLowService.findDiaryById(diaryId)).willReturn(diary);
 
         // when
-        diaryService.deleteDiary(user.getIdentifier(), diaryId);
+        diaryService.deleteDiary(user.getId(), diaryId);
 
         // then
-        verify(userLowService).findByIdentifier(any(String.class));
+        verify(userLowService).getReferenceById(any(Long.class));
         verify(diaryLowService).findDiaryById(any(Long.class));
         verify(diaryLowService).deleteDiary(any(DiaryEntity.class));
 

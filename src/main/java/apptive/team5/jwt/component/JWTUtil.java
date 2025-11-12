@@ -46,7 +46,7 @@ public class JWTUtil {
     }
 
 
-    public String createJWT(String identifier, String role, TokenType tokenType) {
+    public String createJWT(Long userId, String role, TokenType tokenType) {
 
         long expiredMs;
         String type;
@@ -61,7 +61,7 @@ public class JWTUtil {
         }
 
         return Jwts.builder()
-                .claim("identifier", identifier)
+                .claim("userId", userId)
                 .claim("role",role)
                 .claim("tokenType",type)
                 .issuedAt(new Date(System.currentTimeMillis()))
@@ -70,7 +70,7 @@ public class JWTUtil {
                 .compact();
     }
 
-    public String createJWT(String identifier, String role, TokenType tokenType, Long expiredMs) {
+    public String createJWT(String userId, String role, TokenType tokenType, Long expiredMs) {
 
         String type;
 
@@ -82,7 +82,7 @@ public class JWTUtil {
         }
 
         return Jwts.builder()
-                .claim("identifier", identifier)
+                .claim("userId", userId)
                 .claim("role",role)
                 .claim("tokenType",type)
                 .issuedAt(new Date(System.currentTimeMillis()))

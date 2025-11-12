@@ -1,4 +1,4 @@
-package apptive.team5.filter;
+package apptive.team5.global.filter;
 
 import apptive.team5.jwt.component.JWTUtil;
 import apptive.team5.jwt.service.JwtService;
@@ -52,9 +52,9 @@ public class CustomLogoutFilter extends OncePerRequestFilter {
 
         Claims claims = jwtUtil.getClaims(accessToken);
 
-        String identifier = claims.get("identifier").toString();
+        Long userId = Long.valueOf(claims.get("userId").toString());
 
-        jwtService.deleteRefreshTokenByIdentifier(identifier);
+        jwtService.deleteRefreshTokenByUserId(userId);
 
         response.setStatus(HttpServletResponse.SC_OK);
     }

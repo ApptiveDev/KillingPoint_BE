@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserEntity extends BaseTimeEntity {
 
-    private static String defaultImage;
+    private static String DEFAULT_IMAGE = "defaultImage/userDefaultImage.png";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,6 +31,9 @@ public class UserEntity extends BaseTimeEntity {
     @Column(nullable = false)
     private String username;
 
+    @Column(unique = true, nullable = false)
+    private String tag;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private UserRoleType roleType;
@@ -43,36 +46,34 @@ public class UserEntity extends BaseTimeEntity {
     private RefreshToken refreshToken;
 
     @Column(nullable = false)
-    private String profileImageUrl;
+    private String profileImage;
 
-    public UserEntity(String identifier, String email, String username, UserRoleType roleType, SocialType socialType) {
+    public UserEntity(String identifier, String email, String username, String tag, UserRoleType roleType, SocialType socialType) {
         this.identifier = identifier;
         this.email = email;
         this.username = username;
+        this.tag = tag;
         this.roleType = roleType;
         this.socialType = socialType;
-        this.profileImageUrl = defaultImage;
+        this.profileImage = DEFAULT_IMAGE;
     }
 
-    public UserEntity(Long id, String identifier, String email, String username, UserRoleType roleType, SocialType socialType) {
+    public UserEntity(Long id, String identifier, String email, String username, String tag, UserRoleType roleType, SocialType socialType) {
         this.id = id;
         this.identifier = identifier;
         this.email = email;
         this.username = username;
+        this.tag = tag;
         this.roleType = roleType;
         this.socialType = socialType;
-        this.profileImageUrl = defaultImage;
+        this.profileImage = DEFAULT_IMAGE;
     }
 
-    public UserEntity(OAuth2Response oAuth2Response) {
-        this.identifier = oAuth2Response.getProvider() + "-" + oAuth2Response.getProviderId();
-        this.email = oAuth2Response.getEmail();
-        this.username = oAuth2Response.getUsername();
-        this.roleType = UserRoleType.USER;
-        this.socialType = oAuth2Response.getProvider();
+    public void changeTag(String tag) {
+        this.tag = tag;
     }
 
-    public static void setDefaultImage(String url) {
-        defaultImage = url;
+    public void changeProfileImage(String profileImage) {
+        this.profileImage = profileImage;
     }
 }

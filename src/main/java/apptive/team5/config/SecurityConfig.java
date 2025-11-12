@@ -1,12 +1,11 @@
 package apptive.team5.config;
 
-import apptive.team5.filter.CustomLogoutFilter;
-import apptive.team5.filter.JWTFilter;
+import apptive.team5.global.filter.CustomLogoutFilter;
+import apptive.team5.global.filter.JWTFilter;
 import apptive.team5.jwt.component.JWTUtil;
 import apptive.team5.jwt.service.JwtService;
 import apptive.team5.user.service.UserLowService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
