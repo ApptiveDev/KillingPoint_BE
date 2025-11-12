@@ -66,10 +66,14 @@ public class UserService {
     }
 
     public void deleteUser(Long userId) {
+
+        UserEntity findUser = userLowService.findById(userId);
+
         subscribeLowService.deleteByUserId(userId);
         diaryLowService.deleteByUserId(userId);
         userLowService.deleteByUserId(userId);
 
+        s3Service.deleteS3File(findUser.getProfileImage());
     }
 
     public UserResponse changeTag(UserTagUpdateRequest userTagUpdateRequest, Long userId) {
@@ -103,6 +107,16 @@ public class UserService {
         findUser.changeProfileImage(fileName);
 
         temporalLowService.deleteById(fileUploadRequest.id());
+
+        s3Service.deleteS3File(oldProfileImage);
+
+        return new UserResponse(findUser);
+    }
+
+    public UserResponse deleteProfileImage(Long userId) {
+        UserEntity findUser = userLowService.findById(userId);
+        String oldProfileImage = findUser.getProfileImage();
+        findUser.setDefaultImage();
 
         s3Service.deleteS3File(oldProfileImage);
 

@@ -54,6 +54,15 @@ public class UserController {
         return  ResponseEntity.status(HttpStatus.OK).body(userResponse);
     }
 
+    // 기본 이미지로 변경
+    @DeleteMapping("/my/profile-image")
+    public ResponseEntity<UserResponse> deleteProfileImage(@AuthenticationPrincipal Long userId) {
+        UserResponse userResponse = userService.deleteProfileImage(userId);
+
+        return ResponseEntity.status(HttpStatus.OK).body(userResponse);
+    }
+
+
     @GetMapping
     public ResponseEntity<Page<UserResponse>> getUserList(@RequestParam(required = false) String tag,
                                                           @RequestParam(defaultValue = "0") int page,
