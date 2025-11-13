@@ -1,6 +1,7 @@
 package apptive.team5.diary.domain;
 
 import apptive.team5.global.entity.BaseTimeEntity;
+import apptive.team5.global.exception.ExceptionCode;
 import apptive.team5.user.domain.UserEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -96,7 +97,7 @@ public class DiaryEntity extends BaseTimeEntity {
 
     public void validateOwner(UserEntity user) {
         if (!isOwner(user.getId())) {
-            throw new AccessDeniedException("해당 다이어리에 대한 권한이 없습니다.");
+            throw new AccessDeniedException(ExceptionCode.ACCESS_DENIED_DIARY.getDescription());
         }
     }
 

@@ -4,6 +4,7 @@ import apptive.team5.diary.domain.DiaryEntity;
 import apptive.team5.diary.domain.DiaryScope;
 import apptive.team5.diary.dto.DiaryUpdateDto;
 import apptive.team5.diary.repository.DiaryRepository;
+import apptive.team5.global.exception.ExceptionCode;
 import apptive.team5.global.exception.NotFoundEntityException;
 import apptive.team5.user.domain.UserEntity;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +29,7 @@ public class DiaryLowService {
     @Transactional(readOnly = true)
     public DiaryEntity findDiaryById(Long diaryId) {
         return diaryRepository.findById(diaryId)
-                .orElseThrow(() -> new NotFoundEntityException("그런 다이어리는 없습니다."));
+                .orElseThrow(() -> new NotFoundEntityException(ExceptionCode.NOT_FOUND_DIARY.getDescription()));
     }
 
     @Transactional(readOnly = true)

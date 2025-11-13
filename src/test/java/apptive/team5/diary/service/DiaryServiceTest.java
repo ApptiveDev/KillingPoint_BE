@@ -96,7 +96,6 @@ public class DiaryServiceTest {
 
         given(diaryLowService.findDiaryByUserAndScopeIn(owner.getId(), visibleScopes, pageRequest)).willReturn(diaryPage);
         given(diaryLikeLowService.findLikedDiaryIdsByUser(eq(viewer.getId()), any(List.class))).willReturn(likedDiaryIds);
-        given(userLowService.findById(viewer.getId())).willReturn(viewer);
 
         // when
         Page<UserDiaryResponseDto> result = diaryService.getUserDiaries(owner.getId(), viewer.getId(), pageRequest);
@@ -116,7 +115,6 @@ public class DiaryServiceTest {
 
         verify(diaryLowService).findDiaryByUserAndScopeIn(owner.getId(), visibleScopes, pageRequest);
         verify(diaryLikeLowService).findLikedDiaryIdsByUser(eq(viewer.getId()), any(List.class));
-        verify(userLowService).findById(viewer.getId());
         verify(userLowService, never()).getReferenceById(any());
     }
 
@@ -141,7 +139,6 @@ public class DiaryServiceTest {
         given(userLowService.getReferenceById(userId)).willReturn(user);
         given(diaryLowService.findDiaryByUser(user, pageRequest)).willReturn(diaryPage);
         given(diaryLikeLowService.findLikedDiaryIdsByUser(eq(userId), any(List.class))).willReturn(likedDiaryIds);
-        given(userLowService.findById(userId)).willReturn(user);
 
         Page<UserDiaryResponseDto> result = diaryService.getUserDiaries(userId, userId, pageRequest);
 
@@ -161,7 +158,6 @@ public class DiaryServiceTest {
         verify(userLowService).getReferenceById(userId);
         verify(diaryLowService).findDiaryByUser(user, pageRequest);
         verify(diaryLikeLowService).findLikedDiaryIdsByUser(eq(userId), any(List.class));
-        verify(userLowService).findById(userId);
         verify(diaryLowService, never()).findDiaryByUserAndScopeIn(any(), any(), any());
     }
 
