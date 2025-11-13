@@ -22,11 +22,6 @@ public class DiaryLowService {
     }
 
     @Transactional(readOnly = true)
-    public DiaryEntity getReferenceById(Long diaryId) {
-        return diaryRepository.getReferenceById(diaryId);
-    }
-
-    @Transactional(readOnly = true)
     public DiaryEntity findDiaryById(Long diaryId) {
         return diaryRepository.findById(diaryId)
                 .orElseThrow(() -> new NotFoundEntityException("그런 다이어리는 없습니다."));

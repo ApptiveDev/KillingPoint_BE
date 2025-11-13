@@ -19,7 +19,7 @@ public class DiaryLikeService {
 
     public void likeDiary(Long userId, Long diaryId) {
         UserEntity user = userLowService.getReferenceById(userId);
-        DiaryEntity diary = diaryLowService.getReferenceById(diaryId);
+        DiaryEntity diary = diaryLowService.findDiaryById(diaryId);
 
         if (diaryLikeLowService.existsByUserAndDiary(user, diary)) {
             throw new DuplicateException("이미 좋아요를 누르셨습니다!");
@@ -30,11 +30,10 @@ public class DiaryLikeService {
 
     public void unlikeDiary(Long userId, Long diaryId) {
         UserEntity user = userLowService.getReferenceById(userId);
-        DiaryEntity diary = diaryLowService.getReferenceById(diaryId);
+        DiaryEntity diary = diaryLowService.findDiaryById(diaryId);
 
         DiaryLikeEntity diaryLike = diaryLikeLowService.findByUserAndDiary(user, diary);
 
         diaryLikeLowService.deleteDiaryLike(diaryLike);
     }
-
 }
