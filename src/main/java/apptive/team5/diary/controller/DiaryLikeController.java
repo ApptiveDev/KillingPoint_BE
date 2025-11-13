@@ -1,0 +1,43 @@
+package apptive.team5.diary.controller;
+
+import apptive.team5.diary.service.DiaryLikeService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api/diaries/{diaryId}/like")
+public class DiaryLikeController {
+
+    private final DiaryLikeService diaryLikeService;
+
+    @PostMapping
+    public ResponseEntity<Void> likeDiary(
+            @AuthenticationPrincipal
+            Long userId,
+            @PathVariable
+            Long diaryId
+    ) {
+        diaryLikeService.likeDiary(userId, diaryId);
+
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @DeleteMapping
+    public ResponseEntity<Void> unlikeDiary(
+            @AuthenticationPrincipal
+            Long userId,
+            @PathVariable
+            Long diaryId
+    ) {
+        diaryLikeService.unlikeDiary(userId, diaryId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+}
