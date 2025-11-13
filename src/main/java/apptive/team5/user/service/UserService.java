@@ -1,5 +1,7 @@
 package apptive.team5.user.service;
+import apptive.team5.diary.service.DiaryLikeLowService;
 import apptive.team5.diary.service.DiaryLowService;
+import apptive.team5.diary.service.DiaryService;
 import apptive.team5.file.dto.FileUploadRequest;
 import apptive.team5.file.service.S3Service;
 import apptive.team5.file.service.TemporalLowService;
@@ -36,6 +38,8 @@ public class UserService {
     private final TemporalLowService temporalLowService;
     private final SubscribeLowService subscribeLowService;
     private final DiaryLowService diaryLowService;
+    private final DiaryLikeLowService diaryLikeLowService;
+    private final DiaryService diaryService;
 
     public TokenResponse socialLogin(OAuth2Response oAuth2Response) {
         String identifier = oAuth2Response.getProvider() + "-" +oAuth2Response.getProviderId();
@@ -70,7 +74,9 @@ public class UserService {
         UserEntity findUser = userLowService.findById(userId);
 
         subscribeLowService.deleteByUserId(userId);
-        diaryLowService.deleteByUserId(userId);
+        diaryLikeLowService.deleteByUserId(userId);
+
+        diaryService.deleteByUserId(userId);
         userLowService.deleteByUserId(userId);
 
         s3Service.deleteS3File(findUser.getProfileImage());

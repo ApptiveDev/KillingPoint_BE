@@ -1,6 +1,7 @@
 package apptive.team5.diary.domain;
 
 import apptive.team5.global.entity.BaseTimeEntity;
+import apptive.team5.global.exception.ExceptionCode;
 import apptive.team5.user.domain.UserEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -11,8 +12,10 @@ import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -23,6 +26,12 @@ import org.springframework.security.access.AccessDeniedException;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(
+        name = "diary_entity",
+        indexes = {
+            @Index(name = "idx_diary_user_created", columnList = "user_id, createDateTime")
+        }
+)
 public class DiaryEntity extends BaseTimeEntity {
 
     @Id
@@ -54,8 +63,7 @@ public class DiaryEntity extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(
             name = "user_id",
-            nullable = false,
-            foreignKey = @ForeignKey(name = "fk_diary_user_id_ref_user_id")
+            nullable = false
     )
     private UserEntity user;
 
@@ -87,9 +95,21 @@ public class DiaryEntity extends BaseTimeEntity {
     }
 
     public void validateOwner(UserEntity user) {
-        if (!this.user.equals(user)) {
-            throw new AccessDeniedException("해당 다이어리에 대한 권한이 없습니다.");
+        if (!isOwner(user.getId())) {
+            throw new AccessDeniedException(ExceptionCode.ACCESS_DENIED_DIARY.getDescription());
         }
+    }
+
+    public boolean isMyDiary(Long userId) {
+        return isOwner(userId);
+    }
+
+    private boolean isOwner(Long userId) {
+        return this.user.getId().equals(userId);
+    }
+
+    public boolean isScopeKillingPart() {
+        return this.scope == DiaryScope.KILLING_PART;
     }
 
     public void update(

@@ -2,7 +2,7 @@ package apptive.team5.diary.dto;
 
 import apptive.team5.diary.domain.DiaryScope;
 
-public record DiaryUpdateRequest(
+public record DiaryUpdateRequestDto(
         String artist,
         String musicTitle,
         String albumImageUrl,
@@ -13,7 +13,7 @@ public record DiaryUpdateRequest(
         String start,
         String end
 ) {
-    public static DiaryUpdateDto toUpdateDto(DiaryUpdateRequest updateRequest) {
+    public static DiaryUpdateDto toUpdateDto(DiaryUpdateRequestDto updateRequest) {
         return new DiaryUpdateDto(
                 updateRequest.musicTitle,
                 updateRequest.artist,
