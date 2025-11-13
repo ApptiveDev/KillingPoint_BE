@@ -37,8 +37,8 @@ public class DiaryLowService {
     }
 
     @Transactional(readOnly = true)
-    public Page<DiaryEntity> findDiaryByUserAndScope(Long userId, DiaryScope scope, Pageable pageable) {
-        return diaryRepository.findByUserIdAndScope(userId, scope, pageable);
+    public Page<DiaryEntity> findDiaryByUserAndScopeIn(Long userId, List<DiaryScope> scopes, Pageable pageable) {
+        return diaryRepository.findByUserIdAndScopeIn(userId, scopes, pageable);
     }
 
     @Transactional(readOnly = true)

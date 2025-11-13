@@ -25,9 +25,12 @@ import org.springframework.security.access.AccessDeniedException;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "diary_entity", indexes = {
-        @Index(name = "idx_diary_user_created", columnList = "user_id, createDateTime")
-})
+@Table(
+        name = "diary_entity",
+        indexes = {
+            @Index(name = "idx_diary_user_created", columnList = "user_id, createDateTime")
+        }
+)
 public class DiaryEntity extends BaseTimeEntity {
 
     @Id
@@ -92,9 +95,21 @@ public class DiaryEntity extends BaseTimeEntity {
     }
 
     public void validateOwner(UserEntity user) {
-        if (!this.user.equals(user)) {
+        if (!isOwner(user)) {
             throw new AccessDeniedException("해당 다이어리에 대한 권한이 없습니다.");
         }
+    }
+
+    public boolean isMyDiary(UserEntity user) {
+        return isOwner(user);
+    }
+
+    private boolean isOwner(UserEntity user) {
+        return this.user.equals(user);
+    }
+
+    public boolean isScopeKillingPart() {
+        return this.scope == DiaryScope.KILLING_PART;
     }
 
     public void update(

@@ -10,6 +10,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,6 +19,15 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(
+        name = "diary_like",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "uk_diary_like_user_diary",
+                        columnNames = {"user_id", "diary_id"}
+                )
+        }
+)
 public class DiaryLikeEntity {
 
     @Id

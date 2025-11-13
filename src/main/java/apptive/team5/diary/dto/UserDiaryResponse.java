@@ -2,10 +2,12 @@ package apptive.team5.diary.dto;
 
 import apptive.team5.diary.domain.DiaryEntity;
 import apptive.team5.diary.domain.DiaryScope;
+import apptive.team5.user.domain.UserEntity;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
-public record DiaryPublicResponse(
+public record UserDiaryResponse(
         Long diaryId,
         String artist,
         String musicTitle,
@@ -20,13 +22,21 @@ public record DiaryPublicResponse(
         LocalDateTime updateDate,
         boolean isLiked
 ) {
-    public static DiaryPublicResponse from(DiaryEntity diary, boolean isLiked) {
-        return new DiaryPublicResponse(
+    public static String defaultContentMsg = "비공개 일기입니다";
+    public static UserDiaryResponse from(DiaryEntity diary, boolean isLiked, UserEntity currentUser) {
+        String contentResponse = diary.getContent();
+
+        if (!diary.isMyDiary(currentUser) &&
+            diary.isScopeKillingPart()) {
+            contentResponse = defaultContentMsg;
+        }
+
+        return new UserDiaryResponse(
                 diary.getId(),
                 diary.getArtist(),
                 diary.getMusicTitle(),
                 diary.getAlbumImageUrl(),
-                diary.getContent(),
+                contentResponse,
                 diary.getVideoUrl(),
                 diary.getScope(),
                 diary.getDuration(),

@@ -31,14 +31,14 @@ public interface DiaryLikeRepository extends JpaRepository<DiaryLikeEntity, Long
             List<Long> diaryIds
     );
 
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Query("""
             DELETE FROM DiaryLikeEntity dl
             WHERE dl.user.id = :userId
     """)
     void deleteByUserId(@Param("userId") Long userId);
 
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Query("""
             DELETE FROM DiaryLikeEntity dl
             WHERE dl.diary.id = : diaryId

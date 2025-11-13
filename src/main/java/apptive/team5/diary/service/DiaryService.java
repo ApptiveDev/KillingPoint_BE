@@ -1,7 +1,9 @@
 package apptive.team5.diary.service;
 
 import apptive.team5.diary.domain.DiaryEntity;
+import apptive.team5.diary.domain.DiaryScope;
 import apptive.team5.diary.dto.DiaryCreateRequest;
+import apptive.team5.diary.dto.UserDiaryResponse;
 import apptive.team5.diary.dto.DiaryResponse;
 import apptive.team5.diary.dto.DiaryUpdateRequest;
 import apptive.team5.user.domain.UserEntity;
@@ -12,12 +14,17 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+
 @Service
 @RequiredArgsConstructor
 public class DiaryService {
 
     private final UserLowService userLowService;
     private final DiaryLowService diaryLowService;
+    private final DiaryLikeLowService diaryLikeLowService;
 
     @Transactional(readOnly = true)
     public Page<DiaryResponse> getMyDiaries(Long userId, Pageable pageable) {
@@ -25,6 +32,36 @@ public class DiaryService {
 
         return diaryLowService.findDiaryByUser(foundUser, pageable)
                 .map(DiaryResponse::from);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<UserDiaryResponse> getUserDiaries(Long targetUserId, Long currentUserId, Pageable pageable) {
+        Page<DiaryEntity> diaryPage;
+
+        if (Objects.equals(targetUserId, currentUserId)) {
+            UserEntity targetUser = userLowService.getReferenceById(targetUserId);
+            diaryPage = diaryLowService.findDiaryByUser(targetUser, pageable);
+        }
+        else {
+            List<DiaryScope> visibleScopes = List.of(DiaryScope.PUBLIC, DiaryScope.KILLING_PART);
+            diaryPage = diaryLowService.findDiaryByUserAndScopeIn(targetUserId, visibleScopes, pageable);
+        }
+
+        List<Long> diaryIds = diaryPage.getContent().stream()
+                .map(DiaryEntity::getId)
+                .toList();
+
+        Set<Long> likedDiaryIds = diaryLikeLowService.findLikedDiaryIdsByUser(currentUserId, diaryIds);
+
+        UserEntity currentUser = userLowService.findById(currentUserId);
+
+        return diaryPage.map(diary ->
+                UserDiaryResponse.from(
+                        diary,
+                        likedDiaryIds.contains(diary.getId()),
+                        currentUser
+                )
+        );
     }
 
     @Transactional

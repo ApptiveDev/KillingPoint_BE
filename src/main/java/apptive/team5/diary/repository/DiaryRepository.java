@@ -16,7 +16,7 @@ import java.util.List;
 public interface DiaryRepository extends JpaRepository<DiaryEntity, Long> {
     Page<DiaryEntity> findByUser(UserEntity user, Pageable pageable);
 
-    Page<DiaryEntity> findByUserIdAndScope(Long userId, DiaryScope scope, Pageable pageable);
+    Page<DiaryEntity> findByUserIdAndScopeIn(Long userId, List<DiaryScope> scopes, Pageable pageable);
 
     List<DiaryEntity> findByUserIdAndCreateDateTimeBetween(Long userId, LocalDateTime start, LocalDateTime end);
 
