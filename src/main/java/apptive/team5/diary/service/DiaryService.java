@@ -14,6 +14,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -62,6 +65,17 @@ public class DiaryService {
                         currentUser
                 )
         );
+    }
+
+    @Transactional(readOnly = true)
+    public List<DiaryResponse> getMyDiariesByPeriod(Long userId, LocalDate startDate, LocalDate endDate) {
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+        LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
+
+        return diaryLowService.findByUserIdAndPeriod(userId, startDateTime, endDateTime)
+                .stream()
+                .map(DiaryResponse::from)
+                .toList();
     }
 
     @Transactional

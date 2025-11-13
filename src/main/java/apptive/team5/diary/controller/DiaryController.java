@@ -4,11 +4,13 @@ import apptive.team5.diary.domain.DiaryEntity;
 import apptive.team5.diary.dto.DiaryCreateRequest;
 import apptive.team5.diary.dto.DiaryResponse;
 import apptive.team5.diary.dto.DiaryUpdateRequest;
+import apptive.team5.diary.dto.UserDiaryResponse;
 import apptive.team5.diary.service.DiaryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -23,6 +25,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -43,6 +48,34 @@ public class DiaryController {
 
         Page<DiaryResponse> response = diaryService.getMyDiaries(userId, PageRequest.of(page, size));
 
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<Page<UserDiaryResponse>> getUserDiaries(
+            @PathVariable
+            Long userId,
+            @AuthenticationPrincipal
+            Long currentUserId,
+            @RequestParam(defaultValue = "0")
+            int page,
+            @RequestParam(defaultValue = "5")
+            int size
+    ) {
+        Page<UserDiaryResponse> response = diaryService.getUserDiaries(userId, currentUserId, PageRequest.of(page, size));
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping("/my/calendar")
+    public ResponseEntity<List<DiaryResponse>> getMyDiariesByPeriod(
+            @AuthenticationPrincipal
+            Long userId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate start,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate end
+    ) {
+        List<DiaryResponse> response = diaryService.getMyDiariesByPeriod(userId, start, end);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
