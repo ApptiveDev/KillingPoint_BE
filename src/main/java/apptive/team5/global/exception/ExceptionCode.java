@@ -11,7 +11,8 @@ public enum ExceptionCode {
     YOUTUBE_API_EXCEPTION("유튜브 api 호출 실패"),
     KAKAO_API_EXCEPTION("카카오 api 호출 실패"),
     GOOGLE_API_EXCEPTION("구글 api 호출 실패"),
-    DUPLICATE_USER_TAG("이미 존재하는 tag입니다.");
+    DUPLICATE_USER_TAG("이미 존재하는 tag입니다."),
+    DUPLICATE_DIARY_LIKE("이미 좋아요를 누르셨습니다!");
 
     private final String description;
 

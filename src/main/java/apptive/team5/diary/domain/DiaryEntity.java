@@ -95,17 +95,17 @@ public class DiaryEntity extends BaseTimeEntity {
     }
 
     public void validateOwner(UserEntity user) {
-        if (!isOwner(user)) {
+        if (!isOwner(user.getId())) {
             throw new AccessDeniedException("해당 다이어리에 대한 권한이 없습니다.");
         }
     }
 
-    public boolean isMyDiary(UserEntity user) {
-        return isOwner(user);
+    public boolean isMyDiary(Long userId) {
+        return isOwner(userId);
     }
 
-    private boolean isOwner(UserEntity user) {
-        return this.user.equals(user);
+    private boolean isOwner(Long userId) {
+        return this.user.getId().equals(userId);
     }
 
     public boolean isScopeKillingPart() {

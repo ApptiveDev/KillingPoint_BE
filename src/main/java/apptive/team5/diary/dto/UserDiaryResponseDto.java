@@ -22,10 +22,10 @@ public record UserDiaryResponseDto(
         boolean isLiked
 ) {
     public static String defaultContentMsg = "비공개 일기입니다.";
-    public static UserDiaryResponseDto from(DiaryEntity diary, boolean isLiked, UserEntity currentUser) {
+    public static UserDiaryResponseDto from(DiaryEntity diary, boolean isLiked, Long currentUserId) {
         String contentResponse = diary.getContent();
 
-        if (!diary.isMyDiary(currentUser) &&
+        if (!diary.isMyDiary(currentUserId) &&
             diary.isScopeKillingPart()) {
             contentResponse = defaultContentMsg;
         }

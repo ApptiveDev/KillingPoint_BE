@@ -41,7 +41,7 @@ public class DiaryService {
     public Page<UserDiaryResponseDto> getUserDiaries(Long targetUserId, Long currentUserId, Pageable pageable) {
         Page<DiaryEntity> diaryPage;
 
-        if (Objects.equals(targetUserId, currentUserId)) {
+        if (targetUserId.equals(currentUserId)) {
             UserEntity targetUser = userLowService.getReferenceById(targetUserId);
             diaryPage = diaryLowService.findDiaryByUser(targetUser, pageable);
         }
@@ -56,13 +56,11 @@ public class DiaryService {
 
         Set<Long> likedDiaryIds = diaryLikeLowService.findLikedDiaryIdsByUser(currentUserId, diaryIds);
 
-        UserEntity currentUser = userLowService.findById(currentUserId);
-
         return diaryPage.map(diary ->
                 UserDiaryResponseDto.from(
                         diary,
                         likedDiaryIds.contains(diary.getId()),
-                        currentUser
+                        currentUserId
                 )
         );
     }

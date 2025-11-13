@@ -3,6 +3,7 @@ package apptive.team5.diary.service;
 import apptive.team5.diary.domain.DiaryEntity;
 import apptive.team5.diary.domain.DiaryLikeEntity;
 import apptive.team5.global.exception.DuplicateException;
+import apptive.team5.global.exception.ExceptionCode;
 import apptive.team5.user.domain.UserEntity;
 import apptive.team5.user.service.UserLowService;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +23,7 @@ public class DiaryLikeService {
         DiaryEntity diary = diaryLowService.findDiaryById(diaryId);
 
         if (diaryLikeLowService.existsByUserAndDiary(user, diary)) {
-            throw new DuplicateException("이미 좋아요를 누르셨습니다!");
+            throw new DuplicateException(ExceptionCode.DUPLICATE_DIARY_LIKE.getDescription());
         }
 
         diaryLikeLowService.saveDiaryLike(new DiaryLikeEntity(user, diary));
