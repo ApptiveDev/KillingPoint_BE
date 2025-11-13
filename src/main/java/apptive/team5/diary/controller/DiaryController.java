@@ -2,9 +2,9 @@ package apptive.team5.diary.controller;
 
 import apptive.team5.diary.domain.DiaryEntity;
 import apptive.team5.diary.dto.DiaryCreateRequest;
-import apptive.team5.diary.dto.DiaryResponse;
-import apptive.team5.diary.dto.DiaryUpdateRequest;
-import apptive.team5.diary.dto.UserDiaryResponse;
+import apptive.team5.diary.dto.DiaryResponseDto;
+import apptive.team5.diary.dto.DiaryUpdateRequestDto;
+import apptive.team5.diary.dto.UserDiaryResponseDto;
 import apptive.team5.diary.service.DiaryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +26,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -37,7 +36,7 @@ public class DiaryController {
     private final DiaryService diaryService;
 
     @GetMapping("/my")
-    public ResponseEntity<Page<DiaryResponse>> getMyMusicDiary(
+    public ResponseEntity<Page<DiaryResponseDto>> getMyMusicDiary(
             @AuthenticationPrincipal
             Long userId,
             @RequestParam(defaultValue = "0")
@@ -46,13 +45,13 @@ public class DiaryController {
             int size
     ) {
 
-        Page<DiaryResponse> response = diaryService.getMyDiaries(userId, PageRequest.of(page, size));
+        Page<DiaryResponseDto> response = diaryService.getMyDiaries(userId, PageRequest.of(page, size));
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<Page<UserDiaryResponse>> getUserDiaries(
+    public ResponseEntity<Page<UserDiaryResponseDto>> getUserDiaries(
             @PathVariable
             Long userId,
             @AuthenticationPrincipal
@@ -62,12 +61,12 @@ public class DiaryController {
             @RequestParam(defaultValue = "5")
             int size
     ) {
-        Page<UserDiaryResponse> response = diaryService.getUserDiaries(userId, currentUserId, PageRequest.of(page, size));
+        Page<UserDiaryResponseDto> response = diaryService.getUserDiaries(userId, currentUserId, PageRequest.of(page, size));
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/my/calendar")
-    public ResponseEntity<List<DiaryResponse>> getMyDiariesByPeriod(
+    public ResponseEntity<List<DiaryResponseDto>> getMyDiariesByPeriod(
             @AuthenticationPrincipal
             Long userId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
@@ -75,7 +74,7 @@ public class DiaryController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
             LocalDate end
     ) {
-        List<DiaryResponse> response = diaryService.getMyDiariesByPeriod(userId, start, end);
+        List<DiaryResponseDto> response = diaryService.getMyDiariesByPeriod(userId, start, end);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -93,7 +92,7 @@ public class DiaryController {
             @PathVariable
             Long diaryId,
             @RequestBody
-            DiaryUpdateRequest updateRequest
+            DiaryUpdateRequestDto updateRequest
     ) {
         diaryService.updateDiary(userId, diaryId, updateRequest);
 

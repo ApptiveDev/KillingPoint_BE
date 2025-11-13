@@ -1,10 +1,15 @@
 package apptive.team5.diary.controller;
 
 import apptive.team5.diary.domain.DiaryEntity;
+import apptive.team5.diary.domain.DiaryLikeEntity;
+import apptive.team5.diary.domain.DiaryScope;
 import apptive.team5.diary.dto.DiaryCreateRequest;
-import apptive.team5.diary.dto.DiaryResponse;
-import apptive.team5.diary.dto.DiaryUpdateRequest;
+import apptive.team5.diary.dto.DiaryResponseDto;
+import apptive.team5.diary.dto.DiaryUpdateRequestDto;
+import apptive.team5.diary.dto.UserDiaryResponseDto;
 import apptive.team5.diary.repository.DiaryRepository;
+import apptive.team5.diary.service.DiaryLikeLowService;
+import apptive.team5.diary.service.DiaryLowService;
 import apptive.team5.user.domain.UserEntity;
 import apptive.team5.user.repository.UserRepository;
 import apptive.team5.util.TestSecurityContextHolderInjection;
@@ -19,15 +24,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.SoftAssertions.*;
@@ -54,6 +59,12 @@ public class DiaryControllerTest {
     @Autowired
     private DiaryRepository diaryRepository;
 
+    @Autowired
+    private DiaryLowService diaryLowService;
+
+    @Autowired
+    private DiaryLikeLowService diaryLikeLowService;
+
     private UserEntity testUser;
 
     @BeforeEach
@@ -63,7 +74,7 @@ public class DiaryControllerTest {
     }
 
     @Test
-    @DisplayName("다이어리 목록 조회")
+    @DisplayName("내 다이어리 목록 조회")
     void getMyMusicDiary() throws Exception {
         // given
         DiaryEntity diary = diaryRepository.save(TestUtil.makeDiaryEntity(testUser));
@@ -83,12 +94,12 @@ public class DiaryControllerTest {
 
         JsonNode jsonNode = objectMapper.readTree(response);
 
-        List<DiaryResponse> content = objectMapper.convertValue(
+        List<DiaryResponseDto> content = objectMapper.convertValue(
                 jsonNode.path("content"),
-                new TypeReference<List<DiaryResponse>>() {}
+                new TypeReference<List<DiaryResponseDto>>() {}
         );
 
-        DiaryResponse diaryResponse = content.getFirst();
+        DiaryResponseDto diaryResponse = content.getFirst();
 
         assertSoftly(softly-> {
             softly.assertThat(content).hasSize(1);
@@ -97,6 +108,52 @@ public class DiaryControllerTest {
             softly.assertThat(diaryResponse.duration()).isEqualTo(diary.getDuration());
             softly.assertThat(diaryResponse.start()).isEqualTo(diary.getStart());
             softly.assertThat(diaryResponse.end()).isEqualTo(diary.getEnd());
+        });
+    }
+
+    @Test
+    @DisplayName("타인 다이어리 조회 및 scope 확인")
+    void getUserDiariesByViewer() throws Exception {
+        DiaryEntity publicDiary = diaryLowService.saveDiary(TestUtil.makeDiaryEntityWithScope(testUser, DiaryScope.PUBLIC));
+        DiaryEntity killingPartDiary = diaryLowService.saveDiary(TestUtil.makeDiaryEntityWithScope(testUser, DiaryScope.KILLING_PART));
+        DiaryEntity privateDiary = diaryLowService.saveDiary(TestUtil.makeDiaryEntityWithScope(testUser, DiaryScope.PRIVATE));
+
+        UserEntity viewer = userRepository.save(TestUtil.makeDifferentUserEntity(testUser));
+
+        diaryLikeLowService.saveDiaryLike(new DiaryLikeEntity(viewer, publicDiary));
+
+        TestSecurityContextHolderInjection.inject(viewer.getId(), viewer.getRoleType());
+
+        // when
+        String response = mockMvc.perform(get("/api/diaries/user/{userId}", testUser.getId()) // testUser의 다이어리 조회
+                        .with(securityContext(SecurityContextHolder.getContext()))
+                )
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+        // then
+        JsonNode jsonNode = objectMapper.readTree(response);
+        List<UserDiaryResponseDto> content = objectMapper.convertValue(
+                jsonNode.path("content"), new TypeReference<>() {}
+        );
+
+        Map<Long, UserDiaryResponseDto> responseMap = content.stream()
+                .collect(Collectors.toMap(UserDiaryResponseDto::diaryId, Function.identity()));
+
+        assertSoftly(softly -> {
+            softly.assertThat(content).hasSize(2); // PRIVATE은 조회되면 안 됨
+            softly.assertThat(responseMap.containsKey(privateDiary.getId())).isFalse();
+
+            // PUBLIC
+            UserDiaryResponseDto publicResponse = responseMap.get(publicDiary.getId());
+            softly.assertThat(publicResponse.content()).isNotNull();
+            softly.assertThat(publicResponse.content()).isEqualTo(publicDiary.getContent());
+            softly.assertThat(publicResponse.isLiked()).isTrue();
+
+            // KILLING_PART
+            UserDiaryResponseDto killingPartResponse = responseMap.get(killingPartDiary.getId());
+            softly.assertThat(killingPartResponse.content()).isEqualTo("비공개 일기입니다.");
+            softly.assertThat(killingPartResponse.isLiked()).isFalse();
         });
     }
 
@@ -138,7 +195,7 @@ public class DiaryControllerTest {
     void updateDiary() throws Exception {
         // given
         DiaryEntity diary = diaryRepository.save(TestUtil.makeDiaryEntity(testUser));
-        DiaryUpdateRequest updateRequest = TestUtil.makeDiaryUpdateRequest();
+        DiaryUpdateRequestDto updateRequest = TestUtil.makeDiaryUpdateRequest();
         TestSecurityContextHolderInjection.inject(testUser.getId(), testUser.getRoleType());
 
         // when

@@ -3,8 +3,7 @@ package apptive.team5.util;
 import apptive.team5.diary.domain.DiaryEntity;
 import apptive.team5.diary.domain.DiaryScope;
 import apptive.team5.diary.dto.DiaryCreateRequest;
-import apptive.team5.diary.dto.DiaryUpdateRequest;
-import apptive.team5.diary.service.DiaryService;
+import apptive.team5.diary.dto.DiaryUpdateRequestDto;
 import apptive.team5.user.domain.SocialType;
 import apptive.team5.user.domain.UserEntity;
 import apptive.team5.user.domain.UserRoleType;
@@ -59,6 +58,21 @@ public final class TestUtil {
         );
     }
 
+    public static DiaryEntity makeDiaryEntityWithScope(UserEntity user, DiaryScope scope) {
+        return new DiaryEntity(
+                "Test Music",
+                "Test Artist",
+                "image.url",
+                "video.url",
+                "Test content",
+                scope,
+                "PT2M58S",
+                "PT1M1S",
+                "PT1M31S",
+                user
+        );
+    }
+
     public static DiaryEntity makeDiaryEntityWithId(Long diaryId, UserEntity user) {
         return new DiaryEntity(
                 diaryId,
@@ -89,8 +103,8 @@ public final class TestUtil {
         );
     }
 
-    public static DiaryUpdateRequest makeDiaryUpdateRequest() {
-        return new DiaryUpdateRequest(
+    public static DiaryUpdateRequestDto makeDiaryUpdateRequest() {
+        return new DiaryUpdateRequestDto(
                 "Updated Artist",
                 "Updated Music",
                 "updated.image.url",

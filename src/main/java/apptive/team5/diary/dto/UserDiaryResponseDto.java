@@ -5,9 +5,8 @@ import apptive.team5.diary.domain.DiaryScope;
 import apptive.team5.user.domain.UserEntity;
 
 import java.time.LocalDateTime;
-import java.util.Objects;
 
-public record UserDiaryResponse(
+public record UserDiaryResponseDto(
         Long diaryId,
         String artist,
         String musicTitle,
@@ -22,8 +21,8 @@ public record UserDiaryResponse(
         LocalDateTime updateDate,
         boolean isLiked
 ) {
-    public static String defaultContentMsg = "비공개 일기입니다";
-    public static UserDiaryResponse from(DiaryEntity diary, boolean isLiked, UserEntity currentUser) {
+    public static String defaultContentMsg = "비공개 일기입니다.";
+    public static UserDiaryResponseDto from(DiaryEntity diary, boolean isLiked, UserEntity currentUser) {
         String contentResponse = diary.getContent();
 
         if (!diary.isMyDiary(currentUser) &&
@@ -31,7 +30,7 @@ public record UserDiaryResponse(
             contentResponse = defaultContentMsg;
         }
 
-        return new UserDiaryResponse(
+        return new UserDiaryResponseDto(
                 diary.getId(),
                 diary.getArtist(),
                 diary.getMusicTitle(),

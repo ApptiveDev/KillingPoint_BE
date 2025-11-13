@@ -3,9 +3,9 @@ package apptive.team5.diary.service;
 import apptive.team5.diary.domain.DiaryEntity;
 import apptive.team5.diary.domain.DiaryScope;
 import apptive.team5.diary.dto.DiaryCreateRequest;
-import apptive.team5.diary.dto.UserDiaryResponse;
-import apptive.team5.diary.dto.DiaryResponse;
-import apptive.team5.diary.dto.DiaryUpdateRequest;
+import apptive.team5.diary.dto.UserDiaryResponseDto;
+import apptive.team5.diary.dto.DiaryResponseDto;
+import apptive.team5.diary.dto.DiaryUpdateRequestDto;
 import apptive.team5.user.domain.UserEntity;
 import apptive.team5.user.service.UserLowService;
 import lombok.RequiredArgsConstructor;
@@ -30,15 +30,15 @@ public class DiaryService {
     private final DiaryLikeLowService diaryLikeLowService;
 
     @Transactional(readOnly = true)
-    public Page<DiaryResponse> getMyDiaries(Long userId, Pageable pageable) {
+    public Page<DiaryResponseDto> getMyDiaries(Long userId, Pageable pageable) {
         UserEntity foundUser = userLowService.getReferenceById(userId);
 
         return diaryLowService.findDiaryByUser(foundUser, pageable)
-                .map(DiaryResponse::from);
+                .map(DiaryResponseDto::from);
     }
 
     @Transactional(readOnly = true)
-    public Page<UserDiaryResponse> getUserDiaries(Long targetUserId, Long currentUserId, Pageable pageable) {
+    public Page<UserDiaryResponseDto> getUserDiaries(Long targetUserId, Long currentUserId, Pageable pageable) {
         Page<DiaryEntity> diaryPage;
 
         if (Objects.equals(targetUserId, currentUserId)) {
@@ -59,7 +59,7 @@ public class DiaryService {
         UserEntity currentUser = userLowService.findById(currentUserId);
 
         return diaryPage.map(diary ->
-                UserDiaryResponse.from(
+                UserDiaryResponseDto.from(
                         diary,
                         likedDiaryIds.contains(diary.getId()),
                         currentUser
@@ -68,13 +68,13 @@ public class DiaryService {
     }
 
     @Transactional(readOnly = true)
-    public List<DiaryResponse> getMyDiariesByPeriod(Long userId, LocalDate startDate, LocalDate endDate) {
+    public List<DiaryResponseDto> getMyDiariesByPeriod(Long userId, LocalDate startDate, LocalDate endDate) {
         LocalDateTime startDateTime = startDate.atStartOfDay();
         LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
 
         return diaryLowService.findByUserIdAndPeriod(userId, startDateTime, endDateTime)
                 .stream()
-                .map(DiaryResponse::from)
+                .map(DiaryResponseDto::from)
                 .toList();
     }
 
@@ -88,14 +88,14 @@ public class DiaryService {
     }
 
     @Transactional
-    public void updateDiary(Long userId, Long diaryId, DiaryUpdateRequest updateRequest) {
+    public void updateDiary(Long userId, Long diaryId, DiaryUpdateRequestDto updateRequest) {
         UserEntity foundUser = userLowService.getReferenceById(userId);
 
         DiaryEntity foundDiary = diaryLowService.findDiaryById(diaryId);
 
         foundDiary.validateOwner(foundUser);
 
-        diaryLowService.updateDiary(foundDiary, DiaryUpdateRequest.toUpdateDto(updateRequest));
+        diaryLowService.updateDiary(foundDiary, DiaryUpdateRequestDto.toUpdateDto(updateRequest));
     }
 
     @Transactional

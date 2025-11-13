@@ -1,14 +1,12 @@
 package apptive.team5.diary.service;
 
 import apptive.team5.diary.domain.DiaryEntity;
-import apptive.team5.diary.domain.DiaryScope;
 import apptive.team5.diary.dto.DiaryCreateRequest;
-import apptive.team5.diary.dto.DiaryResponse;
-import apptive.team5.diary.dto.DiaryUpdateRequest;
+import apptive.team5.diary.dto.DiaryResponseDto;
+import apptive.team5.diary.dto.DiaryUpdateRequestDto;
 import apptive.team5.user.domain.UserEntity;
 import apptive.team5.user.service.UserLowService;
 import apptive.team5.util.TestUtil;
-import apptive.team5.youtube.dto.YoutubeVideoResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -52,7 +50,7 @@ public class DiaryServiceTest {
         given(diaryLowService.findDiaryByUser(user, pageRequest)).willReturn(diaryEntityPage);
 
         // when
-        Page<DiaryResponse> result = diaryService.getMyDiaries(user.getId(), pageRequest);
+        Page<DiaryResponseDto> result = diaryService.getMyDiaries(user.getId(), pageRequest);
 
         // then
         assertThat(result.getContent()).hasSize(1);
@@ -88,7 +86,7 @@ public class DiaryServiceTest {
         // given
         UserEntity user = TestUtil.makeUserEntityWithId();
         Long diaryId = 1L;
-        DiaryUpdateRequest updateRequest = TestUtil.makeDiaryUpdateRequest();
+        DiaryUpdateRequestDto updateRequest = TestUtil.makeDiaryUpdateRequest();
         DiaryEntity diary = TestUtil.makeDiaryEntity(user);
 
         given(userLowService.getReferenceById(user.getId())).willReturn(user);

@@ -5,7 +5,7 @@ import apptive.team5.diary.domain.DiaryEntity;
 import apptive.team5.diary.domain.DiaryScope;
 import java.time.LocalDateTime;
 
-public record DiaryResponse(
+public record DiaryResponseDto(
         String artist,
         String musicTitle,
         String albumImageUrl,
@@ -18,8 +18,8 @@ public record DiaryResponse(
         LocalDateTime createDate,
         LocalDateTime updateDate
 ) {
-    public static DiaryResponse from(DiaryEntity diary) {
-        return new DiaryResponse(
+    public static DiaryResponseDto from(DiaryEntity diary) {
+        return new DiaryResponseDto(
                 diary.getArtist(),
                 diary.getMusicTitle(),
                 diary.getAlbumImageUrl(),
