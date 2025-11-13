@@ -1,10 +1,14 @@
 package apptive.team5.diary.service;
 
 import apptive.team5.diary.domain.DiaryEntity;
+import apptive.team5.diary.domain.DiaryScope;
 import apptive.team5.diary.dto.DiaryCreateRequest;
 import apptive.team5.diary.dto.DiaryResponseDto;
 import apptive.team5.diary.dto.DiaryUpdateRequestDto;
+import apptive.team5.diary.dto.UserDiaryResponseDto;
+import apptive.team5.user.domain.SocialType;
 import apptive.team5.user.domain.UserEntity;
+import apptive.team5.user.domain.UserRoleType;
 import apptive.team5.user.service.UserLowService;
 import apptive.team5.util.TestUtil;
 import org.junit.jupiter.api.DisplayName;
@@ -16,13 +20,17 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
@@ -36,6 +44,8 @@ public class DiaryServiceTest {
 
     @Mock
     private DiaryLowService diaryLowService;
+    @Mock
+    private DiaryLikeLowService diaryLikeLowService;
 
     @Test
     @DisplayName("내 다이어리 목록 조회")
@@ -59,6 +69,100 @@ public class DiaryServiceTest {
         verify(diaryLowService).findDiaryByUser(any(UserEntity.class), any(PageRequest.class));
 
         verifyNoMoreInteractions(userLowService, diaryLowService);
+    }
+
+    @Test
+    @DisplayName("타인 다이어리 조회 - PUBLIC, KILLING_PART")
+    void getUserDiaries_OtherUser() {
+        // given
+        UserEntity owner = TestUtil.makeUserEntityWithId();
+
+        UserEntity viewer = new UserEntity(
+                2L, "viewer-id", "viewer@email.com", "viewer",
+                "viewerTag", UserRoleType.USER, SocialType.GOOGLE
+        );
+
+        DiaryEntity publicDiary = TestUtil.makeDiaryEntityWithScope(owner, DiaryScope.PUBLIC);
+        ReflectionTestUtils.setField(publicDiary, "id", 10L);
+        DiaryEntity killingPartDiary = TestUtil.makeDiaryEntityWithScope(owner, DiaryScope.KILLING_PART);
+        ReflectionTestUtils.setField(killingPartDiary, "id", 11L);
+
+        List<DiaryEntity> diaries = List.of(publicDiary, killingPartDiary);
+        Page<DiaryEntity> diaryPage = new PageImpl<>(diaries);
+        PageRequest pageRequest = PageRequest.of(0, 5);
+        List<DiaryScope> visibleScopes = List.of(DiaryScope.PUBLIC, DiaryScope.KILLING_PART);
+
+        Set<Long> likedDiaryIds = Set.of(publicDiary.getId());
+
+        given(diaryLowService.findDiaryByUserAndScopeIn(owner.getId(), visibleScopes, pageRequest)).willReturn(diaryPage);
+        given(diaryLikeLowService.findLikedDiaryIdsByUser(eq(viewer.getId()), any(List.class))).willReturn(likedDiaryIds);
+        given(userLowService.findById(viewer.getId())).willReturn(viewer);
+
+        // when
+        Page<UserDiaryResponseDto> result = diaryService.getUserDiaries(owner.getId(), viewer.getId(), pageRequest);
+
+        // then
+        assertThat(result.getContent()).hasSize(2);
+
+        UserDiaryResponseDto publicDto = result.getContent().get(0);
+        assertThat(publicDto.scope()).isEqualTo(DiaryScope.PUBLIC);
+        assertThat(publicDto.content()).isEqualTo(publicDiary.getContent());
+        assertThat(publicDto.isLiked()).isTrue();
+
+        UserDiaryResponseDto killingPartDto = result.getContent().get(1);
+        assertThat(killingPartDto.scope()).isEqualTo(DiaryScope.KILLING_PART);
+        assertThat(killingPartDto.content()).isEqualTo(UserDiaryResponseDto.defaultContentMsg);
+        assertThat(killingPartDto.isLiked()).isFalse();
+
+        verify(diaryLowService).findDiaryByUserAndScopeIn(owner.getId(), visibleScopes, pageRequest);
+        verify(diaryLikeLowService).findLikedDiaryIdsByUser(eq(viewer.getId()), any(List.class));
+        verify(userLowService).findById(viewer.getId());
+        verify(userLowService, never()).getReferenceById(any());
+    }
+
+    @Test
+    @DisplayName("내 다이어리 조회 (getUserDiaries 사용)")
+    void getUserDiaries_OwnUser() {
+        // given
+        UserEntity user = TestUtil.makeUserEntityWithId();
+        Long userId = user.getId();
+
+        DiaryEntity privateDiary = TestUtil.makeDiaryEntityWithScope(user, DiaryScope.PRIVATE);
+        ReflectionTestUtils.setField(privateDiary, "id", 10L);
+        DiaryEntity killingPartDiary = TestUtil.makeDiaryEntityWithScope(user, DiaryScope.KILLING_PART);
+        ReflectionTestUtils.setField(killingPartDiary, "id", 11L);
+
+        List<DiaryEntity> diaries = List.of(privateDiary, killingPartDiary);
+        Page<DiaryEntity> diaryPage = new PageImpl<>(diaries);
+        PageRequest pageRequest = PageRequest.of(0, 5);
+
+        Set<Long> likedDiaryIds = Set.of();
+
+        given(userLowService.getReferenceById(userId)).willReturn(user);
+        given(diaryLowService.findDiaryByUser(user, pageRequest)).willReturn(diaryPage);
+        given(diaryLikeLowService.findLikedDiaryIdsByUser(eq(userId), any(List.class))).willReturn(likedDiaryIds);
+        given(userLowService.findById(userId)).willReturn(user);
+
+        Page<UserDiaryResponseDto> result = diaryService.getUserDiaries(userId, userId, pageRequest);
+
+        // then
+        assertThat(result.getContent()).hasSize(2);
+
+        UserDiaryResponseDto privateDto = result.getContent().getFirst();
+        assertThat(privateDto.scope()).isEqualTo(DiaryScope.PRIVATE);
+        assertThat(privateDto.content()).isEqualTo(privateDiary.getContent());
+        assertThat(privateDto.isLiked()).isFalse();
+
+        UserDiaryResponseDto killingPartDto = result.getContent().get(1);
+        assertThat(killingPartDto.scope()).isEqualTo(DiaryScope.KILLING_PART);
+        assertThat(killingPartDto.content()).isEqualTo(killingPartDiary.getContent()); // 자신의 KILLING_PART 내용은 보여야 함
+        assertThat(killingPartDto.isLiked()).isFalse();
+
+        verify(userLowService).getReferenceById(userId);
+        verify(diaryLowService).findDiaryByUser(user, pageRequest);
+        verify(diaryLikeLowService).findLikedDiaryIdsByUser(eq(userId), any(List.class));
+        verify(userLowService).findById(userId);
+        verify(diaryLowService, never()).findDiaryByUserAndScopeIn(any(), any(), any());
     }
 
     @Test

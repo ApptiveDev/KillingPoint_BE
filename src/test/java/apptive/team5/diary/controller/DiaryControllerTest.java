@@ -29,6 +29,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -152,8 +153,40 @@ public class DiaryControllerTest {
 
             // KILLING_PART
             UserDiaryResponseDto killingPartResponse = responseMap.get(killingPartDiary.getId());
-            softly.assertThat(killingPartResponse.content()).isEqualTo("비공개 일기입니다.");
+            softly.assertThat(killingPartResponse.content()).isEqualTo(UserDiaryResponseDto.defaultContentMsg);
             softly.assertThat(killingPartResponse.isLiked()).isFalse();
+        });
+    }
+
+    @Test
+    @DisplayName("내 다이어리 기간 조회 (캘린더 용)")
+    void getMyDiariesByPeriod() throws Exception {
+        // given
+        diaryRepository.save(TestUtil.makeDiaryEntity(testUser));
+        diaryRepository.save(TestUtil.makeDiaryEntity(testUser));
+
+        LocalDate today = LocalDate.now();
+        LocalDate startDate = today.withDayOfMonth(1);
+        LocalDate endDate = today.withDayOfMonth(today.lengthOfMonth());
+
+        TestSecurityContextHolderInjection.inject(testUser.getId(), testUser.getRoleType());
+
+        // when
+        String response = mockMvc.perform(get("/api/diaries/my/calendar")
+                        .param("start", startDate.toString())
+                        .param("end", endDate.toString())
+                        .with(securityContext(SecurityContextHolder.getContext()))
+                )
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        // then
+        List<DiaryResponseDto> content = objectMapper.readValue(response, new TypeReference<>() {});
+
+        assertSoftly(softly -> {
+            softly.assertThat(content).hasSize(2);
         });
     }
 
