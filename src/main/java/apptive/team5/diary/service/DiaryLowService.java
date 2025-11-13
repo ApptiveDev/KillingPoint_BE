@@ -1,6 +1,7 @@
 package apptive.team5.diary.service;
 
 import apptive.team5.diary.domain.DiaryEntity;
+import apptive.team5.diary.domain.DiaryScope;
 import apptive.team5.diary.dto.DiaryUpdateDto;
 import apptive.team5.diary.repository.DiaryRepository;
 import apptive.team5.global.exception.NotFoundEntityException;
@@ -10,6 +11,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +34,16 @@ public class DiaryLowService {
     @Transactional(readOnly = true)
     public Page<DiaryEntity> findDiaryByUser(UserEntity user, Pageable pageable) {
         return diaryRepository.findByUser(user, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<DiaryEntity> findDiaryByUserAndScope(Long userId, DiaryScope scope, Pageable pageable) {
+        return diaryRepository.findByUserIdAndScope(userId, scope, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public List<DiaryEntity> findByUserIdAndPeriod(Long userId, LocalDateTime start, LocalDateTime end) {
+        return diaryRepository.findByUserIdAndCreateDateTimeBetween(userId, start, end);
     }
 
     public void updateDiary(DiaryEntity diary, DiaryUpdateDto updateDto) {
