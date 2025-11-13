@@ -41,7 +41,14 @@ public interface DiaryLikeRepository extends JpaRepository<DiaryLikeEntity, Long
     @Modifying(clearAutomatically = true)
     @Query("""
             DELETE FROM DiaryLikeEntity dl
-            WHERE dl.diary.id = : diaryId
+            WHERE dl.diary.id = :diaryId
     """)
     void deleteByDiaryId(@Param("diaryId") Long diaryId);
+
+    @Modifying(clearAutomatically = true)
+    @Query("""
+            DELETE FROM DiaryLikeEntity dl
+            WHERE dl.diary.id in :diaryIds
+     """)
+    void deleteByDiaryIds(@Param("diaryIds") List<Long> diaryIds);
 }

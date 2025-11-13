@@ -38,6 +38,11 @@ public class DiaryLowService {
     }
 
     @Transactional(readOnly = true)
+    public List<DiaryEntity> findDiaryByUserId(Long userId) {
+        return diaryRepository.findByUserId(userId);
+    }
+
+    @Transactional(readOnly = true)
     public Page<DiaryEntity> findDiaryByUserAndScopeIn(Long userId, List<DiaryScope> scopes, Pageable pageable) {
         return diaryRepository.findByUserIdAndScopeIn(userId, scopes, pageable);
     }

@@ -104,7 +104,21 @@ public class DiaryService {
 
         foundDiary.validateOwner(foundUser);
 
+        diaryLikeLowService.deleteByDiaryId(diaryId);
         diaryLowService.deleteDiary(foundDiary);
+    }
+
+    @Transactional
+    public void deleteByUserId(Long userId) {
+
+        List<Long> diaryIds = diaryLowService.findDiaryByUserId(userId)
+                .stream()
+                .map(DiaryEntity::getId)
+                .toList();
+
+        diaryLikeLowService.deleteByDiaryIds(diaryIds);
+
+        diaryLowService.deleteByUserId(userId);
     }
 
 }

@@ -42,4 +42,16 @@ public class DiaryLikeLowService {
     public void deleteDiaryLike(DiaryLikeEntity diaryLike) {
         diaryLikeRepository.delete(diaryLike);
     }
+
+    public void deleteByDiaryId(Long diaryId) {
+        diaryLikeRepository.deleteByDiaryId(diaryId);
+    }
+
+    public void deleteByDiaryIds(List<Long> diaryIds) {
+        diaryLikeRepository.deleteByDiaryIds(diaryIds);
+    }
+
+    public void deleteByUserId(Long userId) {
+        diaryLikeRepository.deleteByUserId(userId);
+    }
 }
