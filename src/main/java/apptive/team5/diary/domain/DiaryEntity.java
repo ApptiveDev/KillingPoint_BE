@@ -63,8 +63,7 @@ public class DiaryEntity extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(
             name = "user_id",
-            nullable = false,
-            foreignKey = @ForeignKey(name = "fk_diary_user_id_ref_user_id")
+            nullable = false
     )
     private UserEntity user;
 
