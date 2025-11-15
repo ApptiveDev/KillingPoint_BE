@@ -1,6 +1,8 @@
 package apptive.team5.user.controller;
 
 import apptive.team5.diary.domain.DiaryEntity;
+import apptive.team5.diary.domain.DiaryLikeEntity;
+import apptive.team5.diary.repository.DiaryLikeRepository;
 import apptive.team5.diary.repository.DiaryRepository;
 import apptive.team5.global.exception.ExceptionCode;
 import apptive.team5.global.util.S3Util;
@@ -61,6 +63,9 @@ class UserControllerTest {
 
     @Autowired
     private SubscribeRepository subscribeRepository;
+
+    @Autowired
+    private DiaryLikeRepository diaryLikeRepository;
 
 
     @DisplayName("회원 정보 조회 성공")
@@ -262,7 +267,17 @@ class UserControllerTest {
 
         // given
         UserEntity user = TestUtil.makeUserEntity();
+        UserEntity otherUser = TestUtil.makeDifferentUserEntity(user);
         userRepository.save(user);
+        userRepository.save(otherUser);
+        DiaryEntity diaryEntity = TestUtil.makeDiaryEntity(user);
+        DiaryEntity otherDiary = TestUtil.makeDiaryEntity(otherUser);
+        diaryRepository.save(diaryEntity);
+        diaryRepository.save(otherDiary);
+        DiaryLikeEntity diaryLikeEntity = new DiaryLikeEntity(user, diaryEntity);
+        DiaryLikeEntity otherDiaryLikeEntity = new DiaryLikeEntity(user, otherDiary);
+        diaryLikeRepository.save(diaryLikeEntity);
+        diaryLikeRepository.save(otherDiaryLikeEntity);
         TestSecurityContextHolderInjection.inject(user.getId(), user.getRoleType());
 
 
@@ -273,7 +288,13 @@ class UserControllerTest {
                 .andExpect(status().isNoContent());
 
         // then
-        assertThat(userRepository.existsById(user.getId())).isFalse();
+        assertSoftly(softly -> {
+            softly.assertThat(userRepository.existsById(user.getId())).isFalse();
+            softly.assertThat(diaryRepository.existsById(diaryEntity.getId())).isFalse();
+            softly.assertThat(diaryLikeRepository.existsById(diaryLikeEntity.getId())).isFalse();
+            softly.assertThat(diaryLikeRepository.existsById(otherDiaryLikeEntity.getId())).isFalse();
+            softly.assertThat(diaryRepository.existsById(otherDiary.getId())).isTrue();
+        });
 
     }
 

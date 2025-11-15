@@ -17,6 +17,7 @@ import apptive.team5.util.TestUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -244,6 +245,7 @@ public class DiaryControllerTest {
     void deleteDiary() throws Exception {
         // given
         DiaryEntity diary = diaryRepository.save(TestUtil.makeDiaryEntity(testUser));
+        DiaryLikeEntity diaryLikeEntity = diaryLikeLowService.saveDiaryLike(new DiaryLikeEntity(testUser, diary));
         TestSecurityContextHolderInjection.inject(testUser.getId(), testUser.getRoleType());
 
         // when & then
@@ -251,5 +253,11 @@ public class DiaryControllerTest {
                         .with(securityContext(SecurityContextHolder.getContext()))
                 )
                 .andExpect(status().isNoContent());
+
+
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(diaryRepository.existsById(diary.getId())).isFalse();
+            softly.assertThat(diaryLikeLowService.existsByUserAndDiary(testUser, diary)).isFalse();
+        });
     }
 }
