@@ -1,6 +1,8 @@
 package apptive.team5.user.controller;
 
 import apptive.team5.diary.domain.DiaryEntity;
+import apptive.team5.diary.domain.DiaryLikeEntity;
+import apptive.team5.diary.repository.DiaryLikeRepository;
 import apptive.team5.diary.repository.DiaryRepository;
 import apptive.team5.global.exception.ExceptionCode;
 import apptive.team5.global.util.S3Util;
@@ -9,6 +11,7 @@ import apptive.team5.subscribe.repository.SubscribeRepository;
 import apptive.team5.user.domain.UserEntity;
 import apptive.team5.user.domain.UserRoleType;
 import apptive.team5.user.dto.UserResponse;
+import apptive.team5.user.dto.UserSearchResponse;
 import apptive.team5.user.dto.UserStaticsResponse;
 import apptive.team5.user.dto.UserTagUpdateRequest;
 import apptive.team5.user.repository.UserRepository;
@@ -60,6 +63,9 @@ class UserControllerTest {
 
     @Autowired
     private SubscribeRepository subscribeRepository;
+
+    @Autowired
+    private DiaryLikeRepository diaryLikeRepository;
 
 
     @DisplayName("회원 정보 조회 성공")
@@ -186,11 +192,14 @@ class UserControllerTest {
         // given
         UserEntity user = TestUtil.makeUserEntity();
         userRepository.save(user);
+        UserEntity subscribedToUser = TestUtil.makeDifferentUserEntity(user);
+        userRepository.save(subscribedToUser);
+        subscribeRepository.save(new Subscribe(user, subscribedToUser));
         TestSecurityContextHolderInjection.inject(user.getId(), user.getRoleType());
 
         // when
         String response = mockMvc.perform(get("/api/users")
-                        .param("tag", user.getTag())
+                        .param("searchCond", user.getTag())
                         .with(securityContext(SecurityContextHolder.getContext()))
                 )
                 .andReturn().getResponse().getContentAsString(UTF_8);
@@ -198,14 +207,56 @@ class UserControllerTest {
         // then
         JsonNode jsonNode = objectMapper.readTree(response);
 
-        List<UserResponse> content = objectMapper.convertValue(
+        List<UserSearchResponse> content = objectMapper.convertValue(
                 jsonNode.path("content"),
-                new TypeReference<List<UserResponse>>() {}
+                new TypeReference<List<UserSearchResponse>>() {}
         );
 
+
         assertSoftly(softly -> {
-            softly.assertThat(content.size()).isEqualTo(1);
+            softly.assertThat(content.size()).isEqualTo(2);
             softly.assertThat(content.get(0).userId()).isEqualTo(user.getId());
+            softly.assertThat(content.get(0).isMyPick()).isFalse();
+            softly.assertThat(content.get(1).userId()).isEqualTo(subscribedToUser.getId());
+            softly.assertThat(content.get(1).isMyPick()).isTrue();
+        });
+
+    }
+
+    @DisplayName("username 통해 유저 조회 성공")
+    @Test
+    void getUserByTUsernameSuccess() throws Exception {
+
+        // given
+        UserEntity user = TestUtil.makeUserEntity();
+        userRepository.save(user);
+        UserEntity subscribedToUser = TestUtil.makeDifferentUserEntity(user);
+        userRepository.save(subscribedToUser);
+        subscribeRepository.save(new Subscribe(user, subscribedToUser));
+        TestSecurityContextHolderInjection.inject(user.getId(), user.getRoleType());
+
+        // when
+        String response = mockMvc.perform(get("/api/users")
+                        .param("searchCond", user.getUsername())
+                        .with(securityContext(SecurityContextHolder.getContext()))
+                )
+                .andReturn().getResponse().getContentAsString(UTF_8);
+
+        // then
+        JsonNode jsonNode = objectMapper.readTree(response);
+
+        List<UserSearchResponse> content = objectMapper.convertValue(
+                jsonNode.path("content"),
+                new TypeReference<List<UserSearchResponse>>() {}
+        );
+
+
+        assertSoftly(softly -> {
+            softly.assertThat(content.size()).isEqualTo(2);
+            softly.assertThat(content.get(0).userId()).isEqualTo(user.getId());
+            softly.assertThat(content.get(0).isMyPick()).isFalse();
+            softly.assertThat(content.get(1).userId()).isEqualTo(subscribedToUser.getId());
+            softly.assertThat(content.get(1).isMyPick()).isTrue();
         });
 
     }
@@ -216,7 +267,17 @@ class UserControllerTest {
 
         // given
         UserEntity user = TestUtil.makeUserEntity();
+        UserEntity otherUser = TestUtil.makeDifferentUserEntity(user);
         userRepository.save(user);
+        userRepository.save(otherUser);
+        DiaryEntity diaryEntity = TestUtil.makeDiaryEntity(user);
+        DiaryEntity otherDiary = TestUtil.makeDiaryEntity(otherUser);
+        diaryRepository.save(diaryEntity);
+        diaryRepository.save(otherDiary);
+        DiaryLikeEntity diaryLikeEntity = new DiaryLikeEntity(user, diaryEntity);
+        DiaryLikeEntity otherDiaryLikeEntity = new DiaryLikeEntity(user, otherDiary);
+        diaryLikeRepository.save(diaryLikeEntity);
+        diaryLikeRepository.save(otherDiaryLikeEntity);
         TestSecurityContextHolderInjection.inject(user.getId(), user.getRoleType());
 
 
@@ -227,7 +288,13 @@ class UserControllerTest {
                 .andExpect(status().isNoContent());
 
         // then
-        assertThat(userRepository.existsById(user.getId())).isFalse();
+        assertSoftly(softly -> {
+            softly.assertThat(userRepository.existsById(user.getId())).isFalse();
+            softly.assertThat(diaryRepository.existsById(diaryEntity.getId())).isFalse();
+            softly.assertThat(diaryLikeRepository.existsById(diaryLikeEntity.getId())).isFalse();
+            softly.assertThat(diaryLikeRepository.existsById(otherDiaryLikeEntity.getId())).isFalse();
+            softly.assertThat(diaryRepository.existsById(otherDiary.getId())).isTrue();
+        });
 
     }
 

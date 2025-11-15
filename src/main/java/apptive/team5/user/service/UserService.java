@@ -17,6 +17,7 @@ import apptive.team5.subscribe.service.SubscribeLowService;
 import apptive.team5.user.domain.UserEntity;
 import apptive.team5.user.domain.UserRoleType;
 import apptive.team5.user.dto.UserResponse;
+import apptive.team5.user.dto.UserSearchResponse;
 import apptive.team5.user.dto.UserStaticsResponse;
 import apptive.team5.user.dto.UserTagUpdateRequest;
 import apptive.team5.user.util.TagGenerator;
@@ -25,6 +26,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Transactional
 @Service
@@ -98,9 +104,20 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public Page<UserResponse> findByTag(String tag, Pageable pageable) {
-        return userLowService.findByTag(tag,pageable)
-                .map(UserResponse::new);
+    public Page<UserSearchResponse> findByTagOrUserName(Long subscriberId, String searchCond, Pageable pageable) {
+        Page<UserEntity> findUsers = userLowService.findByTagOrUsername(searchCond, pageable);
+
+        List<Long> userIds = findUsers.stream().map(UserEntity::getId).toList();
+
+        Set<Long> subscribedToIds = subscribeLowService.findBySubscriberIdAndSubscribedToIds(subscriberId, userIds)
+                .stream()
+                .map(subscribe -> subscribe.getSubscribedTo().getId()).collect(Collectors.toSet());
+
+        return findUsers
+                .map(user -> {
+                    boolean isMyPick = subscribedToIds.contains(user.getId());
+                    return new UserSearchResponse(user, isMyPick);
+                });
     }
 
     public UserResponse changeProfileImage(FileUploadRequest fileUploadRequest, Long userId) {
