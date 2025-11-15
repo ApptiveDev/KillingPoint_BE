@@ -2,6 +2,7 @@ package apptive.team5.user.controller;
 
 import apptive.team5.file.dto.FileUploadRequest;
 import apptive.team5.user.dto.UserResponse;
+import apptive.team5.user.dto.UserSearchResponse;
 import apptive.team5.user.dto.UserStaticsResponse;
 import apptive.team5.user.dto.UserTagUpdateRequest;
 import apptive.team5.user.service.UserService;
@@ -64,10 +65,11 @@ public class UserController {
 
 
     @GetMapping
-    public ResponseEntity<Page<UserResponse>> getUserList(@RequestParam(required = false) String tag,
-                                                          @RequestParam(defaultValue = "0") int page,
-                                                          @RequestParam(defaultValue = "5") int size) {
-        Page<UserResponse> response = userService.findByTag(tag, PageRequest.of(page, size));
+    public ResponseEntity<Page<UserSearchResponse>> getUserList(@RequestParam(required = false) String searchCond,
+                                                                @RequestParam(defaultValue = "0") int page,
+                                                                @RequestParam(defaultValue = "5") int size,
+                                                                @AuthenticationPrincipal Long userId) {
+        Page<UserSearchResponse> response = userService.findByTagOrUserName(userId, searchCond, PageRequest.of(page, size));
 
 
         return ResponseEntity.status(HttpStatus.OK).body(response);

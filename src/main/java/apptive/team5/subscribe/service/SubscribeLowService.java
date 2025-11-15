@@ -8,6 +8,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Transactional
 @RequiredArgsConstructor
 @Service
@@ -45,5 +47,10 @@ public class SubscribeLowService {
 
     public void deleteByUserId(Long userId) {
         subscribeRepository.deleteByUserId(userId);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Subscribe> findBySubscriberIdAndSubscribedToIds(Long subscriberId, List<Long> subscribedToIds) {
+        return subscribeRepository.findBySubscriberIdAndSubscribedToIds(subscriberId, subscribedToIds);
     }
 }

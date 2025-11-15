@@ -25,17 +25,17 @@ public class QUserRepository {
         this.queryFactory = new JPAQueryFactory(entityManager);
     }
 
-    public Page<UserEntity> findByTag(String tag, Pageable pageable) {
+    public Page<UserEntity> findByTagOrUsername(String searchCond, Pageable pageable) {
 
         List<UserEntity> content = queryFactory
                 .selectFrom(userEntity)
-                .where(tagLike(tag))
+                .where(tagLike(searchCond).or(usernameLike(searchCond)))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
 
         JPAQuery<Long> countQuery = queryFactory.select(userEntity.count())
-                .where(tagLike(tag))
+                .where(tagLike(searchCond).or(usernameLike(searchCond)))
                 .from(userEntity);
 
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
@@ -43,5 +43,9 @@ public class QUserRepository {
 
     private BooleanExpression tagLike(String tag) {
         return tag != null ? userEntity.tag.like("%"+tag+"%") : null;
+    }
+
+    private BooleanExpression usernameLike(String username) {
+        return username != null ? userEntity.username.like("%"+username+"%") : null;
     }
 }

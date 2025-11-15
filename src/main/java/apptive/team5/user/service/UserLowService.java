@@ -55,7 +55,7 @@ public class UserLowService {
     }
 
     @Transactional(readOnly = true)
-    public Page<UserEntity> findByTag(String tag, Pageable pageable) {
-        return qUserRepository.findByTag(tag,pageable);
+    public Page<UserEntity> findByTagOrUsername(String searchCond, Pageable pageable) {
+        return qUserRepository.findByTagOrUsername(searchCond,pageable);
     }
 }
