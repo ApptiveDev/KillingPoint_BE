@@ -1,10 +1,7 @@
 package apptive.team5.diary.controller;
 
 import apptive.team5.diary.domain.DiaryEntity;
-import apptive.team5.diary.dto.DiaryCreateRequest;
-import apptive.team5.diary.dto.DiaryResponseDto;
-import apptive.team5.diary.dto.DiaryUpdateRequestDto;
-import apptive.team5.diary.dto.UserDiaryResponseDto;
+import apptive.team5.diary.dto.*;
 import apptive.team5.diary.service.DiaryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -46,6 +43,21 @@ public class DiaryController {
     ) {
 
         Page<DiaryResponseDto> response = diaryService.getMyDiaries(userId, PageRequest.of(page, size));
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping("/my/feeds")
+    public ResponseEntity<Page<FeedDiaryResponseDto>> getMyUserDiaryFeeds(
+            @AuthenticationPrincipal
+            Long userId,
+            @RequestParam(defaultValue = "0")
+            int page,
+            @RequestParam(defaultValue = "5")
+            int size
+    ) {
+
+        Page<FeedDiaryResponseDto> response = diaryService.getDiariesFeeds(userId, PageRequest.of(page, size));
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }

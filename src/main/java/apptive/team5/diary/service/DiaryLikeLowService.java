@@ -2,6 +2,7 @@ package apptive.team5.diary.service;
 
 import apptive.team5.diary.domain.DiaryEntity;
 import apptive.team5.diary.domain.DiaryLikeEntity;
+import apptive.team5.diary.dto.DiaryLikeCountDto;
 import apptive.team5.diary.repository.DiaryLikeRepository;
 import apptive.team5.global.exception.ExceptionCode;
 import apptive.team5.global.exception.NotFoundEntityException;
@@ -11,7 +12,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +40,21 @@ public class DiaryLikeLowService {
     @Transactional(readOnly = true)
     public Set<Long> findLikedDiaryIdsByUser(Long currentUserId, List<Long> diaryIds) {
         return diaryLikeRepository.findLikedDiaryIdsByUser(currentUserId, diaryIds);
+    }
+
+    @Transactional(readOnly = true)
+    public Map<Long, Long> findLikeCountsByDiaryIds(List<Long> diaryIds) {
+        if (diaryIds == null || diaryIds.isEmpty()) {
+            return Map.of();
+        }
+
+        return diaryLikeRepository.findLikeCountsByDiaryIds(diaryIds)
+                .stream()
+                .collect(Collectors.toMap(
+                        DiaryLikeCountDto::diaryId,
+                        DiaryLikeCountDto::likeCount,
+                        (a, b) -> a
+                ));
     }
 
     public void deleteDiaryLike(DiaryLikeEntity diaryLike) {

@@ -112,6 +112,10 @@ public class DiaryEntity extends BaseTimeEntity {
         return this.scope == DiaryScope.KILLING_PART;
     }
 
+    public boolean isScopePrivate() {
+        return this.scope == DiaryScope.PRIVATE;
+    }
+
     public void update(
             String musicTitle,
             String artist,
