@@ -18,6 +18,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -56,10 +57,13 @@ public class DiaryService {
 
         Set<Long> likedDiaryIds = diaryLikeLowService.findLikedDiaryIdsByUser(currentUserId, diaryIds);
 
+        Map<Long, Long> likeCountsMap = diaryLikeLowService.findLikeCountsByDiaryIds(diaryIds);
+
         return diaryPage.map(diary ->
                 UserDiaryResponseDto.from(
                         diary,
                         likedDiaryIds.contains(diary.getId()),
+                        likeCountsMap.getOrDefault(diary.getId(), 0L),
                         currentUserId
                 )
         );

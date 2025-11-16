@@ -33,12 +33,12 @@ public interface DiaryLikeRepository extends JpaRepository<DiaryLikeEntity, Long
     );
 
     @Query("""
-            SELECT new apptive.team5.diary.dto.DiaryLikeCountDto(dl.diary.id, count(dl.id))
+            SELECT new apptive.team5.diary.dto.DiaryLikeCountDto(dl.diary.id, COUNT(dl.id))
             FROM DiaryLikeEntity dl
             WHERE dl.diary.id IN :diaryIds
             GROUP BY dl.diary.id
     """)
-    List<DiaryLikeCountDto> findLikeCountsByDiaryIds(List<Long> diaryIds);
+    List<DiaryLikeCountDto> findLikeCountsByDiaryIds(@Param("diaryIds") List<Long> diaryIds);
 
     @Modifying(clearAutomatically = true)
     @Query("""

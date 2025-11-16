@@ -19,10 +19,11 @@ public record UserDiaryResponseDto(
         String end,
         LocalDateTime createDate,
         LocalDateTime updateDate,
-        boolean isLiked
+        boolean isLiked,
+        Long likeCount
 ) {
     public static String defaultContentMsg = "비공개 일기입니다.";
-    public static UserDiaryResponseDto from(DiaryEntity diary, boolean isLiked, Long currentUserId) {
+    public static UserDiaryResponseDto from(DiaryEntity diary, boolean isLiked, Long likeCount, Long currentUserId) {
         String contentResponse = diary.getContent();
 
         if (!diary.isMyDiary(currentUserId) &&
@@ -43,7 +44,8 @@ public record UserDiaryResponseDto(
                 diary.getEnd(),
                 diary.getCreateDateTime(),
                 diary.getUpdateDateTime(),
-                isLiked
+                isLiked,
+                likeCount
         );
     }
 }
