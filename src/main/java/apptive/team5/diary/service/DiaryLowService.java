@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -74,6 +75,14 @@ public class DiaryLowService {
 
     public void deleteByUserId(Long userId) {
         diaryRepository.deleteByUserId(userId);
+    }
+
+    public Page<DiaryEntity> findByUserIds(Set<Long> userIds, Pageable pageable) {
+        return diaryRepository.findByUserIdsPage(userIds, pageable);
+    }
+
+    public Page<DiaryEntity> findByUserIdsWithUsers(Set<Long> userIds, Pageable pageable) {
+        return diaryRepository.findByUserIdsWithUserPage(userIds, pageable);
     }
 
 }

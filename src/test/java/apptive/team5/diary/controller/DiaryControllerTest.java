@@ -3,13 +3,12 @@ package apptive.team5.diary.controller;
 import apptive.team5.diary.domain.DiaryEntity;
 import apptive.team5.diary.domain.DiaryLikeEntity;
 import apptive.team5.diary.domain.DiaryScope;
-import apptive.team5.diary.dto.DiaryCreateRequest;
-import apptive.team5.diary.dto.DiaryResponseDto;
-import apptive.team5.diary.dto.DiaryUpdateRequestDto;
-import apptive.team5.diary.dto.UserDiaryResponseDto;
+import apptive.team5.diary.dto.*;
 import apptive.team5.diary.repository.DiaryRepository;
 import apptive.team5.diary.service.DiaryLikeLowService;
 import apptive.team5.diary.service.DiaryLowService;
+import apptive.team5.subscribe.domain.Subscribe;
+import apptive.team5.subscribe.repository.SubscribeRepository;
 import apptive.team5.user.domain.UserEntity;
 import apptive.team5.user.repository.UserRepository;
 import apptive.team5.util.TestSecurityContextHolderInjection;
@@ -66,6 +65,9 @@ public class DiaryControllerTest {
 
     @Autowired
     private DiaryLikeLowService diaryLikeLowService;
+
+    @Autowired
+    private SubscribeRepository subscribeRepository;
 
     private UserEntity testUser;
 
@@ -193,6 +195,52 @@ public class DiaryControllerTest {
 
         assertSoftly(softly -> {
             softly.assertThat(content).hasSize(2);
+        });
+    }
+
+    @Test
+    @DisplayName("내 피드 조회")
+    void getMyDiariesFeeds() throws Exception {
+        // given
+
+        //구독 한 회원
+        UserEntity subscribedToUser = userRepository.save(TestUtil.makeDifferentUserEntity(testUser));
+        Subscribe subscribe = new Subscribe(testUser, subscribedToUser);
+        subscribeRepository.save(subscribe);
+
+        // 좋아요 누르기
+        DiaryEntity feedDiary = diaryRepository.save(TestUtil.makeDiaryEntity(subscribedToUser));
+        DiaryLikeEntity diaryLikeEntity = diaryLikeLowService.saveDiaryLike(new DiaryLikeEntity(testUser, feedDiary));
+
+        // 구독하지 않은 회원
+        UserEntity otherUser = userRepository.save(TestUtil.makeDifferentUserEntity(subscribedToUser));
+        DiaryEntity noneFeedDiary = diaryRepository.save(TestUtil.makeDiaryEntity(otherUser));
+
+        TestSecurityContextHolderInjection.inject(testUser.getId(), testUser.getRoleType());
+
+        // when
+        String response = mockMvc.perform(get("/api/diaries/my/feeds")
+                        .with(securityContext(SecurityContextHolder.getContext()))
+                )
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        // then
+        JsonNode jsonNode = objectMapper.readTree(response);
+        List<FeedDiaryResponseDto> content = objectMapper.convertValue(
+                jsonNode.path("content"), new TypeReference<>() {}
+        );
+
+        FeedDiaryResponseDto feedDiaryResponseDto = content.getFirst();
+
+        assertSoftly(softly -> {
+            softly.assertThat(content).hasSize(1);
+            softly.assertThat(feedDiaryResponseDto.diaryId()).isEqualTo(feedDiary.getId());
+            softly.assertThat(feedDiaryResponseDto.isLiked()).isTrue();
+            softly.assertThat(feedDiaryResponseDto.likeCount()).isEqualTo(1L);
+            softly.assertThat(feedDiaryResponseDto.userId()).isEqualTo(subscribedToUser.getId());
         });
     }
 
