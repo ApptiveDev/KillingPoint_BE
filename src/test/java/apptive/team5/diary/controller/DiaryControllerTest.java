@@ -114,7 +114,7 @@ public class DiaryControllerTest {
     }
 
     @Test
-    @DisplayName("타인 다이어리 조회 및 scope 확인")
+    @DisplayName("타인 다이어리 조회 및 scope, likeCount 확인")
     void getUserDiariesByViewer() throws Exception {
         DiaryEntity publicDiary = diaryLowService.saveDiary(TestUtil.makeDiaryEntityWithScope(testUser, DiaryScope.PUBLIC));
         DiaryEntity killingPartDiary = diaryLowService.saveDiary(TestUtil.makeDiaryEntityWithScope(testUser, DiaryScope.KILLING_PART));
@@ -123,6 +123,9 @@ public class DiaryControllerTest {
         UserEntity viewer = userRepository.save(TestUtil.makeDifferentUserEntity(testUser));
 
         diaryLikeLowService.saveDiaryLike(new DiaryLikeEntity(viewer, publicDiary));
+        diaryLikeLowService.saveDiaryLike(new DiaryLikeEntity(testUser, publicDiary));
+
+        diaryLikeLowService.saveDiaryLike(new DiaryLikeEntity(testUser, killingPartDiary));
 
         TestSecurityContextHolderInjection.inject(viewer.getId(), viewer.getRoleType());
 
@@ -143,7 +146,7 @@ public class DiaryControllerTest {
                 .collect(Collectors.toMap(UserDiaryResponseDto::diaryId, Function.identity()));
 
         assertSoftly(softly -> {
-            softly.assertThat(content).hasSize(2); // PRIVATE은 조회되면 안 됨
+            softly.assertThat(content).hasSize(2);
             softly.assertThat(responseMap.containsKey(privateDiary.getId())).isFalse();
 
             // PUBLIC
@@ -151,11 +154,13 @@ public class DiaryControllerTest {
             softly.assertThat(publicResponse.content()).isNotNull();
             softly.assertThat(publicResponse.content()).isEqualTo(publicDiary.getContent());
             softly.assertThat(publicResponse.isLiked()).isTrue();
+            softly.assertThat(publicResponse.likeCount()).isEqualTo(2L);
 
             // KILLING_PART
             UserDiaryResponseDto killingPartResponse = responseMap.get(killingPartDiary.getId());
             softly.assertThat(killingPartResponse.content()).isEqualTo(UserDiaryResponseDto.defaultContentMsg);
             softly.assertThat(killingPartResponse.isLiked()).isFalse();
+            softly.assertThat(killingPartResponse.likeCount()).isEqualTo(1L);
         });
     }
 
