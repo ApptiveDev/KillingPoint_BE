@@ -83,6 +83,7 @@ public class UserService {
         diaryLikeLowService.deleteByUserId(userId);
 
         diaryService.deleteByUserId(userId);
+        jwtService.deleteRefreshTokenByUserId(userId);
         userLowService.deleteByUserId(userId);
 
         s3Service.deleteS3File(findUser.getProfileImage());
