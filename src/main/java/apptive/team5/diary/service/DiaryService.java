@@ -62,22 +62,7 @@ public class DiaryService {
             diaryPage = diaryLowService.findDiaryByUserAndScopeIn(targetUserId, visibleScopes, pageable);
         }
 
-        List<Long> diaryIds = diaryPage.getContent().stream()
-                .map(DiaryEntity::getId)
-                .toList();
-
-        Set<Long> likedDiaryIds = diaryLikeLowService.findLikedDiaryIdsByUser(currentUserId, diaryIds);
-
-        Map<Long, Long> likeCountsMap = diaryLikeLowService.findLikeCountsByDiaryIds(diaryIds);
-
-        return diaryPage.map(diary ->
-                UserDiaryResponseDto.from(
-                        diary,
-                        likedDiaryIds.contains(diary.getId()),
-                        likeCountsMap.getOrDefault(diary.getId(), 0L),
-                        currentUserId
-                )
-        );
+        return getUserDiaryResponseDtos(currentUserId, diaryPage);
     }
 
     @Transactional(readOnly = true)
@@ -136,9 +121,7 @@ public class DiaryService {
         diaryLowService.deleteByUserId(userId);
     }
 
-    private Page<UserDiaryResponseDto> getUserDiaryResponseDtos(Long currentUserId, Pageable pageable, Set<Long> subscribedToIds) {
-        Page<DiaryEntity> diaryPage = diaryLowService.findByUserIds(subscribedToIds, pageable);
-
+    private Page<UserDiaryResponseDto> getUserDiaryResponseDtos(Long currentUserId, Page<DiaryEntity> diaryPage) {
         List<Long> diaryIds = diaryPage.getContent().stream()
                 .map(DiaryEntity::getId)
                 .toList();
@@ -158,7 +141,8 @@ public class DiaryService {
     }
 
     private Page<FeedDiaryResponseDto> getFeedDiaryResponseDtos(Long currentUserId, Pageable pageable, Set<Long> subscribedToIds) {
-        Page<DiaryEntity> diaryPage = diaryLowService.findByUserIdsWithUsers(subscribedToIds, pageable);
+        List<DiaryScope> visibleScopes = List.of(DiaryScope.PUBLIC, DiaryScope.KILLING_PART);
+        Page<DiaryEntity> diaryPage = diaryLowService.findByUserIdsAndScopseWithUserPage(subscribedToIds, visibleScopes, pageable);
 
         List<Long> diaryIds = diaryPage.getContent().stream()
                 .map(DiaryEntity::getId)

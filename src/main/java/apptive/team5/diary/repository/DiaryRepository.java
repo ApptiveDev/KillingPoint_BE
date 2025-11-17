@@ -32,6 +32,6 @@ public interface DiaryRepository extends JpaRepository<DiaryEntity, Long> {
     @Query("select d from DiaryEntity d where d.user.id in :userIds")
     Page<DiaryEntity> findByUserIdsPage(Set<Long> userIds, Pageable pageable);
 
-    @Query("select d from DiaryEntity d join fetch d.user where d.user.id in :userIds")
-    Page<DiaryEntity> findByUserIdsWithUserPage(Set<Long> userIds, Pageable pageable);
+    @Query("select d from DiaryEntity d join fetch d.user where d.user.id in :userIds and d.scope in :scopes")
+    Page<DiaryEntity> findByUserIdsAndScopseWithUserPage(Set<Long> userIds, List<DiaryScope> scopes, Pageable pageable);
 }
