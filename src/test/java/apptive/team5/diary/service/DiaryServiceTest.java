@@ -3,7 +3,7 @@ package apptive.team5.diary.service;
 import apptive.team5.diary.domain.DiaryEntity;
 import apptive.team5.diary.domain.DiaryScope;
 import apptive.team5.diary.dto.DiaryCreateRequest;
-import apptive.team5.diary.dto.DiaryResponseDto;
+import apptive.team5.diary.dto.MyDiaryResponseDto;
 import apptive.team5.diary.dto.DiaryUpdateRequestDto;
 import apptive.team5.diary.dto.UserDiaryResponseDto;
 import apptive.team5.user.domain.SocialType;
@@ -60,7 +60,7 @@ public class DiaryServiceTest {
         given(diaryLowService.findDiaryByUser(user, pageRequest)).willReturn(diaryEntityPage);
 
         // when
-        Page<DiaryResponseDto> result = diaryService.getMyDiaries(user.getId(), pageRequest);
+        Page<MyDiaryResponseDto> result = diaryService.getMyDiaries(user.getId(), pageRequest);
 
         // then
         assertThat(result.getContent()).hasSize(1);

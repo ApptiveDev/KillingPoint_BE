@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 public interface DiaryRepository extends JpaRepository<DiaryEntity, Long> {
     Page<DiaryEntity> findByUser(UserEntity user, Pageable pageable);
@@ -27,4 +28,10 @@ public interface DiaryRepository extends JpaRepository<DiaryEntity, Long> {
     @Query("delete from DiaryEntity d where d.user.id = :userId")
     @Modifying(clearAutomatically = true)
     void deleteByUserId(Long userId);
+
+    @Query("select d from DiaryEntity d where d.user.id in :userIds")
+    Page<DiaryEntity> findByUserIdsPage(Set<Long> userIds, Pageable pageable);
+
+    @Query("select d from DiaryEntity d join fetch d.user where d.user.id in :userIds and d.scope in :scopes")
+    Page<DiaryEntity> findByUserIdsAndScopseWithUserPage(Set<Long> userIds, List<DiaryScope> scopes, Pageable pageable);
 }

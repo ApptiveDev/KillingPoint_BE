@@ -1,6 +1,7 @@
 package apptive.team5.subscribe.controller;
 
 
+import apptive.team5.global.exception.ExceptionCode;
 import apptive.team5.subscribe.domain.Subscribe;
 import apptive.team5.subscribe.repository.SubscribeRepository;
 import apptive.team5.user.domain.UserEntity;
@@ -21,8 +22,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 
 import static java.nio.charset.StandardCharsets.*;
+import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.SoftAssertions.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.securityContext;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -75,7 +78,7 @@ class SubscribeControllerTest {
 
     @DisplayName("구독 추가 실패 - 존재하지 않는 회원")
     @Test
-    void subscribeFail() throws Exception {
+    void subscribeFailCase1() throws Exception {
 
         // given
         UserEntity subscriber = TestUtil.makeUserEntity();
@@ -87,6 +90,29 @@ class SubscribeControllerTest {
         mockMvc.perform(post("/api/subscribes/{subscribeToId}", 100L)
                 .with(securityContext(SecurityContextHolder.getContext()))
         ).andExpect(status().isNotFound());
+
+    }
+
+    @DisplayName("구독 추가 실패 - 본인을 구독")
+    @Test
+    void subscribeFailCase2() throws Exception {
+
+        // given
+        UserEntity subscriber = TestUtil.makeUserEntity();
+        userRepository.save(subscriber);
+
+        TestSecurityContextHolderInjection.inject(subscriber.getId(), subscriber.getRoleType());
+
+        // when & then
+        String response = mockMvc.perform(post("/api/subscribes/{subscribeToId}", subscriber.getId())
+                .with(securityContext(SecurityContextHolder.getContext()))
+        ).andExpect(status().isBadRequest()).andReturn().getResponse().getContentAsString();
+
+
+        Map<String, String> apiResponse = objectMapper.readValue(response, new TypeReference<Map<String, String>>() {
+        });
+
+        assertThat(apiResponse.get("message")).isEqualTo(ExceptionCode.BAD_SUBSCRIBE_REQUEST.getDescription());
 
     }
 

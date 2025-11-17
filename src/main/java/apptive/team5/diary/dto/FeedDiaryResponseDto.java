@@ -4,10 +4,12 @@ import apptive.team5.diary.domain.DiaryEntity;
 import apptive.team5.diary.domain.DiaryScope;
 import apptive.team5.global.exception.BadRequestException;
 import apptive.team5.global.exception.ExceptionCode;
+import apptive.team5.global.util.S3Util;
+import apptive.team5.user.domain.UserEntity;
 
 import java.time.LocalDateTime;
 
-public record UserDiaryResponseDto(
+public record FeedDiaryResponseDto(
         Long diaryId,
         String artist,
         String musicTitle,
@@ -21,10 +23,15 @@ public record UserDiaryResponseDto(
         LocalDateTime createDate,
         LocalDateTime updateDate,
         boolean isLiked,
-        Long likeCount
+        Long likeCount,
+        Long userId,
+        String username,
+        String tag,
+        String profileImageUrl
 ) {
+
     public static String defaultContentMsg = "비공개 일기입니다.";
-    public static UserDiaryResponseDto from(DiaryEntity diary, boolean isLiked, Long likeCount, Long currentUserId) {
+    public static FeedDiaryResponseDto from(DiaryEntity diary, boolean isLiked, Long likeCount, Long currentUserId, UserEntity user) {
         String contentResponse = diary.getContent();
 
         if (!diary.isMyDiary(currentUserId) && diary.isScopeKillingPart()) {
@@ -34,7 +41,7 @@ public record UserDiaryResponseDto(
         if (!diary.isMyDiary(currentUserId) && diary.isScopePrivate())
             throw new BadRequestException(ExceptionCode.ACCESS_DENIED_DIARY.getDescription());
 
-        return new UserDiaryResponseDto(
+        return new FeedDiaryResponseDto(
                 diary.getId(),
                 diary.getArtist(),
                 diary.getMusicTitle(),
@@ -48,7 +55,11 @@ public record UserDiaryResponseDto(
                 diary.getCreateDateTime(),
                 diary.getUpdateDateTime(),
                 isLiked,
-                likeCount
+                likeCount,
+                user.getId(),
+                user.getUsername(),
+                user.getTag(),
+                S3Util.s3Url + user.getProfileImage()
         );
     }
 }
