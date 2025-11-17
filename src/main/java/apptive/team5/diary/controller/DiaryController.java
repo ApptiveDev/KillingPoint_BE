@@ -33,7 +33,7 @@ public class DiaryController {
     private final DiaryService diaryService;
 
     @GetMapping("/my")
-    public ResponseEntity<Page<DiaryResponseDto>> getMyMusicDiary(
+    public ResponseEntity<Page<MyDiaryResponseDto>> getMyMusicDiary(
             @AuthenticationPrincipal
             Long userId,
             @RequestParam(defaultValue = "0")
@@ -42,7 +42,7 @@ public class DiaryController {
             int size
     ) {
 
-        Page<DiaryResponseDto> response = diaryService.getMyDiaries(userId, PageRequest.of(page, size));
+        Page<MyDiaryResponseDto> response = diaryService.getMyDiaries(userId, PageRequest.of(page, size));
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -78,7 +78,7 @@ public class DiaryController {
     }
 
     @GetMapping("/my/calendar")
-    public ResponseEntity<List<DiaryResponseDto>> getMyDiariesByPeriod(
+    public ResponseEntity<List<MyDiaryResponseDto>> getMyDiariesByPeriod(
             @AuthenticationPrincipal
             Long userId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
@@ -86,7 +86,7 @@ public class DiaryController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
             LocalDate end
     ) {
-        List<DiaryResponseDto> response = diaryService.getMyDiariesByPeriod(userId, start, end);
+        List<MyDiaryResponseDto> response = diaryService.getMyDiariesByPeriod(userId, start, end);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 

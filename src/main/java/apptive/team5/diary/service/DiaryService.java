@@ -17,7 +17,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -31,11 +30,11 @@ public class DiaryService {
     private final SubscribeLowService subscribeLowService;
 
     @Transactional(readOnly = true)
-    public Page<DiaryResponseDto> getMyDiaries(Long userId, Pageable pageable) {
+    public Page<MyDiaryResponseDto> getMyDiaries(Long userId, Pageable pageable) {
         UserEntity foundUser = userLowService.getReferenceById(userId);
 
         return diaryLowService.findDiaryByUser(foundUser, pageable)
-                .map(DiaryResponseDto::from);
+                .map(MyDiaryResponseDto::from);
     }
 
     @Transactional(readOnly = true)
@@ -66,13 +65,13 @@ public class DiaryService {
     }
 
     @Transactional(readOnly = true)
-    public List<DiaryResponseDto> getMyDiariesByPeriod(Long userId, LocalDate startDate, LocalDate endDate) {
+    public List<MyDiaryResponseDto> getMyDiariesByPeriod(Long userId, LocalDate startDate, LocalDate endDate) {
         LocalDateTime startDateTime = startDate.atStartOfDay();
         LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
 
         return diaryLowService.findByUserIdAndPeriod(userId, startDateTime, endDateTime)
                 .stream()
-                .map(DiaryResponseDto::from)
+                .map(MyDiaryResponseDto::from)
                 .toList();
     }
 

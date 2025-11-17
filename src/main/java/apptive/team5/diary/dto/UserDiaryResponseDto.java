@@ -2,6 +2,8 @@ package apptive.team5.diary.dto;
 
 import apptive.team5.diary.domain.DiaryEntity;
 import apptive.team5.diary.domain.DiaryScope;
+import apptive.team5.global.exception.BadRequestException;
+import apptive.team5.global.exception.ExceptionCode;
 
 import java.time.LocalDateTime;
 
@@ -29,9 +31,8 @@ public record UserDiaryResponseDto(
             contentResponse = defaultContentMsg;
         }
 
-        if (!diary.isMyDiary(currentUserId) && diary.isScopePrivate()) {
-            contentResponse = defaultContentMsg;
-        }
+        if (!diary.isMyDiary(currentUserId) && diary.isScopePrivate())
+            throw new BadRequestException(ExceptionCode.ACCESS_DENIED_DIARY.getDescription());
 
         return new UserDiaryResponseDto(
                 diary.getId(),

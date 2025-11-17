@@ -98,12 +98,12 @@ public class DiaryControllerTest {
 
         JsonNode jsonNode = objectMapper.readTree(response);
 
-        List<DiaryResponseDto> content = objectMapper.convertValue(
+        List<MyDiaryResponseDto> content = objectMapper.convertValue(
                 jsonNode.path("content"),
-                new TypeReference<List<DiaryResponseDto>>() {}
+                new TypeReference<List<MyDiaryResponseDto>>() {}
         );
 
-        DiaryResponseDto diaryResponse = content.getFirst();
+        MyDiaryResponseDto diaryResponse = content.getFirst();
 
         assertSoftly(softly-> {
             softly.assertThat(content).hasSize(1);
@@ -191,7 +191,7 @@ public class DiaryControllerTest {
                 .getContentAsString();
 
         // then
-        List<DiaryResponseDto> content = objectMapper.readValue(response, new TypeReference<>() {});
+        List<MyDiaryResponseDto> content = objectMapper.readValue(response, new TypeReference<>() {});
 
         assertSoftly(softly -> {
             softly.assertThat(content).hasSize(2);
