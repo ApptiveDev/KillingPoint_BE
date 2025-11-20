@@ -126,7 +126,11 @@ public class DiaryEntity extends BaseTimeEntity {
             String albumImageUrl,
             String videoUrl,
             String content,
-            DiaryScope scope
+            DiaryScope scope,
+            String duration,
+            String totalDuration,
+            String start,
+            String end
     ) {
         updateMusicTitle(musicTitle);
         updateArtist(artist);
@@ -134,6 +138,10 @@ public class DiaryEntity extends BaseTimeEntity {
         updateVideoUrl(videoUrl);
         updateContent(content);
         updateScope(scope);
+        updateDuration(duration);
+        updateTotalDuration(totalDuration);
+        updateStart(start);
+        updateEnd(end);
     }
 
     private void updateMusicTitle(String musicTitle) {
@@ -169,6 +177,30 @@ public class DiaryEntity extends BaseTimeEntity {
     private void updateScope(DiaryScope scope) {
         if (scope != null) {
             this.scope = scope;
+        }
+    }
+
+    private void updateDuration(String duration) {
+        if (duration != null && !duration.isBlank()) {
+            this.duration = duration;
+        }
+    }
+
+    private void updateTotalDuration(String totalDuration) {
+        if (totalDuration != null && !totalDuration.isBlank()) {
+            this.totalDuration = totalDuration;
+        }
+    }
+
+    private void updateStart(String start) {
+        if (start != null && !start.isBlank()) {
+            this.start = start;
+        }
+    }
+
+    private void updateEnd(String end) {
+        if (end != null && !end.isBlank()) {
+            this.end = end;
         }
     }
 }
