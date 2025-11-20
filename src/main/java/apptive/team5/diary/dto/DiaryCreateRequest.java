@@ -19,8 +19,10 @@ public record DiaryCreateRequest(
         String content,
         @NotNull(message = "공개 범위는 필수 입력입니다.")
         DiaryScope scope,
-        @NotBlank(message = "영상 길이는 필수 입력입니다.")
+        @NotBlank(message = "킬링파트 길이는 필수 입력입니다.")
         String duration,
+        @NotBlank(message = "영상 길이는 필수 입력입니다.")
+        String totalDuration,
         @NotBlank(message = "킬링파트 시작 시간은 필수 입력입니다.")
         String start,
         @NotBlank(message = "킬링파트 종료 시간은 필수 입력입니다.")
@@ -35,7 +37,8 @@ public record DiaryCreateRequest(
                         diaryRequest.content,
                         diaryRequest.scope,
                         diaryRequest.duration,
-                        diaryRequest.start(),
+                        diaryRequest.totalDuration,
+                        diaryRequest.start,
                         diaryRequest.end,
                         user
                 );

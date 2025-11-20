@@ -56,6 +56,8 @@ public class DiaryEntity extends BaseTimeEntity {
     @Column(nullable = false)
     private String duration;
     @Column(nullable = false)
+    private String totalDuration;
+    @Column(nullable = false)
     private String start;
     @Column(nullable = false)
     private String end;
@@ -75,6 +77,7 @@ public class DiaryEntity extends BaseTimeEntity {
             String content,
             DiaryScope scope,
             String duration,
+            String totalDuration,
             String start,
             String end,
             UserEntity user
@@ -88,6 +91,7 @@ public class DiaryEntity extends BaseTimeEntity {
                 content,
                 scope,
                 duration,
+                totalDuration,
                 start,
                 end,
                 user
