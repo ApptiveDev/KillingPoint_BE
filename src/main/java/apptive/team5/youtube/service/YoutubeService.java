@@ -2,6 +2,7 @@ package apptive.team5.youtube.service;
 
 import apptive.team5.global.exception.ExceptionCode;
 import apptive.team5.global.exception.ExternalApiConnectException;
+import apptive.team5.youtube.YoutubeApiKeyProvider;
 import apptive.team5.youtube.dto.YoutubeSearchRequest;
 import apptive.team5.youtube.dto.YoutubeVideoResponse;
 import com.google.api.client.http.javanet.NetHttpTransport;
@@ -9,7 +10,6 @@ import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.youtube.YouTube;
 import com.google.api.services.youtube.model.SearchListResponse;
 import com.google.api.services.youtube.model.VideoListResponse;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -21,13 +21,18 @@ import java.util.Objects;
 @Service
 public class YoutubeService {
 
-    @Value("${youtube.api.key}")
-    private String apiKey;
+    private final YoutubeApiKeyProvider apiKeyProvider;
     private static final GsonFactory gsonFactory = new GsonFactory();
 
+    public YoutubeService(YoutubeApiKeyProvider provider) {
+        this.apiKeyProvider = provider;
+    }
+
     public List<YoutubeVideoResponse> searchVideo(YoutubeSearchRequest searchRequest) {
-        YouTube youtube = new YouTube.
-                Builder(
+
+        String apiKey = apiKeyProvider.nextKey();
+
+        YouTube youtube = new YouTube.Builder(
                 new NetHttpTransport(), gsonFactory, request -> {}
         ).build();
 
@@ -40,11 +45,11 @@ public class YoutubeService {
                     .setKey(apiKey)
                     .execute();
 
-            List<String> videoIds = searchResponse.getItems().stream()
+            List<String> videoIds = searchResponse.getItems()
+                    .stream()
                     .map(r -> r.getId().getVideoId())
                     .filter(Objects::nonNull)
                     .toList();
-
 
             VideoListResponse videoResponse = youtube.videos()
                     .list(Collections.singletonList("snippet,contentDetails,statistics"))
@@ -53,12 +58,16 @@ public class YoutubeService {
                     .execute();
 
             return videoResponse.getItems()
-                    .stream().map(YoutubeVideoResponse::new)
+                    .stream()
+                    .map(YoutubeVideoResponse::new)
                     .sorted()
                     .toList();
 
         } catch (IOException e) {
-            throw new ExternalApiConnectException(ExceptionCode.YOUTUBE_API_EXCEPTION.getDescription(), HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new ExternalApiConnectException(
+                    ExceptionCode.YOUTUBE_API_EXCEPTION.getDescription(),
+                    HttpStatus.INTERNAL_SERVER_ERROR
+            );
         }
     }
 }
