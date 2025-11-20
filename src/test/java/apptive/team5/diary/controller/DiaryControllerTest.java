@@ -110,6 +110,7 @@ public class DiaryControllerTest {
             softly.assertThat(diaryResponse.musicTitle()).isEqualTo(diary.getMusicTitle());
             softly.assertThat(diaryResponse.artist()).isEqualTo(diary.getArtist());
             softly.assertThat(diaryResponse.duration()).isEqualTo(diary.getDuration());
+            softly.assertThat(diaryResponse.totalDuration()).isEqualTo(diary.getTotalDuration());
             softly.assertThat(diaryResponse.start()).isEqualTo(diary.getStart());
             softly.assertThat(diaryResponse.end()).isEqualTo(diary.getEnd());
         });
@@ -270,6 +271,7 @@ public class DiaryControllerTest {
             softly.assertThat(diaryEntity.getAlbumImageUrl()).isEqualTo(diaryRequest.albumImageUrl());
             softly.assertThat(diaryEntity.getEnd()).isEqualTo(diaryRequest.end());
             softly.assertThat(diaryEntity.getDuration()).isEqualTo(diaryRequest.duration());
+            softly.assertThat(diaryEntity.getTotalDuration()).isEqualTo(diaryRequest.totalDuration());
             softly.assertThat(diaryEntity.getStart()).isEqualTo(diaryRequest.start());
             softly.assertThat(diaryEntity.getArtist()).isEqualTo(diaryRequest.artist());
             softly.assertThat(diaryEntity.getMusicTitle()).isEqualTo(diaryRequest.musicTitle());
@@ -291,6 +293,14 @@ public class DiaryControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateRequest)))
                 .andExpect(status().isOk());
+
+        DiaryEntity updatedDiary = diaryRepository.findById(diary.getId()).orElseThrow();
+
+        assertSoftly(softly -> {
+            softly.assertThat(updatedDiary.getMusicTitle()).isEqualTo(updateRequest.musicTitle());
+            softly.assertThat(updatedDiary.getTotalDuration()).isEqualTo(updateRequest.totalDuration());
+            softly.assertThat(updatedDiary.getContent()).isEqualTo(updateRequest.content());
+        });
     }
 
     @Test

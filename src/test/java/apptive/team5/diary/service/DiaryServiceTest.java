@@ -105,11 +105,13 @@ public class DiaryServiceTest {
 
         UserDiaryResponseDto publicDto = result.getContent().get(0);
         assertThat(publicDto.scope()).isEqualTo(DiaryScope.PUBLIC);
+        assertThat(publicDto.totalDuration()).isEqualTo(publicDiary.getTotalDuration());
         assertThat(publicDto.content()).isEqualTo(publicDiary.getContent());
         assertThat(publicDto.isLiked()).isTrue();
 
         UserDiaryResponseDto killingPartDto = result.getContent().get(1);
         assertThat(killingPartDto.scope()).isEqualTo(DiaryScope.KILLING_PART);
+        assertThat(killingPartDto.totalDuration()).isEqualTo(killingPartDiary.getTotalDuration());
         assertThat(killingPartDto.content()).isEqualTo(UserDiaryResponseDto.defaultContentMsg);
         assertThat(killingPartDto.isLiked()).isFalse();
 
@@ -152,7 +154,7 @@ public class DiaryServiceTest {
 
         UserDiaryResponseDto killingPartDto = result.getContent().get(1);
         assertThat(killingPartDto.scope()).isEqualTo(DiaryScope.KILLING_PART);
-        assertThat(killingPartDto.content()).isEqualTo(killingPartDiary.getContent()); // 자신의 KILLING_PART 내용은 보여야 함
+        assertThat(killingPartDto.content()).isEqualTo(killingPartDiary.getContent());
         assertThat(killingPartDto.isLiked()).isFalse();
 
         verify(userLowService).getReferenceById(userId);

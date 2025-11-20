@@ -10,6 +10,7 @@ public record DiaryUpdateDto(
         String content,
         DiaryScope scope,
         String duration,
+        String totalDuration,
         String start,
         String end
 ) {

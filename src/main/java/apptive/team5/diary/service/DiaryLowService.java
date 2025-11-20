@@ -60,7 +60,11 @@ public class DiaryLowService {
                 updateDto.albumImageUrl(),
                 updateDto.videoUrl(),
                 updateDto.content(),
-                updateDto.scope()
+                updateDto.scope(),
+                updateDto.duration(),
+                updateDto.totalDuration(),
+                updateDto.start(),
+                updateDto.end()
         );
     }
 
