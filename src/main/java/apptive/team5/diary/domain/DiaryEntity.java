@@ -55,7 +55,7 @@ public class DiaryEntity extends BaseTimeEntity {
 
     @Column(nullable = false)
     private String duration;
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "VARCHAR(255) DEFAULT '0'")
     private String totalDuration;
     @Column(nullable = false)
     private String start;
