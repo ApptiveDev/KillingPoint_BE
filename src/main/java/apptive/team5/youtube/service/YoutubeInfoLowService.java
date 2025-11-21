@@ -20,6 +20,7 @@ public class YoutubeInfoLowService {
         return youtubeInfoRepository.save(youtubeInfo);
     }
 
+    @Transactional(readOnly = true)
     public Optional<YoutubeInfo> findBySpotifyId(String spotifyId) {
         return youtubeInfoRepository.findBySpotifyId(spotifyId);
     }
