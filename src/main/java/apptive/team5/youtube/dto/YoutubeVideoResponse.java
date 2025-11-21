@@ -1,5 +1,6 @@
 package apptive.team5.youtube.dto;
 
+import apptive.team5.youtube.domain.YoutubeInfo;
 import com.google.api.services.youtube.model.Video;
 
 public record YoutubeVideoResponse (
@@ -11,6 +12,10 @@ public record YoutubeVideoResponse (
     public YoutubeVideoResponse(Video video) {
         this(video.getSnippet().getTitle(), video.getContentDetails().getDuration(),
                 "https://www.youtube-nocookie.com/embed/" + video.getId());
+    }
+
+    public YoutubeVideoResponse(YoutubeInfo youtubeInfo) {
+        this(youtubeInfo.getTitle(), youtubeInfo.getDuration(), youtubeInfo.getUrl());
     }
 
     @Override
