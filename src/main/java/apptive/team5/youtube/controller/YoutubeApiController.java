@@ -21,9 +21,10 @@ public class YoutubeApiController {
     private final YoutubeService youtubeService;
 
     @GetMapping
-    public ResponseEntity<List<YoutubeVideoResponse>> searchVideo(@RequestParam String artist, @RequestParam String title) {
+    public ResponseEntity<List<YoutubeVideoResponse>> searchVideo(@RequestParam String id, @RequestParam String artist,
+                                                                  @RequestParam String title) {
 
-        List<YoutubeVideoResponse> response = youtubeService.searchVideo(new YoutubeSearchRequest(artist, title));
+        List<YoutubeVideoResponse> response = youtubeService.searchVideo(new YoutubeSearchRequest(id, artist, title));
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
