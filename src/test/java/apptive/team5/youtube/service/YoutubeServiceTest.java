@@ -44,7 +44,7 @@ class YoutubeServiceTest {
         YoutubeInfo youtubeInfo = new YoutubeInfo(youtubeSearchRequest.spotifyId(), youtubeVideoResponse);
 
         given(youtubeInfoLowService.findBySpotifyId(any()))
-                .willReturn(Optional.of(youtubeInfo));
+                .willReturn(List.of(youtubeInfo));
 
         // when
         List<YoutubeVideoResponse> youtubeVideoResponses = youtubeService.searchVideo(youtubeSearchRequest);

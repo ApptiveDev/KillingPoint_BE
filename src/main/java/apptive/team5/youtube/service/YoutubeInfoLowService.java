@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -16,12 +17,12 @@ public class YoutubeInfoLowService {
     private final YoutubeInfoRepository youtubeInfoRepository;
 
 
-    public YoutubeInfo save(YoutubeInfo youtubeInfo) {
-        return youtubeInfoRepository.save(youtubeInfo);
+    public List<YoutubeInfo> saveAll(List<YoutubeInfo> youtubeInfos) {
+        return youtubeInfoRepository.saveAll(youtubeInfos);
     }
 
     @Transactional(readOnly = true)
-    public Optional<YoutubeInfo> findBySpotifyId(String spotifyId) {
+    public List<YoutubeInfo> findBySpotifyId(String spotifyId) {
         return youtubeInfoRepository.findBySpotifyId(spotifyId);
     }
 

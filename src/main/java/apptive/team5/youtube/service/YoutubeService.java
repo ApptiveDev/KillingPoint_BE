@@ -33,10 +33,13 @@ public class YoutubeService {
 
     public List<YoutubeVideoResponse> searchVideo(YoutubeSearchRequest searchRequest) {
 
-        Optional<YoutubeInfo> findYoutubeInfo = youtubeInfoLowService.findBySpotifyId(searchRequest.spotifyId());
+        List<YoutubeInfo> findYoutubeInfo = youtubeInfoLowService.findBySpotifyId(searchRequest.spotifyId());
 
-        if (findYoutubeInfo.isPresent()) {
-            return List.of(new YoutubeVideoResponse(findYoutubeInfo.get()));
+        if (!findYoutubeInfo.isEmpty()) {
+            return findYoutubeInfo.stream()
+                    .map(YoutubeVideoResponse::new)
+                    .sorted()
+                    .toList();
         }
 
         String apiKey = apiKeyProvider.nextKey();
@@ -60,25 +63,28 @@ public class YoutubeService {
                     .filter(Objects::nonNull)
                     .toList();
 
-            VideoListResponse videoResponse = youtube.videos()
+            VideoListResponse videoListResponse = youtube.videos()
                     .list(Collections.singletonList("snippet,contentDetails,statistics"))
                     .setId(Collections.singletonList(String.join(",", videoIds)))
                     .setKey(apiKey)
                     .execute();
 
-            if(videoResponse.isEmpty()) return List.of();
+            if(videoListResponse.isEmpty()) return List.of();
 
-            List<YoutubeVideoResponse> videoResponses = videoResponse.getItems()
+            List<YoutubeVideoResponse> youtubeVideoResponses = videoListResponse.getItems()
                     .stream()
                     .map(YoutubeVideoResponse::new)
                     .sorted()
                     .toList();
 
-            YoutubeVideoResponse firstPriorityVideo = videoResponses.getFirst();
+            List<YoutubeInfo> youtubeInfos = youtubeVideoResponses.
+                    stream()
+                    .map(videoResponse -> new YoutubeInfo(searchRequest.spotifyId(), videoResponse))
+                    .toList();
 
-            youtubeInfoLowService.save(new YoutubeInfo(searchRequest.spotifyId(), firstPriorityVideo));
+            youtubeInfoLowService.saveAll(youtubeInfos);
 
-            return videoResponses;
+            return youtubeVideoResponses;
 
         } catch (IOException e) {
             throw new ExternalApiConnectException(
