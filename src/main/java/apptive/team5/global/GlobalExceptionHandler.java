@@ -1,6 +1,7 @@
 package apptive.team5.global;
 
 import apptive.team5.global.exception.*;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -45,6 +46,13 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", e.getParameterName() + "는 필수값입니다."));
     }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<Map<String,String>> handleConstraintViolationException(ConstraintViolationException e) {
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", e.getMessage()));
+    }
+
 
     @ExceptionHandler(KakaoApiConnectException.class)
     public ResponseEntity<Map<String,Object>> handleKakaoApiConnectException(KakaoApiConnectException e) {
