@@ -33,24 +33,4 @@ public class DiaryLikeService {
             return new DiaryLikeResponseDto(true);
         }
     }
-
-    public void likeDiary(Long userId, Long diaryId) {
-        UserEntity user = userLowService.getReferenceById(userId);
-        DiaryEntity diary = diaryLowService.findDiaryById(diaryId);
-
-        if (diaryLikeLowService.existsByUserAndDiary(user, diary)) {
-            throw new DuplicateException(ExceptionCode.DUPLICATE_DIARY_LIKE.getDescription());
-        }
-
-        diaryLikeLowService.saveDiaryLike(new DiaryLikeEntity(user, diary));
-    }
-
-    public void unlikeDiary(Long userId, Long diaryId) {
-        UserEntity user = userLowService.getReferenceById(userId);
-        DiaryEntity diary = diaryLowService.findDiaryById(diaryId);
-
-        DiaryLikeEntity diaryLike = diaryLikeLowService.findByUserAndDiary(user, diary);
-
-        diaryLikeLowService.deleteDiaryLike(diaryLike);
-    }
 }
