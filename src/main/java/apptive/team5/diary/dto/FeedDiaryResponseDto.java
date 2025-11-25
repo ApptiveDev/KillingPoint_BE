@@ -9,7 +9,7 @@ import apptive.team5.user.domain.UserEntity;
 
 import java.time.LocalDateTime;
 
-public record FeedDiaryResponseDto(
+public record FeedDiaryResponseDto (
         Long diaryId,
         String artist,
         String musicTitle,
@@ -29,18 +29,10 @@ public record FeedDiaryResponseDto(
         String username,
         String tag,
         String profileImageUrl
-) {
-
-    public static String defaultContentMsg = "비공개 일기입니다.";
-    public static FeedDiaryResponseDto from(DiaryEntity diary, boolean isLiked, Long likeCount, Long currentUserId, UserEntity user) {
-        String contentResponse = diary.getContent();
-
-        if (!diary.isMyDiary(currentUserId) && diary.isScopeKillingPart()) {
-            contentResponse = defaultContentMsg;
-        }
-
-        if (!diary.isMyDiary(currentUserId) && diary.isScopePrivate())
-            throw new BadRequestException(ExceptionCode.ACCESS_DENIED_DIARY.getDescription());
+) implements DiaryResponseDto {
+    public static FeedDiaryResponseDto from(DiaryEntity diary, boolean isLiked, Long likeCount, Long currentUserId) {
+        String contentResponse = diary.getContentForViewer(currentUserId);
+        UserEntity user = diary.getUser();
 
         return new FeedDiaryResponseDto(
                 diary.getId(),

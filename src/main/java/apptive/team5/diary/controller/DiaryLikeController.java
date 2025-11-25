@@ -1,5 +1,6 @@
 package apptive.team5.diary.controller;
 
+import apptive.team5.diary.dto.DiaryLikeResponseDto;
 import apptive.team5.diary.service.DiaryLikeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,25 +20,14 @@ public class DiaryLikeController {
     private final DiaryLikeService diaryLikeService;
 
     @PostMapping
-    public ResponseEntity<Void> likeDiary(
+    public ResponseEntity<DiaryLikeResponseDto> toggleDiaryLike(
             @AuthenticationPrincipal
             Long userId,
             @PathVariable
             Long diaryId
     ) {
-        diaryLikeService.likeDiary(userId, diaryId);
+        DiaryLikeResponseDto responseDto = diaryLikeService.toggleDiaryLike(userId, diaryId);
 
-        return ResponseEntity.status(HttpStatus.CREATED).build();
-    }
-
-    @DeleteMapping
-    public ResponseEntity<Void> unlikeDiary(
-            @AuthenticationPrincipal
-            Long userId,
-            @PathVariable
-            Long diaryId
-    ) {
-        diaryLikeService.unlikeDiary(userId, diaryId);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 }

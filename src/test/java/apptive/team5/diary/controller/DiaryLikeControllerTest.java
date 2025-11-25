@@ -2,6 +2,7 @@ package apptive.team5.diary.controller;
 
 import apptive.team5.diary.domain.DiaryEntity;
 import apptive.team5.diary.domain.DiaryLikeEntity;
+import apptive.team5.diary.dto.DiaryLikeResponseDto;
 import apptive.team5.diary.repository.DiaryLikeRepository;
 import apptive.team5.diary.repository.DiaryRepository;
 import apptive.team5.user.domain.UserEntity;
@@ -21,6 +22,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.securityContext;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -61,76 +63,55 @@ public class DiaryLikeControllerTest {
     }
 
     @Test
-    @DisplayName("좋아요 추가 성공")
-    void likeDiarySuccess() throws Exception {
-        // when & then
-        mockMvc.perform(post("/api/diaries/{diaryId}/like", diary.getId())
-                        .with(securityContext(SecurityContextHolder.getContext()))
-                )
-                .andExpect(status().isCreated());
+    @DisplayName("좋아요 추가")
+    void toggleDiaryLikeAdd() throws Exception {
+        String responseBody = mockMvc.perform(post("/api/diaries/{diaryId}/like", diary.getId())
+                .with(securityContext(SecurityContextHolder.getContext()))
+        )
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
 
-        boolean isLiked = diaryLikeRepository.existsByUserAndDiary(userLiker, diary);
-        assertThat(isLiked).isTrue();
+        DiaryLikeResponseDto responseDto = objectMapper.readValue(responseBody, DiaryLikeResponseDto.class);
+
+        // then
+        assertSoftly(softly -> {
+            softly.assertThat(responseDto.isLiked()).isTrue();
+            softly.assertThat(diaryLikeRepository.existsByUserAndDiary(userLiker, diary));
+        });
     }
 
     @Test
-    @DisplayName("좋아요 추가 실패 - 존재하지 않는 다이어리")
-    void likeDiaryFail_DiaryNotFound() throws Exception {
-        // when & then
+    @DisplayName("좋아요 취소")
+    void toggleDiaryLikeRemove() throws Exception {
+        // given
+        diaryLikeRepository.save(new DiaryLikeEntity(userLiker, diary));
+
+        // when
+        String responseBody = mockMvc.perform(post("/api/diaries/{diaryId}/like", diary.getId())
+                .with(securityContext(SecurityContextHolder.getContext()))
+        )
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+        DiaryLikeResponseDto responseDto = objectMapper.readValue(responseBody, DiaryLikeResponseDto.class);
+
+        // then
+        assertSoftly(softly -> {
+            softly.assertThat(responseDto.isLiked()).isFalse();
+            softly.assertThat(diaryLikeRepository.existsByUserAndDiary(userLiker, diary));
+        });
+    }
+
+    @Test
+    @DisplayName("좋아요 실패 - 존재하지 않는 다이어리")
+    void toggleDiaryLikeNotFound() throws Exception {
         String responseBody = mockMvc.perform(post("/api/diaries/{diaryId}/like", 9999L)
-                        .with(securityContext(SecurityContextHolder.getContext()))
-                )
+                .with(securityContext(SecurityContextHolder.getContext()))
+        )
                 .andExpect(status().isNotFound())
                 .andReturn().getResponse().getContentAsString();
 
         JsonNode jsonNode = objectMapper.readTree(responseBody);
         assertThat(jsonNode.path("message").asText()).isEqualTo("그런 다이어리는 없습니다.");
-    }
-
-    @Test
-    @DisplayName("좋아요 추가 실패 - 중복 좋아요")
-    void likeDiaryFail_DuplicateLike() throws Exception {
-        // given
-        diaryLikeRepository.save(new DiaryLikeEntity(userLiker, diary));
-
-        // when & then
-        String responseBody = mockMvc.perform(post("/api/diaries/{diaryId}/like", diary.getId())
-                        .with(securityContext(SecurityContextHolder.getContext()))
-                )
-                .andExpect(status().isBadRequest())
-                .andReturn().getResponse().getContentAsString();
-
-        JsonNode jsonNode = objectMapper.readTree(responseBody);
-        assertThat(jsonNode.path("message").asText()).isEqualTo("이미 좋아요를 누르셨습니다!");
-    }
-
-    @Test
-    @DisplayName("좋아요 취소 성공")
-    void unlikeDiarySuccess() throws Exception {
-        // given
-        diaryLikeRepository.save(new DiaryLikeEntity(userLiker, diary));
-
-        // when & then
-        mockMvc.perform(delete("/api/diaries/{diaryId}/like", diary.getId())
-                        .with(securityContext(SecurityContextHolder.getContext()))
-                )
-                .andExpect(status().isNoContent());
-
-        boolean isLiked = diaryLikeRepository.existsByUserAndDiary(userLiker, diary);
-        assertThat(isLiked).isFalse();
-    }
-
-    @Test
-    @DisplayName("좋아요 취소 실패 - 좋아요 누르지 않은 다이어리")
-    void unlikeDiaryFail_LikeNotFound() throws Exception {
-        // when & then
-        String responseBody = mockMvc.perform(delete("/api/diaries/{diaryId}/like", diary.getId())
-                        .with(securityContext(SecurityContextHolder.getContext()))
-                )
-                .andExpect(status().isNotFound())
-                .andReturn().getResponse().getContentAsString();
-
-        JsonNode jsonNode = objectMapper.readTree(responseBody);
-        assertThat(jsonNode.path("message").asText()).isEqualTo("좋아요를 누르지 않은 킬링파트입니다!");
     }
 }

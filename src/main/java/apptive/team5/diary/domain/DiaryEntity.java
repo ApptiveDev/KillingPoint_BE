@@ -1,14 +1,18 @@
 package apptive.team5.diary.domain;
 
+import apptive.team5.diary.domain.model.DiaryBasicInfo;
+import apptive.team5.diary.domain.model.DiaryInfo;
+import apptive.team5.diary.domain.model.MusicPlayInfo;
 import apptive.team5.global.entity.BaseTimeEntity;
+import apptive.team5.global.exception.BadRequestException;
 import apptive.team5.global.exception.ExceptionCode;
 import apptive.team5.user.domain.UserEntity;
+import apptive.team5.diary.domain.model.MusicBasicInfo;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -39,9 +43,9 @@ public class DiaryEntity extends BaseTimeEntity {
     @Column(name = "diary_id")
     private Long id;
 
-    @Column(nullable = false, length = 255)
+    @Column(nullable = false)
     private String musicTitle;
-    @Column(nullable = false, length = 255)
+    @Column(nullable = false)
     private String artist;
     @Column(columnDefinition = "TEXT", nullable = false)
     private String albumImageUrl;
@@ -69,33 +73,30 @@ public class DiaryEntity extends BaseTimeEntity {
     )
     private UserEntity user;
 
+    private static final String HIDDEN_CONTENT_DEFAULT_MESSAGE = "비공개 일기입니다.";
+
     public DiaryEntity(
-            String musicTitle,
-            String artist,
-            String albumImageUrl,
-            String videoUrl,
-            String content,
-            DiaryScope scope,
-            String duration,
-            String totalDuration,
-            String start,
-            String end,
+            DiaryInfo info,
             UserEntity user
     ) {
-        this(
-                null,
-                musicTitle,
-                artist,
-                albumImageUrl,
-                videoUrl,
-                content,
-                scope,
-                duration,
-                totalDuration,
-                start,
-                end,
-                user
-        );
+        this.user = user;
+        update(info);
+    }
+
+    public String getContentForViewer(Long viewerId) {
+        if (isMyDiary(viewerId)) {
+            return this.content;
+        }
+
+        if (this.scope == DiaryScope.PRIVATE) {
+            throw new BadRequestException(ExceptionCode.ACCESS_DENIED_DIARY.getDescription());
+        }
+
+        if (this.scope == DiaryScope.KILLING_PART) {
+            return HIDDEN_CONTENT_DEFAULT_MESSAGE;
+        }
+
+        return this.content;
     }
 
     public void validateOwner(UserEntity user) {
@@ -112,36 +113,29 @@ public class DiaryEntity extends BaseTimeEntity {
         return this.user.getId().equals(userId);
     }
 
-    public boolean isScopeKillingPart() {
-        return this.scope == DiaryScope.KILLING_PART;
+    public void update(DiaryInfo info) {
+        updateMusicBaseInfo(info.musicBasicInfo());
+        updateDiaryBasicInfo(info.diaryBasicInfo());
+        updateMusicPlayInfo(info.musicPlayInfo());
     }
 
-    public boolean isScopePrivate() {
-        return this.scope == DiaryScope.PRIVATE;
+    public void updateMusicBaseInfo(MusicBasicInfo musicBasicInfo) {
+        updateMusicTitle(musicBasicInfo.musicTitle());
+        updateArtist(musicBasicInfo.artist());
+        updateAlbumImageUrl(musicBasicInfo.albumImageUrl());
+        updateVideoUrl(musicBasicInfo.videoUrl());
     }
 
-    public void update(
-            String musicTitle,
-            String artist,
-            String albumImageUrl,
-            String videoUrl,
-            String content,
-            DiaryScope scope,
-            String duration,
-            String totalDuration,
-            String start,
-            String end
-    ) {
-        updateMusicTitle(musicTitle);
-        updateArtist(artist);
-        updateAlbumImageUrl(albumImageUrl);
-        updateVideoUrl(videoUrl);
-        updateContent(content);
-        updateScope(scope);
-        updateDuration(duration);
-        updateTotalDuration(totalDuration);
-        updateStart(start);
-        updateEnd(end);
+    public void updateDiaryBasicInfo(DiaryBasicInfo diaryBasicInfo) {
+        updateContent(diaryBasicInfo.content());
+        updateScope(diaryBasicInfo.scope());
+    }
+
+    public void updateMusicPlayInfo(MusicPlayInfo musicPlayInfo) {
+        updateDuration(musicPlayInfo.duration());
+        updateTotalDuration(musicPlayInfo.totalDuration());
+        updateStart(musicPlayInfo.start());
+        updateEnd(musicPlayInfo.end());
     }
 
     private void updateMusicTitle(String musicTitle) {

@@ -42,7 +42,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.mockito.Mockito.mock;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -161,7 +161,7 @@ public class DiaryControllerTest {
 
             // KILLING_PART
             UserDiaryResponseDto killingPartResponse = responseMap.get(killingPartDiary.getId());
-            softly.assertThat(killingPartResponse.content()).isEqualTo(UserDiaryResponseDto.defaultContentMsg);
+            softly.assertThat(killingPartResponse.content()).isEqualTo("비공개 일기입니다.");
             softly.assertThat(killingPartResponse.isLiked()).isFalse();
             softly.assertThat(killingPartResponse.likeCount()).isEqualTo(1L);
         });
@@ -288,7 +288,7 @@ public class DiaryControllerTest {
         TestSecurityContextHolderInjection.inject(testUser.getId(), testUser.getRoleType());
 
         // when
-        mockMvc.perform(put("/api/diaries/{diaryId}", diary.getId())
+        mockMvc.perform(patch("/api/diaries/{diaryId}", diary.getId())
                         .with(securityContext(SecurityContextHolder.getContext()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateRequest)))

@@ -2,7 +2,7 @@ package apptive.team5.diary.service;
 
 import apptive.team5.diary.domain.DiaryEntity;
 import apptive.team5.diary.domain.DiaryScope;
-import apptive.team5.diary.dto.DiaryUpdateDto;
+import apptive.team5.diary.domain.model.DiaryInfo;
 import apptive.team5.diary.repository.DiaryRepository;
 import apptive.team5.global.exception.ExceptionCode;
 import apptive.team5.global.exception.NotFoundEntityException;
@@ -53,19 +53,8 @@ public class DiaryLowService {
         return diaryRepository.findByUserIdAndCreateDateTimeBetween(userId, start, end);
     }
 
-    public void updateDiary(DiaryEntity diary, DiaryUpdateDto updateDto) {
-        diary.update(
-                updateDto.musicTitle(),
-                updateDto.artist(),
-                updateDto.albumImageUrl(),
-                updateDto.videoUrl(),
-                updateDto.content(),
-                updateDto.scope(),
-                updateDto.duration(),
-                updateDto.totalDuration(),
-                updateDto.start(),
-                updateDto.end()
-        );
+    public void updateDiary(DiaryEntity diary, DiaryInfo diaryInfo) {
+        diary.update(diaryInfo);
     }
 
     public void deleteDiary(DiaryEntity diary) {
