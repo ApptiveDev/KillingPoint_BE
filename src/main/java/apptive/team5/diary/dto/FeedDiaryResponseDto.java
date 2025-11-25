@@ -30,10 +30,9 @@ public record FeedDiaryResponseDto(
         String tag,
         String profileImageUrl
 ) {
-
-    public static String defaultContentMsg = "비공개 일기입니다.";
-    public static FeedDiaryResponseDto from(DiaryEntity diary, boolean isLiked, Long likeCount, Long currentUserId, UserEntity user) {
+    public static FeedDiaryResponseDto from(DiaryEntity diary, boolean isLiked, Long likeCount, Long currentUserId) {
         String contentResponse = diary.getContentForViewer(currentUserId);
+        UserEntity user = diary.getUser();
 
         return new FeedDiaryResponseDto(
                 diary.getId(),
