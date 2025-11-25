@@ -18,6 +18,21 @@ public class DiaryLikeService {
     private final UserLowService userLowService;
     private final DiaryLowService diaryLowService;
 
+    public boolean toggleDiaryLike(Long userId, Long diaryId) {
+        UserEntity user = userLowService.getReferenceById(userId);
+        DiaryEntity diary = diaryLowService.findDiaryById(diaryId);
+
+        if (diaryLikeLowService.existsByUserAndDiary(user, diary)) {
+            DiaryLikeEntity diaryLike = diaryLikeLowService.findByUserAndDiary(user, diary);
+            diaryLikeLowService.deleteDiaryLike(diaryLike);
+            return false;
+        }
+        else {
+            diaryLikeLowService.saveDiaryLike(new DiaryLikeEntity(user, diary));
+            return true;
+        }
+    }
+
     public void likeDiary(Long userId, Long diaryId) {
         UserEntity user = userLowService.getReferenceById(userId);
         DiaryEntity diary = diaryLowService.findDiaryById(diaryId);
