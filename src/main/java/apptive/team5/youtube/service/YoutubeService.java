@@ -2,7 +2,6 @@ package apptive.team5.youtube.service;
 
 import apptive.team5.global.exception.ExceptionCode;
 import apptive.team5.global.exception.ExternalApiConnectException;
-import apptive.team5.youtube.YoutubeApiKeyProvider;
 import apptive.team5.youtube.domain.YoutubeInfo;
 import apptive.team5.youtube.dto.YoutubeSearchRequest;
 import apptive.team5.youtube.dto.YoutubeVideoResponse;
@@ -12,6 +11,7 @@ import com.google.api.services.youtube.YouTube;
 import com.google.api.services.youtube.model.SearchListResponse;
 import com.google.api.services.youtube.model.VideoListResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,14 +20,14 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 @Transactional
 @Service
 @RequiredArgsConstructor
 public class YoutubeService {
 
-    private final YoutubeApiKeyProvider apiKeyProvider;
+    @Value("${youtube.api.key}")
+    private String apiKey;
     private static final GsonFactory gsonFactory = new GsonFactory();
     private final YoutubeInfoLowService youtubeInfoLowService;
 
@@ -41,8 +41,6 @@ public class YoutubeService {
                     .sorted()
                     .toList();
         }
-
-        String apiKey = apiKeyProvider.nextKey();
 
         YouTube youtube = new YouTube.Builder(
                 new NetHttpTransport(), gsonFactory, request -> {}

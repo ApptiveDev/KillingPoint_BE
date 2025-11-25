@@ -1,6 +1,5 @@
 package apptive.team5.youtube.service;
 
-import apptive.team5.youtube.YoutubeApiKeyProvider;
 import apptive.team5.youtube.domain.YoutubeInfo;
 import apptive.team5.youtube.dto.YoutubeSearchRequest;
 import apptive.team5.youtube.dto.YoutubeVideoResponse;
@@ -12,7 +11,6 @@ import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.SoftAssertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -29,8 +27,6 @@ class YoutubeServiceTest {
     @Mock
     private YoutubeInfoLowService youtubeInfoLowService;;
 
-    @Mock
-    private YoutubeApiKeyProvider youtubeApiKeyProvider;
 
 
     @Test
@@ -58,7 +54,7 @@ class YoutubeServiceTest {
         });
 
         verify(youtubeInfoLowService).findBySpotifyId(any());
-        verifyNoMoreInteractions(youtubeInfoLowService,  youtubeApiKeyProvider);
+        verifyNoMoreInteractions(youtubeInfoLowService);
 
     }
 
