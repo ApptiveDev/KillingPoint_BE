@@ -14,16 +14,16 @@ import java.util.Set;
 public class DiaryResponseMapper {
 
     @FunctionalInterface
-    private interface DiaryResponseDtoMapper {
-        DiaryResponseDto map(DiaryEntity diary, boolean isLiked, Long likeCount, Long currentUserId);
+    public interface DiaryResponseDtoMapper<T extends DiaryResponseDto> {
+        T map(DiaryEntity diary, boolean isLiked, Long likeCount, Long currentUserId);
     }
 
-    private Page<DiaryResponseDto> mapToResponseDto(
+    public <T extends DiaryResponseDto> Page<T> mapToResponseDto(
             Page<DiaryEntity> diaryPage,
             Set<Long> likedDiaryIds,
             Map<Long, Long> likeCountsMap,
             Long currentUserId,
-            DiaryResponseDtoMapper mapper
+            DiaryResponseDtoMapper<T> mapper
     ) {
         if (diaryPage.isEmpty()) {
             return Page.empty(diaryPage.getPageable());

@@ -6,6 +6,7 @@ import apptive.team5.diary.dto.DiaryCreateRequest;
 import apptive.team5.diary.dto.MyDiaryResponseDto;
 import apptive.team5.diary.dto.DiaryUpdateRequestDto;
 import apptive.team5.diary.dto.UserDiaryResponseDto;
+import apptive.team5.diary.mapper.DiaryResponseMapper;
 import apptive.team5.user.domain.SocialType;
 import apptive.team5.user.domain.UserEntity;
 import apptive.team5.user.domain.UserRoleType;
@@ -16,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -36,6 +38,9 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 @ExtendWith(MockitoExtension.class)
 public class DiaryServiceTest {
+    @Spy
+    DiaryResponseMapper diaryResponseMapper;
+
     @InjectMocks
     private DiaryService diaryService;
 
