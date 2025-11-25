@@ -33,14 +33,7 @@ public record FeedDiaryResponseDto(
 
     public static String defaultContentMsg = "비공개 일기입니다.";
     public static FeedDiaryResponseDto from(DiaryEntity diary, boolean isLiked, Long likeCount, Long currentUserId, UserEntity user) {
-        String contentResponse = diary.getContent();
-
-        if (!diary.isMyDiary(currentUserId) && diary.isScopeKillingPart()) {
-            contentResponse = defaultContentMsg;
-        }
-
-        if (!diary.isMyDiary(currentUserId) && diary.isScopePrivate())
-            throw new BadRequestException(ExceptionCode.ACCESS_DENIED_DIARY.getDescription());
+        String contentResponse = diary.getContentForViewer(currentUserId);
 
         return new FeedDiaryResponseDto(
                 diary.getId(),

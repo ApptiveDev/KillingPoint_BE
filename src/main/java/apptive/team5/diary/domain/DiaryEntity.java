@@ -4,6 +4,7 @@ import apptive.team5.diary.domain.model.DiaryBasicInfo;
 import apptive.team5.diary.domain.model.DiaryInfo;
 import apptive.team5.diary.domain.model.MusicPlayInfo;
 import apptive.team5.global.entity.BaseTimeEntity;
+import apptive.team5.global.exception.BadRequestException;
 import apptive.team5.global.exception.ExceptionCode;
 import apptive.team5.user.domain.UserEntity;
 import apptive.team5.diary.domain.model.MusicBasicInfo;
@@ -72,12 +73,30 @@ public class DiaryEntity extends BaseTimeEntity {
     )
     private UserEntity user;
 
+    private static final String HIDDEN_CONTENT_DEFAULT_MESSAGE = "비공개 일기입니다.";
+
     public DiaryEntity(
             DiaryInfo info,
             UserEntity user
     ) {
         this.user = user;
         update(info);
+    }
+
+    public String getContentForViewer(Long viewerId) {
+        if (isMyDiary(viewerId)) {
+            return this.content;
+        }
+
+        if (this.scope == DiaryScope.PRIVATE) {
+            throw new BadRequestException(ExceptionCode.ACCESS_DENIED_DIARY.getDescription());
+        }
+
+        if (this.scope == DiaryScope.KILLING_PART) {
+            return HIDDEN_CONTENT_DEFAULT_MESSAGE;
+        }
+
+        return this.content;
     }
 
     public void validateOwner(UserEntity user) {
