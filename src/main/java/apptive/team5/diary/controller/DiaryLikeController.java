@@ -30,27 +30,4 @@ public class DiaryLikeController {
 
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
-
-    @PostMapping
-    public ResponseEntity<Void> likeDiary(
-            @AuthenticationPrincipal
-            Long userId,
-            @PathVariable
-            Long diaryId
-    ) {
-        diaryLikeService.likeDiary(userId, diaryId);
-
-        return ResponseEntity.status(HttpStatus.CREATED).build();
-    }
-
-    @DeleteMapping
-    public ResponseEntity<Void> unlikeDiary(
-            @AuthenticationPrincipal
-            Long userId,
-            @PathVariable
-            Long diaryId
-    ) {
-        diaryLikeService.unlikeDiary(userId, diaryId);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-    }
 }
