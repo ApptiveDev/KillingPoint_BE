@@ -113,14 +113,6 @@ public class DiaryEntity extends BaseTimeEntity {
         return this.user.getId().equals(userId);
     }
 
-    public boolean isScopeKillingPart() {
-        return this.scope == DiaryScope.KILLING_PART;
-    }
-
-    public boolean isScopePrivate() {
-        return this.scope == DiaryScope.PRIVATE;
-    }
-
     public void update(DiaryInfo info) {
         updateMusicBaseInfo(info.musicBasicInfo());
         updateDiaryBasicInfo(info.diaryBasicInfo());

@@ -95,7 +95,7 @@ public class DiaryService {
 
         foundDiary.validateOwner(foundUser);
 
-        diaryLowService.updateDiary(foundDiary, DiaryUpdateRequestDto.toUpdateDto(updateRequest));
+        diaryLowService.updateDiary(foundDiary, updateRequest.toDomainInfo());
     }
 
     @Transactional
