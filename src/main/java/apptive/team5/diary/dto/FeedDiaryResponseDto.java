@@ -9,7 +9,7 @@ import apptive.team5.user.domain.UserEntity;
 
 import java.time.LocalDateTime;
 
-public record FeedDiaryResponseDto(
+public record FeedDiaryResponseDto (
         Long diaryId,
         String artist,
         String musicTitle,
@@ -29,7 +29,7 @@ public record FeedDiaryResponseDto(
         String username,
         String tag,
         String profileImageUrl
-) {
+) implements DiaryResponseDto {
     public static FeedDiaryResponseDto from(DiaryEntity diary, boolean isLiked, Long likeCount, Long currentUserId) {
         String contentResponse = diary.getContentForViewer(currentUserId);
         UserEntity user = diary.getUser();

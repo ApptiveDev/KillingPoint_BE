@@ -112,7 +112,7 @@ public class DiaryServiceTest {
         UserDiaryResponseDto killingPartDto = result.getContent().get(1);
         assertThat(killingPartDto.scope()).isEqualTo(DiaryScope.KILLING_PART);
         assertThat(killingPartDto.totalDuration()).isEqualTo(killingPartDiary.getTotalDuration());
-        assertThat(killingPartDto.content()).isEqualTo(UserDiaryResponseDto.defaultContentMsg);
+        assertThat(killingPartDto.content()).isEqualTo("비공개 일기입니다.");
         assertThat(killingPartDto.isLiked()).isFalse();
 
         verify(diaryLowService).findDiaryByUserAndScopeIn(owner.getId(), visibleScopes, pageRequest);

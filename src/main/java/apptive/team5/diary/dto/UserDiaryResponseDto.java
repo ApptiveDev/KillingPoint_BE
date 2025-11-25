@@ -23,8 +23,7 @@ public record UserDiaryResponseDto(
         LocalDateTime updateDate,
         boolean isLiked,
         Long likeCount
-) {
-    public static String defaultContentMsg = "비공개 일기입니다.";
+) implements DiaryResponseDto {
     public static UserDiaryResponseDto from(DiaryEntity diary, boolean isLiked, Long likeCount, Long currentUserId) {
         String contentResponse = diary.getContentForViewer(currentUserId);
 

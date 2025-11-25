@@ -19,7 +19,7 @@ public record MyDiaryResponseDto(
         String end,
         LocalDateTime createDate,
         LocalDateTime updateDate
-) {
+) implements DiaryResponseDto {
     public static MyDiaryResponseDto from(DiaryEntity diary) {
         return new MyDiaryResponseDto(
                 diary.getId(),
