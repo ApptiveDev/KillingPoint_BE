@@ -1,5 +1,6 @@
 package apptive.team5.diary.domain;
 
+import apptive.team5.diary.domain.model.DiaryUpdateInfo;
 import apptive.team5.global.entity.BaseTimeEntity;
 import apptive.team5.global.exception.ExceptionCode;
 import apptive.team5.user.domain.UserEntity;
@@ -8,7 +9,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -120,28 +120,17 @@ public class DiaryEntity extends BaseTimeEntity {
         return this.scope == DiaryScope.PRIVATE;
     }
 
-    public void update(
-            String musicTitle,
-            String artist,
-            String albumImageUrl,
-            String videoUrl,
-            String content,
-            DiaryScope scope,
-            String duration,
-            String totalDuration,
-            String start,
-            String end
-    ) {
-        updateMusicTitle(musicTitle);
-        updateArtist(artist);
-        updateAlbumImageUrl(albumImageUrl);
-        updateVideoUrl(videoUrl);
-        updateContent(content);
-        updateScope(scope);
-        updateDuration(duration);
-        updateTotalDuration(totalDuration);
-        updateStart(start);
-        updateEnd(end);
+    public void update(DiaryUpdateInfo info) {
+        updateMusicTitle(info.musicTitle());
+        updateArtist(info.artist());
+        updateAlbumImageUrl(info.albumImageUrl());
+        updateVideoUrl(info.videoUrl());
+        updateContent(info.content());
+        updateScope(info.scope());
+        updateDuration(info.duration());
+        updateTotalDuration(info.totalDuration());
+        updateStart(info.start());
+        updateEnd(info.end());
     }
 
     private void updateMusicTitle(String musicTitle) {
