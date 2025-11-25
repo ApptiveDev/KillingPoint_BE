@@ -1,9 +1,12 @@
 package apptive.team5.diary.domain;
 
-import apptive.team5.diary.domain.model.DiaryUpdateInfo;
+import apptive.team5.diary.domain.model.DiaryBasicInfo;
+import apptive.team5.diary.domain.model.DiaryInfo;
+import apptive.team5.diary.domain.model.MusicPlayInfo;
 import apptive.team5.global.entity.BaseTimeEntity;
 import apptive.team5.global.exception.ExceptionCode;
 import apptive.team5.user.domain.UserEntity;
+import apptive.team5.diary.domain.model.MusicBasicInfo;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -120,17 +123,29 @@ public class DiaryEntity extends BaseTimeEntity {
         return this.scope == DiaryScope.PRIVATE;
     }
 
-    public void update(DiaryUpdateInfo info) {
-        updateMusicTitle(info.musicTitle());
-        updateArtist(info.artist());
-        updateAlbumImageUrl(info.albumImageUrl());
-        updateVideoUrl(info.videoUrl());
-        updateContent(info.content());
-        updateScope(info.scope());
-        updateDuration(info.duration());
-        updateTotalDuration(info.totalDuration());
-        updateStart(info.start());
-        updateEnd(info.end());
+    public void update(DiaryInfo info) {
+        updateMusicBaseInfo(info.musicBasicInfo());
+        updateDiaryBasicInfo(info.diaryBasicInfo());
+        updateMusicPlayInfo(info.musicPlayInfo());
+    }
+
+    public void updateMusicBaseInfo(MusicBasicInfo musicBasicInfo) {
+        updateMusicTitle(musicBasicInfo.musicTitle());
+        updateArtist(musicBasicInfo.artist());
+        updateAlbumImageUrl(musicBasicInfo.albumImageUrl());
+        updateVideoUrl(musicBasicInfo.videoUrl());
+    }
+
+    public void updateDiaryBasicInfo(DiaryBasicInfo diaryBasicInfo) {
+        updateContent(diaryBasicInfo.content());
+        updateScope(diaryBasicInfo.scope());
+    }
+
+    public void updateMusicPlayInfo(MusicPlayInfo musicPlayInfo) {
+        updateDuration(musicPlayInfo.duration());
+        updateTotalDuration(musicPlayInfo.totalDuration());
+        updateStart(musicPlayInfo.start());
+        updateEnd(musicPlayInfo.end());
     }
 
     private void updateMusicTitle(String musicTitle) {

@@ -1,7 +1,10 @@
 package apptive.team5.diary.dto;
 
 import apptive.team5.diary.domain.DiaryScope;
-import apptive.team5.diary.domain.model.DiaryUpdateInfo;
+import apptive.team5.diary.domain.model.DiaryBasicInfo;
+import apptive.team5.diary.domain.model.DiaryInfo;
+import apptive.team5.diary.domain.model.MusicBasicInfo;
+import apptive.team5.diary.domain.model.MusicPlayInfo;
 
 public record DiaryUpdateDto(
         String musicTitle,
@@ -15,18 +18,24 @@ public record DiaryUpdateDto(
         String start,
         String end
 ) {
-    public DiaryUpdateInfo toDomainInfo() {
-        return new DiaryUpdateInfo(
-                musicTitle,
-                artist,
-                albumImageUrl,
-                videoUrl,
-                content,
-                scope,
-                duration,
-                totalDuration,
-                start,
-                end
+    public DiaryInfo toDomainInfo() {
+        return new DiaryInfo(
+                new MusicBasicInfo(
+                        musicTitle,
+                        artist,
+                        albumImageUrl,
+                        videoUrl
+                ),
+                new DiaryBasicInfo(
+                        content,
+                        scope
+                ),
+                new MusicPlayInfo(
+                        duration,
+                        totalDuration,
+                        start,
+                        end
+                )
         );
     }
 }
