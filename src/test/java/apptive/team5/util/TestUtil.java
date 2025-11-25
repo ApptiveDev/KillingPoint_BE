@@ -2,6 +2,10 @@ package apptive.team5.util;
 
 import apptive.team5.diary.domain.DiaryEntity;
 import apptive.team5.diary.domain.DiaryScope;
+import apptive.team5.diary.domain.model.DiaryBasicInfo;
+import apptive.team5.diary.domain.model.DiaryInfo;
+import apptive.team5.diary.domain.model.MusicBasicInfo;
+import apptive.team5.diary.domain.model.MusicPlayInfo;
 import apptive.team5.diary.dto.DiaryCreateRequest;
 import apptive.team5.diary.dto.DiaryUpdateRequestDto;
 import apptive.team5.user.domain.SocialType;
@@ -44,35 +48,49 @@ public final class TestUtil {
     }
 
     public static DiaryEntity makeDiaryEntity(UserEntity user) {
-        return new DiaryEntity(
-                "Test Music",
-                "Test Artist",
-                "image.url",
-                "video.url",
-                "Test content",
-                DiaryScope.PUBLIC,
-                "30S",
-                "PT2M58S",
-                "PT1M1S",
-                "PT1M31S",
-                user
+        DiaryInfo diaryInfo = new DiaryInfo(
+                new MusicBasicInfo(
+                        "Test Music",
+                        "Test Artist",
+                        "image.url",
+                        "video.url"
+                ),
+                new DiaryBasicInfo(
+                        "Test content",
+                        DiaryScope.PUBLIC
+                ),
+                new MusicPlayInfo(
+                        "30S",
+                        "PT2M58S",
+                        "PT1M1S",
+                        "PT1M31S"
+                )
         );
+
+        return new DiaryEntity(diaryInfo, user);
     }
 
     public static DiaryEntity makeDiaryEntityWithScope(UserEntity user, DiaryScope scope) {
-        return new DiaryEntity(
-                "Test Music",
-                "Test Artist",
-                "image.url",
-                "video.url",
-                "Test content",
-                scope,
-                "30S",
-                "PT2M58S",
-                "PT1M1S",
-                "PT1M31S",
-                user
+        DiaryInfo diaryInfo = new DiaryInfo(
+                new MusicBasicInfo(
+                        "Test Music",
+                        "Test Artist",
+                        "image.url",
+                        "video.url"
+                ),
+                new DiaryBasicInfo(
+                        "Test content",
+                        scope
+                ),
+                new MusicPlayInfo(
+                        "30S",
+                        "PT2M58S",
+                        "PT1M1S",
+                        "PT1M31S"
+                )
         );
+
+        return new DiaryEntity(diaryInfo, user);
     }
 
     public static DiaryEntity makeDiaryEntityWithId(Long diaryId, UserEntity user) {

@@ -79,7 +79,7 @@ public class DiaryService {
     public DiaryEntity createDiary(Long userId, DiaryCreateRequest diaryRequest) {
         UserEntity foundUser = userLowService.getReferenceById(userId);
 
-        DiaryEntity diary = DiaryCreateRequest.toEntity(diaryRequest, foundUser);
+        DiaryEntity diary = diaryRequest.toEntity(foundUser);
 
         return diaryLowService.saveDiary(diary);
     }

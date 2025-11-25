@@ -42,9 +42,9 @@ public class DiaryEntity extends BaseTimeEntity {
     @Column(name = "diary_id")
     private Long id;
 
-    @Column(nullable = false, length = 255)
+    @Column(nullable = false)
     private String musicTitle;
-    @Column(nullable = false, length = 255)
+    @Column(nullable = false)
     private String artist;
     @Column(columnDefinition = "TEXT", nullable = false)
     private String albumImageUrl;
@@ -73,32 +73,11 @@ public class DiaryEntity extends BaseTimeEntity {
     private UserEntity user;
 
     public DiaryEntity(
-            String musicTitle,
-            String artist,
-            String albumImageUrl,
-            String videoUrl,
-            String content,
-            DiaryScope scope,
-            String duration,
-            String totalDuration,
-            String start,
-            String end,
+            DiaryInfo info,
             UserEntity user
     ) {
-        this(
-                null,
-                musicTitle,
-                artist,
-                albumImageUrl,
-                videoUrl,
-                content,
-                scope,
-                duration,
-                totalDuration,
-                start,
-                end,
-                user
-        );
+        this.user = user;
+        update(info);
     }
 
     public void validateOwner(UserEntity user) {
