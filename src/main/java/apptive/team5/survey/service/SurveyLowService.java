@@ -16,4 +16,8 @@ public class SurveyLowService {
     public SurveyEntity save(SurveyEntity surveyEntity) {
         return surveyRepository.save(surveyEntity);
     }
+
+    public void deleteByUserId(Long userId) {
+        surveyRepository.deleteByUserId(userId);
+    }
 }

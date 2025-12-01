@@ -14,6 +14,7 @@ import apptive.team5.jwt.dto.TokenResponse;
 import apptive.team5.jwt.service.JwtService;
 import apptive.team5.oauth2.dto.OAuth2Response;
 import apptive.team5.subscribe.service.SubscribeLowService;
+import apptive.team5.survey.service.SurveyLowService;
 import apptive.team5.user.domain.UserEntity;
 import apptive.team5.user.domain.UserRoleType;
 import apptive.team5.user.dto.UserResponse;
@@ -46,6 +47,7 @@ public class UserService {
     private final DiaryLowService diaryLowService;
     private final DiaryLikeLowService diaryLikeLowService;
     private final DiaryService diaryService;
+    private final SurveyLowService surveyLowService;
 
     public TokenResponse socialLogin(OAuth2Response oAuth2Response) {
         String identifier = oAuth2Response.getProvider() + "-" +oAuth2Response.getProviderId();
@@ -79,6 +81,7 @@ public class UserService {
 
         UserEntity findUser = userLowService.findById(userId);
 
+        surveyLowService.deleteByUserId(userId);
         subscribeLowService.deleteByUserId(userId);
         diaryLikeLowService.deleteByUserId(userId);
 
