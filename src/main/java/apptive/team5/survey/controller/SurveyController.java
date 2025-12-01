@@ -1,5 +1,7 @@
 package apptive.team5.survey.controller;
 
+import apptive.team5.mail.service.MailService;
+import apptive.team5.survey.domain.SurveyEntity;
 import apptive.team5.survey.dto.SurveyCreateRequestDto;
 import apptive.team5.survey.service.SurveyService;
 import jakarta.validation.Valid;
@@ -18,12 +20,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class SurveyController {
 
     private final SurveyService surveyService;
+    private final MailService mailService;
 
     @PostMapping
     public ResponseEntity<Void> createSurvey(@AuthenticationPrincipal Long userId,
                                              @Valid @RequestBody SurveyCreateRequestDto surveyCreateRequestDto) {
 
-        surveyService.save(surveyCreateRequestDto, userId);
+        SurveyEntity survey = surveyService.save(surveyCreateRequestDto, userId);
+        mailService.sendSurveyMailMessage(survey.getContent());
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
 
