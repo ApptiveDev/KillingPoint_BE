@@ -2,7 +2,6 @@ package apptive.team5.survey.service;
 
 import apptive.team5.survey.domain.SurveyEntity;
 import apptive.team5.survey.dto.SurveyCreateRequestDto;
-import apptive.team5.survey.repository.SurveyRepository;
 import apptive.team5.user.domain.UserEntity;
 import apptive.team5.user.service.UserLowService;
 import lombok.RequiredArgsConstructor;
