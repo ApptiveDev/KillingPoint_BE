@@ -14,12 +14,16 @@ import java.util.List;
 import java.util.Set;
 
 public interface DiaryRepository extends JpaRepository<DiaryEntity, Long> {
+
+    @Query("select d from DiaryEntity d where d.user = :user order by d.id desc")
     Page<DiaryEntity> findByUser(UserEntity user, Pageable pageable);
 
     List<DiaryEntity> findByUserId(Long userId);
 
+    @Query("select d from DiaryEntity d where d.user.id = :userId and d.scope in :scopes order by d.id desc")
     Page<DiaryEntity> findByUserIdAndScopeIn(Long userId, List<DiaryScope> scopes, Pageable pageable);
 
+    @Query("select d from DiaryEntity d where d.user.id = :userId and d.createDateTime between :start and :end order by d.id desc")
     List<DiaryEntity> findByUserIdAndCreateDateTimeBetween(Long userId, LocalDateTime start, LocalDateTime end);
 
     @Query("select count(d) from DiaryEntity d where d.user.id = :userId")
@@ -29,9 +33,6 @@ public interface DiaryRepository extends JpaRepository<DiaryEntity, Long> {
     @Modifying(clearAutomatically = true)
     void deleteByUserId(Long userId);
 
-    @Query("select d from DiaryEntity d where d.user.id in :userIds")
-    Page<DiaryEntity> findByUserIdsPage(Set<Long> userIds, Pageable pageable);
-
-    @Query("select d from DiaryEntity d join fetch d.user where d.user.id in :userIds and d.scope in :scopes")
+    @Query("select d from DiaryEntity d join fetch d.user where d.user.id in :userIds and d.scope in :scopes order by d.id desc")
     Page<DiaryEntity> findByUserIdsAndScopseWithUserPage(Set<Long> userIds, List<DiaryScope> scopes, Pageable pageable);
 }

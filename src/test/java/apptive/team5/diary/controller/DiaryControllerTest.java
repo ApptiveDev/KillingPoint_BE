@@ -81,7 +81,8 @@ public class DiaryControllerTest {
     @DisplayName("내 다이어리 목록 조회")
     void getMyMusicDiary() throws Exception {
         // given
-        DiaryEntity diary = diaryRepository.save(TestUtil.makeDiaryEntity(testUser));
+        DiaryEntity firstDiary = diaryRepository.save(TestUtil.makeDiaryEntity(testUser));
+        DiaryEntity secondDiary = diaryRepository.save(TestUtil.makeDiaryEntity(testUser));
 
         TestSecurityContextHolderInjection.inject(testUser.getId(), testUser.getRoleType());
 
@@ -106,13 +107,15 @@ public class DiaryControllerTest {
         MyDiaryResponseDto diaryResponse = content.getFirst();
 
         assertSoftly(softly-> {
-            softly.assertThat(content).hasSize(1);
-            softly.assertThat(diaryResponse.musicTitle()).isEqualTo(diary.getMusicTitle());
-            softly.assertThat(diaryResponse.artist()).isEqualTo(diary.getArtist());
-            softly.assertThat(diaryResponse.duration()).isEqualTo(diary.getDuration());
-            softly.assertThat(diaryResponse.totalDuration()).isEqualTo(diary.getTotalDuration());
-            softly.assertThat(diaryResponse.start()).isEqualTo(diary.getStart());
-            softly.assertThat(diaryResponse.end()).isEqualTo(diary.getEnd());
+            softly.assertThat(content).hasSize(2);
+            softly.assertThat(diaryResponse.diaryId()).isEqualTo(secondDiary.getId());
+            softly.assertThat(diaryResponse.musicTitle()).isEqualTo(secondDiary.getMusicTitle());
+            softly.assertThat(diaryResponse.artist()).isEqualTo(secondDiary.getArtist());
+            softly.assertThat(diaryResponse.duration()).isEqualTo(secondDiary.getDuration());
+            softly.assertThat(diaryResponse.totalDuration()).isEqualTo(secondDiary.getTotalDuration());
+            softly.assertThat(diaryResponse.start()).isEqualTo(secondDiary.getStart());
+            softly.assertThat(diaryResponse.end()).isEqualTo(secondDiary.getEnd());
+            softly.assertThat(content.getFirst().diaryId() > content.getLast().diaryId()).isTrue();
         });
     }
 
@@ -151,6 +154,7 @@ public class DiaryControllerTest {
         assertSoftly(softly -> {
             softly.assertThat(content).hasSize(2);
             softly.assertThat(responseMap.containsKey(privateDiary.getId())).isFalse();
+            softly.assertThat(content.getFirst().diaryId() > content.getLast().diaryId()).isTrue();
 
             // PUBLIC
             UserDiaryResponseDto publicResponse = responseMap.get(publicDiary.getId());
@@ -195,6 +199,7 @@ public class DiaryControllerTest {
         List<MyDiaryResponseDto> content = objectMapper.readValue(response, new TypeReference<>() {});
 
         assertSoftly(softly -> {
+            softly.assertThat(content.getFirst().diaryId() > content.getLast().diaryId()).isTrue();
             softly.assertThat(content).hasSize(2);
         });
     }
@@ -209,9 +214,11 @@ public class DiaryControllerTest {
         Subscribe subscribe = new Subscribe(testUser, subscribedToUser);
         subscribeRepository.save(subscribe);
 
+        DiaryEntity otherFeedDiary = diaryRepository.save(TestUtil.makeDiaryEntity(subscribedToUser));
+        // 좋아요 누를 다이어를 두 번째로 저장
+        DiaryEntity likedFeedDiary = diaryRepository.save(TestUtil.makeDiaryEntity(subscribedToUser));
         // 좋아요 누르기
-        DiaryEntity feedDiary = diaryRepository.save(TestUtil.makeDiaryEntity(subscribedToUser));
-        DiaryLikeEntity diaryLikeEntity = diaryLikeLowService.saveDiaryLike(new DiaryLikeEntity(testUser, feedDiary));
+        DiaryLikeEntity diaryLikeEntity = diaryLikeLowService.saveDiaryLike(new DiaryLikeEntity(testUser, likedFeedDiary));
 
         // 구독하지 않은 회원
         UserEntity otherUser = userRepository.save(TestUtil.makeDifferentUserEntity(subscribedToUser));
@@ -237,11 +244,12 @@ public class DiaryControllerTest {
         FeedDiaryResponseDto feedDiaryResponseDto = content.getFirst();
 
         assertSoftly(softly -> {
-            softly.assertThat(content).hasSize(1);
-            softly.assertThat(feedDiaryResponseDto.diaryId()).isEqualTo(feedDiary.getId());
+            softly.assertThat(content).hasSize(2);
+            softly.assertThat(feedDiaryResponseDto.diaryId()).isEqualTo(likedFeedDiary.getId());
             softly.assertThat(feedDiaryResponseDto.isLiked()).isTrue();
             softly.assertThat(feedDiaryResponseDto.likeCount()).isEqualTo(1L);
             softly.assertThat(feedDiaryResponseDto.userId()).isEqualTo(subscribedToUser.getId());
+            softly.assertThat(content.getFirst().diaryId() > content.getLast().diaryId()).isTrue();
         });
     }
 
