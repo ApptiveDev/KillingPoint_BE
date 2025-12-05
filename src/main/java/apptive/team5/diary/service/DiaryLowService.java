@@ -70,9 +70,6 @@ public class DiaryLowService {
         diaryRepository.deleteByUserId(userId);
     }
 
-    public Page<DiaryEntity> findByUserIds(Set<Long> userIds, Pageable pageable) {
-        return diaryRepository.findByUserIdsPage(userIds, pageable);
-    }
 
     public Page<DiaryEntity> findByUserIdsAndScopseWithUserPage(Set<Long> userIds, List<DiaryScope> scopes, Pageable pageable) {
         return diaryRepository.findByUserIdsAndScopseWithUserPage(userIds, scopes, pageable);
